@@ -1,0 +1,38 @@
+{
+  "version": 2,
+  "name": "kong-tattoo-care",
+  "functions": {
+    "api/create-checkout-session.js": { "maxDuration": 10 },
+    "api/webhook.js": { "maxDuration": 10 }
+  },
+  "routes": [
+    { "src": "/api/create-checkout-session", "dest": "/api/create-checkout-session.js" },
+    { "src": "/api/webhook",                 "dest": "/api/webhook.js" },
+    { "src": "/",                            "dest": "/index.html" },
+    { "src": "/shop",                        "dest": "/shop.html" },
+    { "src": "/about",                       "dest": "/about.html" },
+    { "src": "/blog",                        "dest": "/blog.html" },
+    { "src": "/login",                       "dest": "/login.html" },
+    { "src": "/account",                     "dest": "/account.html" },
+    { "src": "/checkout",                    "dest": "/checkout.html" },
+    { "src": "/checkout-success",            "dest": "/checkout-success.html" },
+    { "src": "/lang/(.*)",                   "dest": "/lang/$1" },
+    { "src": "/(.*)\\.html",                 "dest": "/$1.html" },
+    { "handle": "filesystem" },
+    { "src": "/(.*)",                        "dest": "/index.html" }
+  ],
+  "headers": [
+    {
+      "source": "/api/(.*)",
+      "headers": [{ "key": "Cache-Control", "value": "no-store" }]
+    },
+    {
+      "source": "/assets/(.*)",
+      "headers": [{ "key": "Cache-Control", "value": "public, max-age=31536000, immutable" }]
+    },
+    {
+      "source": "/(.*)\\.html",
+      "headers": [{ "key": "Cache-Control", "value": "public, max-age=3600, must-revalidate" }]
+    }
+  ]
+}
