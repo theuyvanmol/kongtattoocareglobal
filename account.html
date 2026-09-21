@@ -1,0 +1,323 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8"/>
+<meta name="viewport" content="width=device-width,initial-scale=1"/>
+<title>My Account | Kong Tattoo Care</title>
+<link rel="stylesheet" href="/assets/shared.css"/>
+<style>
+body::before{content:'';position:fixed;inset:0;z-index:0;pointer-events:none;
+  background:radial-gradient(ellipse 70% 50% at 10% 15%,rgba(20,178,110,.08) 0%,transparent 55%);}
+.account-wrap{position:relative;z-index:1;min-height:100vh;padding:100px 56px 80px;max-width:1200px;margin:0 auto}
+.account-header{display:flex;align-items:center;justify-content:space-between;margin-bottom:48px;flex-wrap:wrap;gap:16px}
+.account-greeting{}
+.account-greeting .sec-kicker{margin-bottom:8px}
+.account-greeting h1{font-family:'Bebas Neue',sans-serif;font-size:clamp(36px,5vw,60px);letter-spacing:.01em;line-height:.92}
+.account-tabs{display:flex;gap:4px;background:rgba(255,255,255,.06);border-radius:12px;padding:4px}
+.acc-tab{font-size:11px;font-weight:600;letter-spacing:.1em;text-transform:uppercase;padding:9px 20px;border-radius:9px;border:none;background:transparent;color:rgba(255,255,255,.45);cursor:pointer;transition:background .25s,color .25s}
+.acc-tab.active{background:rgba(255,255,255,.1);color:#fff}
+.acc-panel{display:none}
+.acc-panel.active{display:block}
+
+/* Overview cards */
+.overview-grid{display:grid;grid-template-columns:repeat(3,1fr);gap:16px;margin-bottom:40px}
+.ov-card{padding:28px;border-radius:18px;background:rgba(255,255,255,.04);border:1px solid rgba(255,255,255,.08);box-shadow:inset 0 1px 0 rgba(255,255,255,.09)}
+.ov-label{font-size:10px;font-weight:600;letter-spacing:.18em;text-transform:uppercase;color:rgba(255,255,255,.28);margin-bottom:8px}
+.ov-value{font-family:'Bebas Neue',sans-serif;font-size:40px;line-height:1;background:linear-gradient(135deg,#20b278,#38a4f8);-webkit-background-clip:text;-webkit-text-fill-color:transparent}
+.ov-sub{font-size:12px;color:rgba(255,255,255,.3);margin-top:4px}
+
+/* Orders */
+.orders-empty{padding:40px;text-align:center;color:rgba(255,255,255,.3);font-size:14px}
+.order-item{padding:20px;border-radius:14px;background:rgba(255,255,255,.04);border:1px solid rgba(255,255,255,.08);margin-bottom:12px;display:flex;align-items:center;justify-content:space-between;gap:16px;flex-wrap:wrap}
+.order-id{font-family:'Bebas Neue',sans-serif;font-size:18px;letter-spacing:.05em}
+.order-date,.order-items{font-size:12px;color:rgba(255,255,255,.35)}
+.order-total{font-family:'Bebas Neue',sans-serif;font-size:22px}
+.order-status{font-size:10px;font-weight:600;letter-spacing:.14em;text-transform:uppercase;padding:4px 12px;border-radius:100px;background:rgba(32,178,120,.15);color:#20b278}
+
+/* Reseller section */
+.reseller-section{padding:28px;border-radius:18px;background:rgba(32,178,120,.06);border:1px solid rgba(32,178,120,.15);margin-bottom:24px}
+.reseller-section h3{font-family:'Bebas Neue',sans-serif;font-size:22px;letter-spacing:.03em;margin-bottom:8px;color:#20b278}
+.reseller-section p{font-size:13px;color:rgba(255,255,255,.4);line-height:1.7;margin-bottom:16px}
+.wholesale-table{width:100%;border-collapse:collapse;font-size:13px}
+.wholesale-table th{text-align:left;font-size:10px;font-weight:700;letter-spacing:.15em;text-transform:uppercase;color:rgba(255,255,255,.3);padding:8px 0;border-bottom:1px solid rgba(255,255,255,.08)}
+.wholesale-table td{padding:12px 0;border-bottom:1px solid rgba(255,255,255,.05);color:rgba(255,255,255,.6)}
+.wholesale-table td:last-child,.wholesale-table th:last-child{text-align:right}
+.ws-price{font-family:'Bebas Neue',sans-serif;font-size:18px;color:#20b278}
+
+/* Profile form */
+.profile-form{max-width:480px}
+.logout-btn{background:rgba(224,85,112,.12);border:1px solid rgba(224,85,112,.2);color:#e05570;font-size:11px;font-weight:600;letter-spacing:.1em;text-transform:uppercase;padding:10px 22px;border-radius:10px;cursor:pointer;transition:background .2s}
+.logout-btn:hover{background:rgba(224,85,112,.2)}
+
+@media(max-width:768px){
+  .account-wrap{padding:90px 20px 60px}
+  .overview-grid{grid-template-columns:1fr 1fr}
+  .account-header{flex-direction:column;align-items:flex-start}
+  .account-tabs{flex-wrap:wrap}
+}
+</style>
+</head>
+<body>
+<nav id="nav">
+  <a href="/index.html" class="nav-logo">KONG<em>.</em></a>
+  <div class="nav-links">
+    <a href="/index.html">Home</a>
+    <a href="/shop.html">Shop</a>
+    <a href="/about.html">About</a>
+    <a href="/blog.html">Blog</a>
+    <a href="/login.html">Login</a>
+  </div>
+  <div class="nav-right">
+    <div class="nav-lang" id="lang-btn" onclick="toggleLang()">
+      <span id="lang-flag">🌐</span>
+      <span class="lang-label" id="lang-name">EN</span>
+      <svg width="10" height="6" viewBox="0 0 10 6" fill="none"><path d="M1 1l4 4 4-4" stroke="currentColor" stroke-width="1.5"/></svg>
+      <div class="lang-dropdown" id="lang-dropdown"></div>
+    </div>
+    <button class="nav-icon-btn" id="cart-btn" title="Cart" style="position:relative">
+      🛒
+      <span class="cart-badge" style="position:absolute;top:-4px;right:-4px;background:#20b278;color:#fff;font-size:9px;font-weight:700;width:16px;height:16px;border-radius:50%;display:none;align-items:center;justify-content:center">0</span>
+    </button>
+    <a href="/login.html"><button class="nav-icon-btn" title="Account">👤</button></a>
+    <button class="nav-cta" onclick="location.href='/shop.html'">Shop Now</button>
+  </div>
+  <button class="nav-ham" id="ham"><span></span><span></span><span></span></button>
+</nav>
+
+<div id="mob-nav">
+  <button id="mob-close">&#x2715;</button>
+  <a href="/index.html">Home</a>
+  <a href="/shop.html">Shop</a>
+  <a href="/about.html">About</a>
+  <a href="/blog.html">Blog</a>
+  <a href="/login.html">Login</a>
+  <button class="btn-grad" onclick="location.href='/shop.html'">Shop Now</button>
+</div>
+<div id="cart-sidebar">
+  <div class="cart-header">
+    <div class="cart-title">Your Cart</div>
+    <button class="cart-close" id="cart-close-btn">&#x2715;</button>
+  </div>
+  <div class="cart-items" id="cart-items"></div>
+  <div class="cart-footer">
+    <div class="cart-subtotal">
+      <span>Subtotal</span>
+      <strong id="cart-total">£0.00</strong>
+    </div>
+    <div style="font-size:11px;color:rgba(255,255,255,.28);margin-bottom:14px;text-align:center">Free UK delivery on orders over £30</div>
+    <button class="cart-checkout" onclick="alert('Checkout coming soon!')">Checkout &rarr;</button>
+  </div>
+</div>
+
+<div class="account-wrap" id="account-wrap" style="display:none">
+  <div class="account-header">
+    <div class="account-greeting">
+      <div class="sec-kicker">Welcome back</div>
+      <h1 id="acc-name">Loading...</h1>
+    </div>
+    <div style="display:flex;gap:10px;align-items:center">
+      <button class="logout-btn" onclick="logout()">Sign Out</button>
+    </div>
+  </div>
+
+  <div class="account-tabs" style="margin-bottom:36px">
+    <button class="acc-tab active" onclick="accTab('overview',this)">Overview</button>
+    <button class="acc-tab" onclick="accTab('orders',this)">Orders</button>
+    <button class="acc-tab" id="reseller-tab" onclick="accTab('reseller',this)" style="display:none">Reseller Portal</button>
+    <button class="acc-tab" onclick="accTab('profile',this)">Profile</button>
+  </div>
+
+  <!-- OVERVIEW -->
+  <div class="acc-panel active" id="panel-overview">
+    <div class="overview-grid">
+      <div class="ov-card">
+        <div class="ov-label">Total Orders</div>
+        <div class="ov-value" id="ov-orders">0</div>
+        <div class="ov-sub">Since joining</div>
+      </div>
+      <div class="ov-card">
+        <div class="ov-label">Cart Items</div>
+        <div class="ov-value" id="ov-cart">0</div>
+        <div class="ov-sub">Ready to checkout</div>
+      </div>
+      <div class="ov-card">
+        <div class="ov-label">Account Type</div>
+        <div class="ov-value" id="ov-type">Customer</div>
+        <div class="ov-sub" id="ov-since">Member</div>
+      </div>
+    </div>
+    <div style="display:flex;gap:12px;flex-wrap:wrap">
+      <button class="btn-grad" onclick="location.href='/shop.html'">Shop Now</button>
+      <button class="btn-glass" onclick="openCart()">View Cart</button>
+    </div>
+  </div>
+
+  <!-- ORDERS -->
+  <div class="acc-panel" id="panel-orders">
+    <div class="orders-empty" id="orders-empty">
+      <p style="font-size:32px;opacity:.3;margin-bottom:12px">📦</p>
+      <p>No orders yet.</p>
+      <button class="btn-grad" style="margin-top:20px" onclick="location.href='/shop.html'">Start Shopping</button>
+    </div>
+    <div id="orders-list"></div>
+  </div>
+
+  <!-- RESELLER PORTAL -->
+  <div class="acc-panel" id="panel-reseller">
+    <div class="reseller-section">
+      <h3>Reseller Dashboard</h3>
+      <p>Your wholesale pricing is active. Place orders through the shop — wholesale prices are applied automatically to your account.</p>
+      <button class="btn-grad" onclick="location.href='/shop.html'">Order Stock</button>
+    </div>
+    <div style="background:rgba(255,255,255,.04);border:1px solid rgba(255,255,255,.08);border-radius:18px;padding:28px">
+      <div style="font-size:11px;font-weight:700;letter-spacing:.18em;text-transform:uppercase;color:rgba(255,255,255,.3);margin-bottom:18px">Wholesale Price List</div>
+      <table class="wholesale-table">
+        <thead><tr><th>Product</th><th>RRP</th><th>Your Price</th></tr></thead>
+        <tbody>
+          <tr><td>KONG Rapid Spray 30ml</td><td style="color:rgba(255,255,255,.35)">£17.99</td><td><span class="ws-price">£9.89</span></td></tr>
+          <tr><td>KONG Rapid Cream 30g</td><td style="color:rgba(255,255,255,.35)">£12.99</td><td><span class="ws-price">£7.14</span></td></tr>
+          <tr><td>Foam Cleanser</td><td style="color:rgba(255,255,255,.35)">£13.19</td><td><span class="ws-price">£7.25</span></td></tr>
+          <tr><td>Tattoo Balm</td><td style="color:rgba(255,255,255,.35)">£17.99</td><td><span class="ws-price">£9.89</span></td></tr>
+          <tr><td>Tattoo Care Stick</td><td style="color:rgba(255,255,255,.35)">£14.39</td><td><span class="ws-price">£7.91</span></td></tr>
+          <tr><td>Care Stick Roll-On</td><td style="color:rgba(255,255,255,.35)">£12.79</td><td><span class="ws-price">£7.03</span></td></tr>
+          <tr><td>Tattoo Glide</td><td style="color:rgba(255,255,255,.35)">£15.99</td><td><span class="ws-price">£8.79</span></td></tr>
+          <tr><td>Renew Supreme Butter</td><td style="color:rgba(255,255,255,.35)">£18.00</td><td><span class="ws-price">£9.90</span></td></tr>
+          <tr><td>Defend Sun Lotion SPF50</td><td style="color:rgba(255,255,255,.35)">£19.19</td><td><span class="ws-price">£10.55</span></td></tr>
+        </tbody>
+      </table>
+    </div>
+  </div>
+
+  <!-- PROFILE -->
+  <div class="acc-panel" id="panel-profile">
+    <div class="profile-form">
+      <div class="form-group">
+        <label class="form-label">Full Name</label>
+        <input class="form-input" type="text" id="prof-name"/>
+      </div>
+      <div class="form-group">
+        <label class="form-label">Email Address</label>
+        <input class="form-input" type="email" id="prof-email"/>
+      </div>
+      <div class="form-group">
+        <label class="form-label">New Password (leave blank to keep current)</label>
+        <input class="form-input" type="password" id="prof-pass" placeholder="New password"/>
+      </div>
+      <div style="display:flex;gap:12px;margin-top:8px;flex-wrap:wrap">
+        <button class="btn-grad" onclick="saveProfile()">Save Changes</button>
+        <button class="logout-btn" onclick="logout()">Sign Out</button>
+      </div>
+      <div style="margin-top:16px;font-size:12px;color:rgba(32,178,120,.8);display:none" id="prof-saved">Changes saved.</div>
+    </div>
+  </div>
+
+</div>
+
+<footer id="footer">
+  <div class="ft">
+    <div class="ft-top">
+      <div>
+        <div class="ft-logo">KONG<em>.</em></div>
+        <p class="ft-p">Professional-grade tattoo aftercare made in the UK. Trusted by artists and collectors worldwide.</p>
+        <div class="ft-social">
+          <a class="ft-soc" href="#" title="Instagram">📸</a>
+          <a class="ft-soc" href="#" title="TikTok">🎵</a>
+          <a class="ft-soc" href="#" title="Facebook">💬</a>
+        </div>
+      </div>
+      <div>
+        <div class="ft-col-h">Shop</div>
+        <div class="ft-ls">
+          <a href="/shop.html">All Products</a>
+          <a href="/shop.html?col=numb">Numb Collection</a>
+          <a href="/shop.html?col=glow">Glow Collection</a>
+          <a href="/shop.html?col=renew">Renew Collection</a>
+          <a href="/shop.html?col=defend">Defend Collection</a>
+        </div>
+      </div>
+      <div>
+        <div class="ft-col-h">Company</div>
+        <div class="ft-ls">
+          <a href="/about.html">About Us</a>
+          <a href="/blog.html">Blog</a>
+          <a href="/login.html">Reseller Login</a>
+          <a href="/login.html">My Account</a>
+        </div>
+      </div>
+      <div>
+        <div class="ft-col-h">Help</div>
+        <div class="ft-ls">
+          <a href="#">How It Works</a>
+          <a href="#">Contact Us</a>
+          <a href="#">Returns Policy</a>
+          <a href="#">Aftercare Guide</a>
+        </div>
+      </div>
+      <div>
+        <div class="ft-col-h">Markets</div>
+        <div class="ft-ls">
+          <a href="/lang/sv.html">🇸🇪 Sweden</a>
+          <a href="/lang/no.html">🇳🇴 Norway</a>
+          <a href="/lang/de.html">🇩🇪 Germany</a>
+          <a href="/lang/nl.html">🇳🇱 Netherlands</a>
+          <a href="/lang/ru.html">🇷🇺 Russia</a>
+        </div>
+      </div>
+    </div>
+    <div class="ft-bottom">
+      <span>&copy; 2026 Kong Tattoo Care. All rights reserved.</span>
+      <div class="ft-bl">
+        <a href="#">Privacy Policy</a>
+        <a href="#">Terms of Service</a>
+        <a href="#">Cookie Policy</a>
+      </div>
+    </div>
+  </div>
+</footer>
+
+<script src="/assets/shared.js"></script>
+<script>
+buildLangDropdown('en');
+document.getElementById('lang-flag').textContent='🇬🇧';
+document.getElementById('lang-name').textContent='EN';
+
+var cu = JSON.parse(localStorage.getItem('kong_current_user')||'null');
+if(!cu){ location.href='/login.html'; }
+else {
+  document.getElementById('account-wrap').style.display='block';
+  document.getElementById('acc-name').textContent=cu.name||'My Account';
+  document.getElementById('ov-orders').textContent='0';
+  document.getElementById('ov-cart').textContent=JSON.parse(localStorage.getItem('kong_cart')||'[]').reduce(function(s,i){return s+i.qty;},0);
+  document.getElementById('ov-type').textContent=cu.isReseller?'Reseller':'Customer';
+  document.getElementById('ov-since').textContent=cu.created?'Since '+new Date(cu.created).getFullYear():'Member';
+  if(cu.isReseller){document.getElementById('reseller-tab').style.display='';}
+  document.getElementById('prof-name').value=cu.name||'';
+  document.getElementById('prof-email').value=cu.email||'';
+}
+
+function accTab(tab,btn){
+  document.querySelectorAll('.acc-tab').forEach(function(b){b.classList.remove('active');});
+  document.querySelectorAll('.acc-panel').forEach(function(p){p.classList.remove('active');});
+  if(btn)btn.classList.add('active');
+  document.getElementById('panel-'+tab).classList.add('active');
+}
+
+function saveProfile(){
+  if(!cu)return;
+  cu.name=document.getElementById('prof-name').value;
+  cu.email=document.getElementById('prof-email').value;
+  var newPass=document.getElementById('prof-pass').value;
+  if(newPass.length>=8)cu.pass=newPass;
+  localStorage.setItem('kong_current_user',JSON.stringify(cu));
+  document.getElementById('prof-saved').style.display='block';
+  document.getElementById('acc-name').textContent=cu.name;
+  setTimeout(function(){document.getElementById('prof-saved').style.display='none';},3000);
+}
+
+function logout(){
+  localStorage.removeItem('kong_current_user');
+  location.href='/login.html';
+}
+</script>
+</body>
+</html>

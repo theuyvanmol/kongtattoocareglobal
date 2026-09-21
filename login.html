@@ -1,0 +1,405 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8"/>
+<meta name="viewport" content="width=device-width,initial-scale=1"/>
+<title>Login | Kong Tattoo Care</title>
+<link rel="stylesheet" href="/assets/shared.css"/>
+<style>
+body::before{content:'';position:fixed;inset:0;z-index:0;pointer-events:none;
+  background:radial-gradient(ellipse 70% 50% at 10% 15%,rgba(20,178,110,.1) 0%,transparent 55%),
+             radial-gradient(ellipse 60% 50% at 90% 80%,rgba(40,120,240,.08) 0%,transparent 55%);}
+
+.login-wrap{
+  position:relative;z-index:1;min-height:100vh;
+  display:flex;align-items:center;justify-content:center;
+  padding:80px 24px;
+}
+.login-box{
+  width:100%;max-width:480px;
+  background:rgba(255,255,255,.05);
+  backdrop-filter:blur(32px) saturate(180%);
+  border:1px solid rgba(255,255,255,.1);
+  border-radius:28px;
+  padding:48px 44px;
+  box-shadow:inset 0 1px 0 rgba(255,255,255,.13),0 24px 64px rgba(0,0,0,.3);
+}
+.login-logo{
+  font-family:'Bebas Neue',sans-serif;font-size:26px;letter-spacing:.12em;
+  text-align:center;margin-bottom:32px;
+}
+.login-logo em{font-style:normal;background:linear-gradient(135deg,#20b278,#38a4f8);-webkit-background-clip:text;-webkit-text-fill-color:transparent}
+.login-tabs{
+  display:flex;gap:0;margin-bottom:32px;
+  background:rgba(255,255,255,.06);border-radius:12px;padding:4px;
+}
+.login-tab{
+  flex:1;padding:10px;border-radius:9px;
+  font-size:11px;font-weight:600;letter-spacing:.1em;text-transform:uppercase;
+  color:rgba(255,255,255,.45);background:transparent;border:none;
+  transition:background .25s,color .25s;cursor:pointer;
+}
+.login-tab.active{background:rgba(255,255,255,.1);color:#fff}
+.login-panel{display:none}
+.login-panel.active{display:block}
+.reseller-badge{
+  display:flex;align-items:center;gap:10px;
+  padding:12px 16px;border-radius:12px;margin-bottom:24px;
+  background:rgba(32,178,120,.1);border:1px solid rgba(32,178,120,.2);
+}
+.reseller-badge-icon{font-size:20px}
+.reseller-badge-text{font-size:12px;color:rgba(255,255,255,.6);line-height:1.5}
+.reseller-badge-text strong{color:#20b278;display:block;font-size:12px;margin-bottom:2px}
+.login-divider{
+  display:flex;align-items:center;gap:12px;
+  margin:24px 0;font-size:11px;color:rgba(255,255,255,.25);
+}
+.login-divider::before,.login-divider::after{content:'';flex:1;height:1px;background:rgba(255,255,255,.1)}
+.login-links{display:flex;justify-content:space-between;margin-top:20px;font-size:12px}
+.login-links a{color:rgba(255,255,255,.4);transition:color .2s}
+.login-links a:hover{color:#20b278}
+.register-panel .form-group{margin-bottom:14px}
+.benefits-list{
+  padding:20px;border-radius:14px;
+  background:rgba(32,178,120,.06);border:1px solid rgba(32,178,120,.15);
+  margin-bottom:22px;
+}
+.benefits-list h4{font-size:11px;font-weight:700;letter-spacing:.15em;text-transform:uppercase;color:#20b278;margin-bottom:12px}
+.benefits-list li{font-size:12.5px;color:rgba(255,255,255,.5);line-height:1.8;padding-left:14px;position:relative}
+.benefits-list li::before{content:'✓';position:absolute;left:0;color:#20b278;font-size:10px}
+.submit-btn{
+  width:100%;padding:15px;border-radius:12px;border:none;
+  background:linear-gradient(135deg,#20b278,#38a4f8);color:#fff;
+  font-size:12px;font-weight:600;letter-spacing:.1em;text-transform:uppercase;
+  box-shadow:0 4px 20px rgba(32,178,120,.4);
+  transition:opacity .2s,transform .15s;cursor:pointer;
+}
+.submit-btn:hover{opacity:.88;transform:translateY(-1px)}
+.error-msg{
+  display:none;padding:10px 14px;border-radius:10px;margin-bottom:16px;
+  background:rgba(224,85,112,.1);border:1px solid rgba(224,85,112,.3);
+  font-size:12px;color:#e05570;
+}
+.success-msg{
+  display:none;padding:10px 14px;border-radius:10px;margin-bottom:16px;
+  background:rgba(32,178,120,.1);border:1px solid rgba(32,178,120,.3);
+  font-size:12px;color:#20b278;
+}
+</style>
+</head>
+<body>
+<nav id="nav">
+  <a href="/index.html" class="nav-logo">KONG<em>.</em></a>
+  <div class="nav-links">
+    <a href="/index.html">Home</a>
+    <a href="/shop.html">Shop</a>
+    <a href="/about.html">About</a>
+    <a href="/blog.html">Blog</a>
+    <a href="/login.html">Login</a>
+  </div>
+  <div class="nav-right">
+    <div class="nav-lang" id="lang-btn" onclick="toggleLang()">
+      <span id="lang-flag">🌐</span>
+      <span class="lang-label" id="lang-name">EN</span>
+      <svg width="10" height="6" viewBox="0 0 10 6" fill="none"><path d="M1 1l4 4 4-4" stroke="currentColor" stroke-width="1.5"/></svg>
+      <div class="lang-dropdown" id="lang-dropdown"></div>
+    </div>
+    <button class="nav-icon-btn" id="cart-btn" title="Cart" style="position:relative">
+      🛒
+      <span class="cart-badge" style="position:absolute;top:-4px;right:-4px;background:#20b278;color:#fff;font-size:9px;font-weight:700;width:16px;height:16px;border-radius:50%;display:none;align-items:center;justify-content:center">0</span>
+    </button>
+    <a href="/login.html"><button class="nav-icon-btn" title="Account">👤</button></a>
+    <button class="nav-cta" onclick="location.href='/shop.html'">Shop Now</button>
+  </div>
+  <button class="nav-ham" id="ham"><span></span><span></span><span></span></button>
+</nav>
+
+<div id="mob-nav">
+  <button id="mob-close">&#x2715;</button>
+  <a href="/index.html">Home</a>
+  <a href="/shop.html">Shop</a>
+  <a href="/about.html">About</a>
+  <a href="/blog.html">Blog</a>
+  <a href="/login.html">Login</a>
+  <button class="btn-grad" onclick="location.href='/shop.html'">Shop Now</button>
+</div>
+
+<div class="login-wrap">
+  <div class="login-box">
+    <div class="login-logo">KONG<em>.</em></div>
+
+    <div class="login-tabs">
+      <button class="login-tab active" onclick="switchTab('customer',this)">Customer</button>
+      <button class="login-tab" onclick="switchTab('reseller',this)">Reseller</button>
+      <button class="login-tab" onclick="switchTab('register',this)">Register</button>
+    </div>
+
+    <!-- CUSTOMER LOGIN -->
+    <div class="login-panel active" id="panel-customer">
+      <div class="error-msg" id="cust-error">Incorrect email or password.</div>
+      <div class="success-msg" id="cust-success">Logged in successfully! Redirecting...</div>
+      <div class="form-group">
+        <label class="form-label">Email Address</label>
+        <input class="form-input" type="email" id="cust-email" placeholder="you@example.com"/>
+      </div>
+      <div class="form-group">
+        <label class="form-label">Password</label>
+        <input class="form-input" type="password" id="cust-pass" placeholder="Your password"/>
+      </div>
+      <button class="submit-btn" onclick="loginCustomer()">Sign In</button>
+      <div class="login-links">
+        <a href="#">Forgot password?</a>
+        <a href="#" onclick="switchTab('register',null)">Create account</a>
+      </div>
+    </div>
+
+    <!-- RESELLER LOGIN -->
+    <div class="login-panel" id="panel-reseller">
+      <div class="reseller-badge">
+        <span class="reseller-badge-icon">🏪</span>
+        <div class="reseller-badge-text">
+          <strong>Reseller Portal</strong>
+          Wholesale pricing, studio tools, and account management for approved resellers.
+        </div>
+      </div>
+      <div class="error-msg" id="res-error">Reseller account not found or not yet approved.</div>
+      <div class="success-msg" id="res-success">Welcome back! Loading your reseller dashboard...</div>
+      <div class="form-group">
+        <label class="form-label">Business Email</label>
+        <input class="form-input" type="email" id="res-email" placeholder="studio@example.com"/>
+      </div>
+      <div class="form-group">
+        <label class="form-label">Password</label>
+        <input class="form-input" type="password" id="res-pass" placeholder="Your password"/>
+      </div>
+      <button class="submit-btn" onclick="loginReseller()">Sign In to Reseller Portal</button>
+      <div class="login-links">
+        <a href="#">Forgot password?</a>
+        <a href="#" onclick="switchTab('register',null)">Apply as Reseller</a>
+      </div>
+    </div>
+
+    <!-- REGISTER -->
+    <div class="login-panel register-panel" id="panel-register">
+      <div id="reg-type-toggle" style="display:flex;gap:8px;margin-bottom:20px">
+        <button class="filter-btn active" id="reg-cust-btn" onclick="setRegType('customer',this)" style="flex:1;padding:9px;border-radius:10px;border:none;font-size:11px;font-weight:600;letter-spacing:.08em;text-transform:uppercase;background:rgba(255,255,255,.08);color:#fff;cursor:pointer">Customer</button>
+        <button class="filter-btn" id="reg-res-btn" onclick="setRegType('reseller',this)" style="flex:1;padding:9px;border-radius:10px;border:none;font-size:11px;font-weight:600;letter-spacing:.08em;text-transform:uppercase;background:rgba(255,255,255,.04);color:rgba(255,255,255,.45);cursor:pointer">Reseller</button>
+      </div>
+
+      <div id="reseller-fields" style="display:none">
+        <div class="benefits-list">
+          <h4>Reseller Benefits</h4>
+          <ul>
+            <li>Wholesale pricing (40–45% below RRP)</li>
+            <li>Co-branded aftercare cards</li>
+            <li>Dedicated account manager</li>
+            <li>Kong Studio Finder listing</li>
+            <li>Early access to new products</li>
+          </ul>
+        </div>
+        <div class="form-group">
+          <label class="form-label">Studio / Business Name</label>
+          <input class="form-input" type="text" id="reg-biz" placeholder="Your studio name"/>
+        </div>
+        <div class="form-group">
+          <label class="form-label">Studio Website or Instagram</label>
+          <input class="form-input" type="text" id="reg-website" placeholder="https:// or @handle"/>
+        </div>
+        <div class="form-group">
+          <label class="form-label">Country</label>
+          <select class="form-select" id="reg-country">
+            <option value="">Select country</option>
+            <option>United Kingdom</option>
+            <option>Sweden</option>
+            <option>Finland</option>
+            <option>Norway</option>
+            <option>Netherlands</option>
+            <option>Germany</option>
+            <option>Portugal</option>
+            <option>Czech Republic</option>
+            <option>Russia</option>
+            <option>Kazakhstan</option>
+            <option>Serbia</option>
+            <option>Croatia</option>
+            <option>Bosnia</option>
+            <option>Thailand</option>
+            <option>Other</option>
+          </select>
+        </div>
+      </div>
+
+      <div class="form-group">
+        <label class="form-label">Full Name</label>
+        <input class="form-input" type="text" id="reg-name" placeholder="Your full name"/>
+      </div>
+      <div class="form-group">
+        <label class="form-label">Email Address</label>
+        <input class="form-input" type="email" id="reg-email" placeholder="you@example.com"/>
+      </div>
+      <div class="form-group">
+        <label class="form-label">Password</label>
+        <input class="form-input" type="password" id="reg-pass" placeholder="Min. 8 characters"/>
+      </div>
+      <div class="error-msg" id="reg-error">Please fill in all required fields.</div>
+      <div class="success-msg" id="reg-success">Account created! Check your email to verify.</div>
+      <button class="submit-btn" onclick="registerAccount()">Create Account</button>
+      <div class="login-links" style="justify-content:center">
+        <a href="#" onclick="switchTab('customer',null)">Already have an account? Sign in</a>
+      </div>
+    </div>
+
+  </div>
+</div>
+
+<footer id="footer">
+  <div class="ft">
+    <div class="ft-top">
+      <div>
+        <div class="ft-logo">KONG<em>.</em></div>
+        <p class="ft-p">Professional-grade tattoo aftercare made in the UK. Trusted by artists and collectors worldwide.</p>
+        <div class="ft-social">
+          <a class="ft-soc" href="#" title="Instagram">📸</a>
+          <a class="ft-soc" href="#" title="TikTok">🎵</a>
+          <a class="ft-soc" href="#" title="Facebook">💬</a>
+        </div>
+      </div>
+      <div>
+        <div class="ft-col-h">Shop</div>
+        <div class="ft-ls">
+          <a href="/shop.html">All Products</a>
+          <a href="/shop.html?col=numb">Numb Collection</a>
+          <a href="/shop.html?col=glow">Glow Collection</a>
+          <a href="/shop.html?col=renew">Renew Collection</a>
+          <a href="/shop.html?col=defend">Defend Collection</a>
+        </div>
+      </div>
+      <div>
+        <div class="ft-col-h">Company</div>
+        <div class="ft-ls">
+          <a href="/about.html">About Us</a>
+          <a href="/blog.html">Blog</a>
+          <a href="/login.html">Reseller Login</a>
+          <a href="/login.html">My Account</a>
+        </div>
+      </div>
+      <div>
+        <div class="ft-col-h">Help</div>
+        <div class="ft-ls">
+          <a href="#">How It Works</a>
+          <a href="#">Contact Us</a>
+          <a href="#">Returns Policy</a>
+          <a href="#">Aftercare Guide</a>
+        </div>
+      </div>
+      <div>
+        <div class="ft-col-h">Markets</div>
+        <div class="ft-ls">
+          <a href="/lang/sv.html">🇸🇪 Sweden</a>
+          <a href="/lang/no.html">🇳🇴 Norway</a>
+          <a href="/lang/de.html">🇩🇪 Germany</a>
+          <a href="/lang/nl.html">🇳🇱 Netherlands</a>
+          <a href="/lang/ru.html">🇷🇺 Russia</a>
+        </div>
+      </div>
+    </div>
+    <div class="ft-bottom">
+      <span>&copy; 2026 Kong Tattoo Care. All rights reserved.</span>
+      <div class="ft-bl">
+        <a href="#">Privacy Policy</a>
+        <a href="#">Terms of Service</a>
+        <a href="#">Cookie Policy</a>
+      </div>
+    </div>
+  </div>
+</footer>
+
+<script src="/assets/shared.js"></script>
+<script>
+buildLangDropdown('en');
+document.getElementById('lang-flag').textContent='🇬🇧';
+document.getElementById('lang-name').textContent='EN';
+
+// Simple in-memory user store (demo)
+var USERS = JSON.parse(localStorage.getItem('kong_users') || '[]');
+var RESELLERS = JSON.parse(localStorage.getItem('kong_resellers') || '[]');
+
+function switchTab(tab, btn){
+  document.querySelectorAll('.login-tab').forEach(function(b){b.classList.remove('active');});
+  document.querySelectorAll('.login-panel').forEach(function(p){p.classList.remove('active');});
+  if(btn) btn.classList.add('active');
+  else document.querySelectorAll('.login-tab').forEach(function(b,i){
+    if(i===(tab==='customer'?0:tab==='reseller'?1:2)) b.classList.add('active');
+  });
+  document.getElementById('panel-'+tab).classList.add('active');
+}
+
+var regType='customer';
+function setRegType(type, btn){
+  regType=type;
+  document.querySelectorAll('#reg-type-toggle button').forEach(function(b){
+    b.style.background='rgba(255,255,255,.04)';b.style.color='rgba(255,255,255,.45)';
+  });
+  btn.style.background='rgba(255,255,255,.12)';btn.style.color='#fff';
+  document.getElementById('reseller-fields').style.display=type==='reseller'?'block':'none';
+}
+
+function showError(id){document.getElementById(id).style.display='block';}
+function hideError(id){document.getElementById(id).style.display='none';}
+function showSuccess(id){document.getElementById(id).style.display='block';}
+
+function loginCustomer(){
+  var email=document.getElementById('cust-email').value.trim();
+  var pass=document.getElementById('cust-pass').value;
+  hideError('cust-error');
+  if(!email||!pass){showError('cust-error');return;}
+  var user=USERS.find(function(u){return u.email===email&&u.pass===pass;});
+  if(!user){showError('cust-error');return;}
+  localStorage.setItem('kong_current_user', JSON.stringify(user));
+  showSuccess('cust-success');
+  setTimeout(function(){location.href='/account.html';},1200);
+}
+
+function loginReseller(){
+  var email=document.getElementById('res-email').value.trim();
+  var pass=document.getElementById('res-pass').value;
+  hideError('res-error');
+  if(!email||!pass){showError('res-error');return;}
+  var res=RESELLERS.find(function(r){return r.email===email&&r.pass===pass;});
+  if(!res){showError('res-error');return;}
+  localStorage.setItem('kong_current_user', JSON.stringify(Object.assign({isReseller:true},res)));
+  showSuccess('res-success');
+  setTimeout(function(){location.href='/account.html';},1200);
+}
+
+function registerAccount(){
+  hideError('reg-error');
+  var name=document.getElementById('reg-name').value.trim();
+  var email=document.getElementById('reg-email').value.trim();
+  var pass=document.getElementById('reg-pass').value;
+  if(!name||!email||pass.length<8){showError('reg-error');return;}
+  var user={name:name,email:email,pass:pass,isReseller:regType==='reseller',created:new Date().toISOString()};
+  if(regType==='reseller'){
+    user.biz=document.getElementById('reg-biz').value.trim();
+    user.website=document.getElementById('reg-website').value.trim();
+    user.country=document.getElementById('reg-country').value;
+    user.approved=false;
+    RESELLERS.push(user);
+    localStorage.setItem('kong_resellers',JSON.stringify(RESELLERS));
+    document.getElementById('reg-success').textContent='Reseller application submitted! We review within 48 hours.';
+  } else {
+    USERS.push(user);
+    localStorage.setItem('kong_users',JSON.stringify(USERS));
+  }
+  showSuccess('reg-success');
+  if(regType!=='reseller'){
+    localStorage.setItem('kong_current_user',JSON.stringify(user));
+    setTimeout(function(){location.href='/account.html';},1400);
+  }
+}
+
+// Check if already logged in
+var cu=JSON.parse(localStorage.getItem('kong_current_user')||'null');
+if(cu) location.href='/account.html';
+</script>
+</body>
+</html>

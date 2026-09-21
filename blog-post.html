@@ -1,0 +1,290 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8"/>
+<meta name="viewport" content="width=device-width,initial-scale=1"/>
+<title>Blog | Kong Tattoo Care</title>
+<link rel="stylesheet" href="/assets/shared.css"/>
+<style>
+body::before{content:'';position:fixed;inset:0;z-index:0;pointer-events:none;
+  background:radial-gradient(ellipse 70% 50% at 15% 20%,rgba(20,178,110,.08) 0%,transparent 55%);}
+.post-hero{padding:120px 56px 48px;position:relative;z-index:1;background:linear-gradient(180deg,#07090e 0%,#080a14 100%);max-width:900px}
+.post-cat{font-size:10px;font-weight:700;letter-spacing:.22em;text-transform:uppercase;color:#20b278;margin-bottom:14px}
+.post-title{font-family:'Bebas Neue',sans-serif;font-size:clamp(40px,6vw,80px);letter-spacing:.01em;line-height:.9;margin-bottom:18px}
+.post-meta{font-size:12px;color:rgba(255,255,255,.3);display:flex;gap:16px;flex-wrap:wrap}
+.post-body{position:relative;z-index:1;max-width:740px;margin:0 auto;padding:48px 56px 100px}
+.post-body p{font-size:15px;color:rgba(255,255,255,.62);line-height:1.9;margin-bottom:22px;font-weight:300}
+.post-body h2{font-family:'Bebas Neue',sans-serif;font-size:clamp(24px,3vw,38px);letter-spacing:.02em;margin:36px 0 14px}
+.post-body strong{color:rgba(255,255,255,.82);font-weight:600}
+.post-body ul{padding-left:20px;margin-bottom:22px}
+.post-body ul li{font-size:15px;color:rgba(255,255,255,.58);line-height:1.8;margin-bottom:8px;font-weight:300}
+.post-nav{position:relative;z-index:1;padding:0 56px 80px;display:flex;gap:16px;align-items:center;justify-content:space-between}
+@media(max-width:768px){
+  .post-hero{padding:100px 20px 40px}
+  .post-body{padding:32px 20px 64px}
+  .post-nav{padding:0 20px 60px}
+}
+</style>
+</head>
+<body>
+<nav id="nav">
+  <a href="/index.html" class="nav-logo">KONG<em>.</em></a>
+  <div class="nav-links">
+    <a href="/index.html">Home</a>
+    <a href="/shop.html">Shop</a>
+    <a href="/about.html">About</a>
+    <a href="/blog.html">Blog</a>
+    <a href="/login.html">Login</a>
+  </div>
+  <div class="nav-right">
+    <div class="nav-lang" id="lang-btn" onclick="toggleLang()">
+      <span id="lang-flag">🌐</span>
+      <span class="lang-label" id="lang-name">EN</span>
+      <svg width="10" height="6" viewBox="0 0 10 6" fill="none"><path d="M1 1l4 4 4-4" stroke="currentColor" stroke-width="1.5"/></svg>
+      <div class="lang-dropdown" id="lang-dropdown"></div>
+    </div>
+    <button class="nav-icon-btn" id="cart-btn" title="Cart" style="position:relative">
+      🛒
+      <span class="cart-badge" style="position:absolute;top:-4px;right:-4px;background:#20b278;color:#fff;font-size:9px;font-weight:700;width:16px;height:16px;border-radius:50%;display:none;align-items:center;justify-content:center">0</span>
+    </button>
+    <a href="/login.html"><button class="nav-icon-btn" title="Account">👤</button></a>
+    <button class="nav-cta" onclick="location.href='/shop.html'">Shop Now</button>
+  </div>
+  <button class="nav-ham" id="ham"><span></span><span></span><span></span></button>
+</nav>
+
+<div id="mob-nav">
+  <button id="mob-close">&#x2715;</button>
+  <a href="/index.html">Home</a>
+  <a href="/shop.html">Shop</a>
+  <a href="/about.html">About</a>
+  <a href="/blog.html">Blog</a>
+  <a href="/login.html">Login</a>
+  <button class="btn-grad" onclick="location.href='/shop.html'">Shop Now</button>
+</div>
+<div id="cart-sidebar">
+  <div class="cart-header">
+    <div class="cart-title">Your Cart</div>
+    <button class="cart-close" id="cart-close-btn">&#x2715;</button>
+  </div>
+  <div class="cart-items" id="cart-items"></div>
+  <div class="cart-footer">
+    <div class="cart-subtotal">
+      <span>Subtotal</span>
+      <strong id="cart-total">£0.00</strong>
+    </div>
+    <div style="font-size:11px;color:rgba(255,255,255,.28);margin-bottom:14px;text-align:center">Free UK delivery on orders over £30</div>
+    <button class="cart-checkout" onclick="alert('Checkout coming soon!')">Checkout &rarr;</button>
+  </div>
+</div>
+
+<div class="post-hero" id="post-hero">
+  <div class="post-cat" id="post-cat">Aftercare</div>
+  <h1 class="post-title" id="post-title">Loading...</h1>
+  <div class="post-meta">
+    <span id="post-date"></span>
+    <span id="post-author"></span>
+    <span id="post-read"></span>
+  </div>
+</div>
+
+<div class="post-body" id="post-body"></div>
+
+<div class="post-nav">
+  <a href="/blog.html" class="btn-glass">&larr; Back to Blog</a>
+  <button class="btn-grad" onclick="location.href='/shop.html'">Shop Kong Products</button>
+</div>
+
+<footer id="footer">
+  <div class="ft">
+    <div class="ft-top">
+      <div>
+        <div class="ft-logo">KONG<em>.</em></div>
+        <p class="ft-p">Professional-grade tattoo aftercare made in the UK. Trusted by artists and collectors worldwide.</p>
+        <div class="ft-social">
+          <a class="ft-soc" href="#" title="Instagram">📸</a>
+          <a class="ft-soc" href="#" title="TikTok">🎵</a>
+          <a class="ft-soc" href="#" title="Facebook">💬</a>
+        </div>
+      </div>
+      <div>
+        <div class="ft-col-h">Shop</div>
+        <div class="ft-ls">
+          <a href="/shop.html">All Products</a>
+          <a href="/shop.html?col=numb">Numb Collection</a>
+          <a href="/shop.html?col=glow">Glow Collection</a>
+          <a href="/shop.html?col=renew">Renew Collection</a>
+          <a href="/shop.html?col=defend">Defend Collection</a>
+        </div>
+      </div>
+      <div>
+        <div class="ft-col-h">Company</div>
+        <div class="ft-ls">
+          <a href="/about.html">About Us</a>
+          <a href="/blog.html">Blog</a>
+          <a href="/login.html">Reseller Login</a>
+          <a href="/login.html">My Account</a>
+        </div>
+      </div>
+      <div>
+        <div class="ft-col-h">Help</div>
+        <div class="ft-ls">
+          <a href="#">How It Works</a>
+          <a href="#">Contact Us</a>
+          <a href="#">Returns Policy</a>
+          <a href="#">Aftercare Guide</a>
+        </div>
+      </div>
+      <div>
+        <div class="ft-col-h">Markets</div>
+        <div class="ft-ls">
+          <a href="/lang/sv.html">🇸🇪 Sweden</a>
+          <a href="/lang/no.html">🇳🇴 Norway</a>
+          <a href="/lang/de.html">🇩🇪 Germany</a>
+          <a href="/lang/nl.html">🇳🇱 Netherlands</a>
+          <a href="/lang/ru.html">🇷🇺 Russia</a>
+        </div>
+      </div>
+    </div>
+    <div class="ft-bottom">
+      <span>&copy; 2026 Kong Tattoo Care. All rights reserved.</span>
+      <div class="ft-bl">
+        <a href="#">Privacy Policy</a>
+        <a href="#">Terms of Service</a>
+        <a href="#">Cookie Policy</a>
+      </div>
+    </div>
+  </div>
+</footer>
+
+<script src="/assets/shared.js"></script>
+<script>
+var BLOG_POSTS = {
+  "tattoo-healing-stages":{title:'The 5 Stages of Tattoo Healing (And How to Handle Each One)',date:'September 14, 2026',author:'Kong Team',category:'Aftercare',read:'6 min read',excerpt:"Understanding the healing process is the key to protecting your investment. Here's exactly what to expect week by week, and which Kong products help at each stage.",body:`<p>Getting a tattoo is just the beginning. What happens in the weeks after determines how your ink looks for years to come. Understanding the five stages of healing helps you give your skin exactly what it needs — and avoid the mistakes that cause fading, scarring, and patchy colour.</p>
+
+<h2>Stage 1: Days 1–3 — The Open Wound Phase</h2>
+<p>Your fresh tattoo is essentially an open wound. The skin is inflamed, may ooze plasma and ink, and feels hot to the touch. This is completely normal. Your immune system has immediately begun the repair process.</p>
+<p><strong>What to do:</strong> Keep it clean. Wash with Kong Foam Cleanser twice daily using lukewarm water — never hot. Pat completely dry (never rub) and apply a thin layer of Kong Tattoo Balm. Avoid plastic wrap after the first 24 hours unless your artist specifically advises otherwise.</p>
+<p><strong>What to avoid:</strong> Swimming, direct sunlight, tight clothing over the area, and anything scented.</p>
+
+<h2>Stage 2: Days 4–7 — The Intense Itch</h2>
+<p>As the skin begins to repair itself, the surface layers start to dry out and harden slightly. This triggers the notorious tattoo itch. Do not scratch. Gently slapping the area to relieve the itch is fine — scratching damages the forming skin and can pull out ink.</p>
+<p><strong>What to do:</strong> Continue twice-daily cleansing. Apply Kong Tattoo Balm more frequently if the itch is intense — 3 to 4 times a day. The balm's conditioning ingredients calm inflammation and reduce the urge to scratch.</p>
+
+<h2>Stage 3: Days 7–14 — Peeling</h2>
+<p>This is the stage that alarms most people. The outer layer of skin peels away, sometimes taking what looks like coloured flakes with it. This is completely normal and does not mean your tattoo is ruined. The ink is deep in the dermis layer — the surface skin peeling away is expected.</p>
+<p><strong>What to do:</strong> Never pick or peel. Let it come off naturally. Switch to Kong Aftercare Lotion as your primary product — it's lighter than the balm and ideal for this stage. The lightweight formula hydrates without suffocating the peeling skin.</p>
+
+<h2>Stage 4: Weeks 2–4 — The Dull Period</h2>
+<p>Once the peeling stops, your tattoo will look dull, slightly grey, or cloudy. A thin layer of new skin has formed over the ink. This is normal and temporary. Most people panic here, thinking the colour has been lost. It hasn't.</p>
+<p><strong>What to do:</strong> Keep moisturising daily with Aftercare Lotion. Stay out of direct sun. The new skin layer will thin and clarify over the next few weeks, and your colours will return.</p>
+
+<h2>Stage 5: Month 2–3 — Full Surface Healing</h2>
+<p>The surface is healed. Your colours should be vibrant and the lines crisp. However, the deeper layers of skin are still completing their repair — this process continues for up to 6 months.</p>
+<p><strong>What to do:</strong> Maintain daily moisturising. Most importantly, start using Kong Defend Sun Lotion SPF50 every time your tattoo will be exposed to sunlight. UV is the single biggest cause of long-term tattoo fading. One summer without sun protection can undo months of careful aftercare.</p>
+
+<h2>The Long Game</h2>
+<p>Once fully healed, your ongoing routine is simple: moisturise daily, protect from sun, and use Kong Renew Supreme Butter for a deep nourishing treatment once or twice a week. That's the formula for ink that stays vibrant for decades.</p>`},
+  "numbing-cream-guide":{title:"Numbing Creams: What Actually Works and What Doesn't",date:'September 8, 2026',author:'Kong Team',category:'Before Your Session',read:'5 min read',excerpt:"Not all numbing products are created equal. Here's an honest breakdown of how they work, how to use them correctly, and what the professional results look like.",body:`<p>Numbing creams have transformed the tattoo experience for millions of people — but they're also surrounded by misinformation. Used correctly, they're safe, effective, and completely accepted by professional artists. Used incorrectly, they can affect skin texture and complicate the tattooing process.</p>
+
+<h2>How Numbing Creams Work</h2>
+<p>The active ingredient in professional numbing creams and sprays is typically lidocaine, a topical anaesthetic that temporarily blocks nerve signals in the skin. When applied correctly, it reduces the skin's sensitivity to pain without affecting the structure of the dermis where ink is deposited.</p>
+<p>Kong Rapid Cream and Kong Rapid Spray both use a professional-grade lidocaine formula. The spray format is ideal for larger areas and is particularly popular in professional studios. The cream tube is better for precise application on smaller areas.</p>
+
+<h2>The Correct Way to Use Numbing Products</h2>
+<p><strong>Step 1:</strong> Clean the area thoroughly. Remove any oils, lotions, or debris.</p>
+<p><strong>Step 2:</strong> Apply a generous, even layer to the area to be tattooed. For Kong Rapid Spray, 2–3 sprays per area. For Kong Rapid Cream, apply a layer approximately 2–3mm thick.</p>
+<p><strong>Step 3:</strong> Wait. This is where most people go wrong. The product needs 20–30 minutes to fully penetrate the skin. Apply it before you arrive at the studio, not when you sit in the chair.</p>
+<p><strong>Step 4:</strong> Wipe completely clean before your artist begins. Remove all product from the skin surface. Your artist should confirm the area is clean before starting.</p>
+
+<h2>How Long Does it Last?</h2>
+<p>Effective numbing duration varies between individuals, but you can generally expect 1.5 to 2 hours of significantly reduced sensitivity. For longer sessions, speak to your artist about reapplication strategy — in some cases, artists can apply product to fresh sections during natural breaks.</p>
+
+<h2>What About Skin Texture?</h2>
+<p>This is the most common concern among tattoo artists, and it's valid. Numbing creams that swell the skin or contain vasoconstricting agents can affect how ink sits in the skin. Kong products are formulated specifically to avoid this — they numb without changing the skin's workable texture.</p>
+<p>Communication with your artist is key. Show them the product you're using and let them make the final call. In our experience, the vast majority of professional artists have no issue with correctly used professional-grade numbing products.</p>`},
+  "spf-tattoos":{title:'Why SPF is Non-Negotiable for Tattooed Skin',date:'September 2, 2026',author:'Kong Team',category:'Protect',read:'4 min read',excerpt:"UV radiation is the number one cause of tattoo fading. Here's the science of why it happens and how consistent sun protection keeps your ink sharp for decades.",body:`<p>You spent hours in the chair. You paid good money. You've followed the aftercare instructions to the letter. Then summer arrives, and without realising it, you undo months of careful healing in a few weeks of unprotected sun exposure.</p>
+
+<h2>What UV Does to Tattoo Ink</h2>
+<p>Tattoo ink sits in the dermis — the layer of skin beneath the surface epidermis. Ultraviolet radiation penetrates this outer layer and breaks down the pigment molecules in the ink through a process called photobleaching. Dark blacks turn grey. Vibrant colours fade and lose their saturation. Fine lines blur at the edges.</p>
+<p>This process is gradual and cumulative. It doesn't happen after one beach trip — it happens after years of unprotected exposure adding up. The problem is that by the time you notice significant fading, the damage is already extensive.</p>
+
+<h2>Why Regular Sunscreen Isn't Enough</h2>
+<p>Standard sunscreens are formulated for skin protection, not for the specific needs of tattooed skin. Many contain ingredients that dry out the skin or interfere with the ink. Kong Defend Sun Lotion SPF50 is formulated specifically for tattooed skin — it protects without the drying effect of conventional sunscreens, and includes moisturising ingredients that keep ink-covered skin supple.</p>
+
+<h2>When to Apply</h2>
+<p>Apply Kong Defend 15 minutes before any sun exposure. This allows the active ingredients to fully bond with the skin before UV hits. Reapply every two hours during prolonged outdoor activity, and immediately after swimming or sweating heavily.</p>
+<p>For tattoos in areas permanently exposed to sunlight — hands, forearms, neck — make SPF application part of your daily routine year-round. UV damage occurs even on overcast days.</p>
+
+<h2>The Long-Term Maths</h2>
+<p>A quality tattoo can cost anywhere from hundreds to thousands of pounds. A bottle of Kong Defend costs £19.19. The value proposition is clear. Consistent SPF application is the single most cost-effective thing you can do to protect your long-term investment in your ink.</p>`},
+  "reseller-programme":{title:'Kong Reseller Programme: Everything Studios Need to Know',date:'August 26, 2026',author:'Kong Team',category:'Business',read:'4 min read',excerpt:"Professional aftercare is part of the service. Here's how tattoo studios across the UK and Europe are adding Kong to their offering — and what it means for their clients.",body:`<p>The aftercare your clients use directly affects the quality of the healed tattoo — and by extension, your reputation as an artist. That's why a growing number of studios across the UK and Europe have made Kong part of their standard aftercare recommendation.</p>
+
+<h2>The Case for Stocking Aftercare</h2>
+<p>Clients who leave a studio without a clear aftercare product often improvise. They use whatever moisturiser is in the bathroom, or products that aren't designed for healing tattoos. The results — dull colours, patchy healing, excess scabbing — often come back to the artist as a complaint.</p>
+<p>Studios that send clients home with a specific, quality aftercare product see better healed results, fewer touch-up requests, and stronger word-of-mouth. It's also an additional revenue stream that requires no additional staff time.</p>
+
+<h2>The Kong Reseller Programme</h2>
+<p>Kong works directly with professional tattoo studios, barbershops, and beauty retailers across all markets. Resellers receive wholesale pricing, co-branded aftercare cards, and priority stock access.</p>
+<p>Applications are reviewed within 48 hours. There is no minimum order quantity for initial stock — we understand that studios want to test sell-through before committing to larger volumes.</p>
+
+<h2>What Resellers Get</h2>
+<ul>
+<li>Wholesale pricing (typically 40–45% below RRP)</li>
+<li>Co-branded aftercare instruction cards for client handouts</li>
+<li>Listing on the Kong Studio Finder (coming 2026)</li>
+<li>Dedicated account contact for restocking</li>
+<li>Access to product training materials and FAQs</li>
+</ul>
+
+<h2>How to Apply</h2>
+<p>Use the Reseller Login on our website to create a business account. You'll be asked to verify your business (studio name, address, and website or Instagram). Once approved, your account will automatically show wholesale pricing in the shop.</p>`},
+  "tattoo-balm-vs-lotion":{title:'Tattoo Balm vs Lotion: Which One Do You Actually Need?',date:'August 19, 2026',author:'Kong Team',category:'Aftercare',read:'3 min read',excerpt:"Two products, different jobs. Here's the simple breakdown of when to use Kong Tattoo Balm versus Kong Aftercare Lotion throughout the healing process.",body:`<p>One of the most common questions we receive is: "Should I use the balm or the lotion?" The answer is both — just at different stages.</p>
+
+<h2>Kong Tattoo Balm: The Heavy Hitter</h2>
+<p>The balm is a rich, dense conditioning formula. It creates a protective layer over the tattoo that locks in moisture, reduces inflammation, and supports the skin's repair process. It's designed for the early, intensive stages of healing — the first one to two weeks when the skin is most vulnerable.</p>
+<p>Apply it 2–3 times daily during this period. A thin layer is all you need — avoid over-application, which can suffocate the skin and slow healing. The balm should absorb fully within a few minutes of application.</p>
+
+<h2>Kong Aftercare Lotion: The Daily Driver</h2>
+<p>The lotion is lighter. Once the skin has started peeling and the intensive healing phase is over, the balm becomes too heavy. The lotion provides the hydration your skin still needs without the weight of the balm. It absorbs faster, sits more comfortably under clothing, and is better suited for daily use over the longer healing period.</p>
+<p>Switch to the lotion at around the two-week mark, or when peeling begins. Continue using it once or twice a day until the tattoo is fully healed — and beyond. Keeping your healed tattoo moisturised is a permanent part of good ink maintenance.</p>
+
+<h2>The Simple Rule</h2>
+<p>New and healing: Kong Tattoo Balm. Peeling and after: Kong Aftercare Lotion. When in doubt, you can use the balm as a treatment overnight and the lotion during the day. Both products are formulated to work together — there's no conflict in using them alongside each other.</p>`},
+  "renew-old-tattoos":{title:'Renewing Old Tattoos: A Guide to Reviving Faded Ink',date:'August 12, 2026',author:'Kong Team',category:'Renew',read:'5 min read',excerpt:"Faded ink doesn't always mean a touch-up. Here's what consistent use of Kong Renew Supreme Butter can do for older tattoos — and when you actually need professional intervention.",body:`<p>Every tattoo ages. The ink migrates slightly in the skin, the surface layer thickens over years of sun exposure and cell renewal, and the vibrance of new work gradually settles into something less sharp. This is normal and expected. But there's a significant difference between a tattoo that's aged well and one that's been neglected.</p>
+
+<h2>What Causes Fading in Old Tattoos</h2>
+<p>Three main factors cause tatoos to fade over time: UV damage, dry skin reducing colour saturation, and natural skin cell turnover that slowly moves ink upward toward the skin's surface. Of these, UV damage and dehydration are the two you have direct control over — even years after the tattoo was done.</p>
+
+<h2>What Renew Supreme Butter Actually Does</h2>
+<p>Kong Renew Supreme Butter is formulated for healed, older tattoos. It doesn't do anything magical — it deeply hydrates and nourishes the skin, which has two effects. First, well-hydrated skin appears more vibrant because light reflects off supple skin more evenly. Second, consistent deep moisturising over time improves the overall health of the skin layer where the ink sits, which contributes to the appearance of sharper, more saturated colour.</p>
+<p>Think of it like polishing a car. The paint hasn't changed — but clean, conditioned paint reflects more light and looks dramatically better than the same paint covered in grime and neglect.</p>
+
+<h2>How to Use It</h2>
+<p>Warm a small amount of the butter between your palms until it liquefies slightly, then massage it into the tattooed area using circular motions. The best results come from consistent overnight application — apply before sleep and let it work for 6–8 hours. Once or twice per week is sufficient as a treatment; daily use as a regular moisturiser is also fine.</p>
+
+<h2>When You Actually Need a Touch-Up</h2>
+<p>If the linework has spread significantly, if there are patchy areas where ink didn't take or has been damaged, or if fading is extensive despite consistent care, a professional touch-up is the right answer. No topical product can replace lost or damaged ink. What Renew Butter can do is optimise the appearance of what's there and slow further degradation. Used alongside Kong Defend SPF50 for sun protection, it's the complete toolkit for maintaining older work.</p>`},
+};
+
+
+var id = new URLSearchParams(window.location.search).get('id');
+var post = BLOG_POSTS[id];
+if(post){
+  document.title = post.title + ' | Kong Blog';
+  document.getElementById('post-cat').textContent = post.category;
+  document.getElementById('post-title').textContent = post.title;
+  document.getElementById('post-date').textContent = post.date;
+  document.getElementById('post-author').textContent = 'By ' + post.author;
+  document.getElementById('post-read').textContent = post.read;
+  document.getElementById('post-body').innerHTML = post.body;
+} else {
+  document.getElementById('post-title').textContent = 'Post Not Found';
+  document.getElementById('post-body').innerHTML = '<p>This article could not be found. <a href="/blog.html" style="color:#20b278">Return to the blog.</a></p>';
+}
+buildLangDropdown('en');
+document.getElementById('lang-flag').textContent='🇬🇧';
+document.getElementById('lang-name').textContent='EN';
+</script>
+</body>
+</html>
