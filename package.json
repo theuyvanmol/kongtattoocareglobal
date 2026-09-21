@@ -1,16 +1,19 @@
 {
   "name": "kong-tattoo-care",
   "version": "1.0.0",
-  "description": "Kong Tattoo Care — Official Website",
+  "description": "Kong Tattoo Care — Official Website with Stripe Checkout",
   "private": true,
   "scripts": {
-    "dev": "npx serve . -p 3000",
+    "dev": "node server.js",
     "build": "echo 'Static site — no build step required'",
-    "start": "npx serve . -p 3000"
+    "start": "node server.js"
   },
-  "devDependencies": {
-    "serve": "^14.0.0"
+  "dependencies": {
+    "dotenv": "^16.4.7",
+    "express": "^4.21.2",
+    "stripe": "^17.7.0"
   },
+  "devDependencies": {},
   "engines": {
     "node": ">=18.0.0"
   },
