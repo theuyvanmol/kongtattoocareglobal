@@ -1,0 +1,489 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8"/>
+<meta name="viewport" content="width=device-width,initial-scale=1"/>
+<title>Checkout | Kong Tattoo Care</title>
+<!-- Stripe.js — must load from this exact URL, never self-hosted (PCI requirement) -->
+<script src="https://js.stripe.com/dahlia/stripe.js"></script>
+<link rel="preconnect" href="https://fonts.googleapis.com"/>
+<link href="https://fonts.googleapis.com/css2?family=Bebas+Neue&family=Inter:wght@300;400;500;600;700&display=swap" rel="stylesheet"/>
+<style>
+*{margin:0;padding:0;box-sizing:border-box}
+html{scroll-behavior:smooth}
+body{
+  font-family:'Inter',sans-serif;
+  background:#0a0a0c;color:#fff;
+  min-height:100vh;
+  -webkit-font-smoothing:antialiased;
+}
+a{color:inherit;text-decoration:none}
+
+/* ── HEADER ── */
+.co-header{
+  position:sticky;top:0;z-index:100;
+  background:rgba(10,10,14,0.88);
+  backdrop-filter:blur(24px);
+  border-bottom:1px solid rgba(255,255,255,0.08);
+  padding:0 40px;
+  height:60px;display:flex;align-items:center;justify-content:space-between;
+}
+.co-logo{
+  font-family:'Bebas Neue',sans-serif;font-size:22px;letter-spacing:.14em;
+}
+.co-logo span{
+  background:linear-gradient(135deg,#20c17a,#38a4f8);
+  -webkit-background-clip:text;-webkit-text-fill-color:transparent;
+}
+.co-secure{
+  display:flex;align-items:center;gap:6px;
+  font-size:11px;color:rgba(255,255,255,.35);letter-spacing:.06em;
+}
+.co-secure svg{opacity:.4}
+.co-back{
+  font-size:11px;font-weight:500;letter-spacing:.06em;
+  color:rgba(255,255,255,.4);
+  display:flex;align-items:center;gap:5px;
+  transition:color .2s;
+}
+.co-back:hover{color:#fff}
+
+/* ── LAYOUT ── */
+.co-wrap{
+  max-width:1100px;margin:0 auto;
+  display:grid;grid-template-columns:1fr 460px;
+  gap:0;min-height:calc(100vh - 60px);
+  align-items:start;
+}
+
+/* ── LEFT — stripe form ── */
+.co-form-side{
+  padding:48px 56px 80px 40px;
+  border-right:1px solid rgba(255,255,255,.07);
+}
+.co-section-label{
+  font-size:10px;font-weight:600;letter-spacing:.22em;text-transform:uppercase;
+  color:rgba(255,255,255,.28);margin-bottom:20px;
+  display:flex;align-items:center;gap:10px;
+}
+.co-section-label::after{content:'';flex:1;height:1px;background:rgba(255,255,255,.07)}
+.co-title{
+  font-family:'Bebas Neue',sans-serif;
+  font-size:clamp(32px,4vw,52px);letter-spacing:.02em;
+  margin-bottom:8px;line-height:.95;
+}
+.co-title em{
+  font-style:normal;
+  background:linear-gradient(135deg,#20c17a,#38a4f8);
+  -webkit-background-clip:text;-webkit-text-fill-color:transparent;
+}
+.co-subtitle{
+  font-size:13px;color:rgba(255,255,255,.35);
+  margin-bottom:36px;font-weight:300;line-height:1.6;
+}
+
+/* Stripe form container */
+#checkout-form{
+  min-height:320px;
+  position:relative;
+}
+#checkout-form-loading{
+  display:flex;flex-direction:column;align-items:center;justify-content:center;
+  min-height:280px;gap:16px;color:rgba(255,255,255,.3);font-size:13px;
+}
+.spinner{
+  width:32px;height:32px;border-radius:50%;
+  border:2px solid rgba(255,255,255,.1);
+  border-top-color:#20c17a;
+  animation:spin .8s linear infinite;
+}
+@keyframes spin{to{transform:rotate(360deg)}}
+
+/* Error state */
+#checkout-error{
+  display:none;
+  background:rgba(224,85,112,.1);border:1px solid rgba(224,85,112,.25);
+  border-radius:12px;padding:16px 18px;margin-top:16px;
+  font-size:13px;color:#e05570;line-height:1.6;
+}
+
+/* ── RIGHT — order summary ── */
+.co-summary{
+  padding:48px 40px 80px 48px;
+  background:rgba(255,255,255,.025);
+  min-height:calc(100vh - 60px);
+}
+.co-summary-title{
+  font-family:'Bebas Neue',sans-serif;font-size:22px;letter-spacing:.05em;
+  margin-bottom:28px;
+}
+.order-items{
+  display:flex;flex-direction:column;gap:0;
+  margin-bottom:24px;
+}
+.order-item{
+  display:flex;gap:14px;padding:16px 0;
+  border-bottom:1px solid rgba(255,255,255,.07);
+  align-items:center;
+}
+.order-item:first-child{border-top:1px solid rgba(255,255,255,.07)}
+.oi-img{
+  width:60px;height:60px;border-radius:10px;
+  background:#111318;flex-shrink:0;overflow:hidden;
+  display:flex;align-items:center;justify-content:center;
+  position:relative;
+}
+.oi-img img{width:100%;height:100%;object-fit:cover}
+.oi-qty-badge{
+  position:absolute;top:-6px;right:-6px;
+  width:18px;height:18px;border-radius:50%;
+  background:rgba(255,255,255,.18);
+  font-size:10px;font-weight:700;
+  display:flex;align-items:center;justify-content:center;
+}
+.oi-info{flex:1}
+.oi-name{font-size:13px;font-weight:500;margin-bottom:3px}
+.oi-col{font-size:11px;color:rgba(255,255,255,.35)}
+.oi-price{
+  font-family:'Bebas Neue',sans-serif;font-size:19px;
+  white-space:nowrap;
+}
+
+/* Empty cart state */
+.co-empty{
+  text-align:center;padding:40px 0;color:rgba(255,255,255,.28);
+}
+.co-empty p{font-size:13px;margin-top:8px;font-weight:300}
+
+/* Price breakdown */
+.co-breakdown{
+  border-top:1px solid rgba(255,255,255,.07);
+  padding-top:18px;
+  display:flex;flex-direction:column;gap:10px;
+  margin-bottom:20px;
+}
+.co-breakdown-row{
+  display:flex;justify-content:space-between;align-items:center;
+  font-size:13px;color:rgba(255,255,255,.45);
+}
+.co-breakdown-row.total{
+  font-family:'Bebas Neue',sans-serif;font-size:22px;
+  color:#fff;padding-top:10px;
+  border-top:1px solid rgba(255,255,255,.1);
+  margin-top:4px;
+}
+.co-breakdown-row.total span:first-child{font-size:14px;font-family:'Inter',sans-serif;font-weight:600;letter-spacing:.02em}
+
+/* Trust badges */
+.co-trust{
+  display:flex;flex-direction:column;gap:10px;
+  margin-top:24px;padding-top:20px;
+  border-top:1px solid rgba(255,255,255,.06);
+}
+.co-trust-row{
+  display:flex;align-items:center;gap:10px;
+  font-size:11.5px;color:rgba(255,255,255,.35);
+}
+.co-trust-icon{font-size:15px;flex-shrink:0}
+
+/* ── SUCCESS PAGE ── */
+#success-view{display:none}
+.success-wrap{
+  max-width:520px;margin:80px auto;padding:0 24px;text-align:center;
+}
+.success-icon{
+  width:72px;height:72px;border-radius:50%;
+  background:linear-gradient(135deg,#20c17a,#38a4f8);
+  display:flex;align-items:center;justify-content:center;
+  font-size:32px;margin:0 auto 28px;
+  box-shadow:0 0 0 12px rgba(32,193,122,.1);
+}
+.success-h{
+  font-family:'Bebas Neue',sans-serif;
+  font-size:clamp(40px,5vw,62px);letter-spacing:.02em;margin-bottom:12px;
+}
+.success-h em{font-style:normal;background:linear-gradient(135deg,#20c17a,#38a4f8);-webkit-background-clip:text;-webkit-text-fill-color:transparent}
+.success-p{font-size:14px;color:rgba(255,255,255,.4);line-height:1.8;margin-bottom:32px;font-weight:300}
+.success-id{
+  display:inline-block;
+  background:rgba(255,255,255,.05);border:1px solid rgba(255,255,255,.09);
+  border-radius:10px;padding:10px 18px;
+  font-size:11px;letter-spacing:.06em;color:rgba(255,255,255,.35);
+  margin-bottom:32px;font-family:monospace;
+}
+.btn-grad{
+  background:linear-gradient(135deg,#20c17a,#38a4f8);color:#fff;
+  font-size:12px;font-weight:600;letter-spacing:.1em;text-transform:uppercase;
+  padding:14px 32px;border-radius:11px;border:none;cursor:pointer;
+  box-shadow:0 4px 24px rgba(32,193,122,.45);
+  transition:opacity .2s,transform .15s;display:inline-block;
+}
+.btn-grad:hover{opacity:.88;transform:translateY(-1px)}
+
+/* ── RESPONSIVE ── */
+@media(max-width:900px){
+  .co-wrap{grid-template-columns:1fr;min-height:auto}
+  .co-form-side{padding:32px 20px 48px}
+  .co-summary{padding:32px 20px 48px;min-height:auto;border-top:1px solid rgba(255,255,255,.07)}
+  .co-header{padding:0 20px}
+}
+@media(max-width:480px){
+  .co-title{font-size:30px}
+}
+</style>
+</head>
+<body>
+
+<!-- HEADER -->
+<header class="co-header">
+  <a href="index.html" class="co-back">← Back to shop</a>
+  <div class="co-logo">KONG<span>.</span></div>
+  <div class="co-secure">
+    <svg width="12" height="14" viewBox="0 0 12 14" fill="none">
+      <path d="M6 1L1 3.5V7c0 2.76 2.12 5.28 5 5.9C8.88 12.28 11 9.76 11 7V3.5L6 1Z" stroke="white" stroke-width="1.2"/>
+      <path d="M4 7l1.5 1.5L8 5" stroke="white" stroke-width="1.2" stroke-linecap="round"/>
+    </svg>
+    Secure Checkout
+  </div>
+</header>
+
+<!-- MAIN CHECKOUT VIEW -->
+<div id="checkout-view">
+  <div class="co-wrap">
+
+    <!-- LEFT: Payment form -->
+    <div class="co-form-side">
+      <div class="co-section-label">Payment</div>
+      <div class="co-title">Complete Your <em>Order</em></div>
+      <div class="co-subtitle">Professional-grade tattoo aftercare. Made in the UK.</div>
+
+      <!-- Stripe Embedded Form mounts here -->
+      <div id="checkout-form">
+        <div id="checkout-form-loading">
+          <div class="spinner"></div>
+          <span>Loading secure payment form…</span>
+        </div>
+      </div>
+
+      <div id="checkout-error"></div>
+    </div>
+
+    <!-- RIGHT: Order summary -->
+    <div class="co-summary">
+      <div class="co-summary-title">Order Summary</div>
+
+      <div class="order-items" id="orderItems">
+        <!-- Populated from localStorage cart by JS -->
+        <div class="co-empty">
+          <div style="font-size:32px;opacity:.25">🛒</div>
+          <p>Your cart is empty.<br/>
+          <a href="shop.html" style="color:#20c17a">Continue shopping →</a></p>
+        </div>
+      </div>
+
+      <div class="co-breakdown" id="coBreakdown" style="display:none">
+        <div class="co-breakdown-row">
+          <span>Subtotal</span>
+          <span id="subtotalVal">£0.00</span>
+        </div>
+        <div class="co-breakdown-row">
+          <span>Shipping</span>
+          <span id="shippingVal">Free</span>
+        </div>
+        <div class="co-breakdown-row total">
+          <span>Total</span>
+          <span id="totalVal">£0.00</span>
+        </div>
+      </div>
+
+      <div class="co-trust">
+        <div class="co-trust-row"><span class="co-trust-icon">🔒</span> 256-bit SSL encryption. Your payment info is never stored on our servers.</div>
+        <div class="co-trust-row"><span class="co-trust-icon">↩</span> 30-day hassle-free returns on all products.</div>
+        <div class="co-trust-row"><span class="co-trust-icon">🚚</span> Free UK delivery on orders over £30.</div>
+        <div class="co-trust-row"><span class="co-trust-icon">✦</span> Trusted by 50,000+ customers across 14 markets.</div>
+      </div>
+    </div>
+
+  </div>
+</div>
+
+<!-- SUCCESS VIEW (shown after successful payment) -->
+<div id="success-view">
+  <div class="success-wrap">
+    <div class="success-icon">✓</div>
+    <div class="success-h">Order <em>Confirmed!</em></div>
+    <p class="success-p">
+      Thank you for your order. Your Kong products are on their way.<br/>
+      A confirmation email has been sent to you.
+    </p>
+    <div class="success-id" id="successSessionId"></div>
+    <br/>
+    <a href="index.html" class="btn-grad">Back to Homepage</a>
+  </div>
+</div>
+
+<script>
+// ── Product→Price ID mapping ──────────────────────────────────────────────────
+// TODO: Replace each placeholder with your real Stripe Price ID.
+// Create prices at: https://dashboard.stripe.com/prices
+// Format: price_xxxxxxxxxxxxxxxxxxxxxxxx
+var PRICE_MAP = {
+  'numb-spray':   '{{PRICE_ID_NUMB_SPRAY}}',
+  'numb-cream':   '{{PRICE_ID_NUMB_CREAM}}',
+  'glow-foam':    '{{PRICE_ID_GLOW_FOAM}}',
+  'glow-balm':    '{{PRICE_ID_GLOW_BALM}}',
+  'glow-stick':   '{{PRICE_ID_GLOW_STICK}}',
+  'glow-roll':    '{{PRICE_ID_GLOW_ROLL}}',
+  'glow-glide':   '{{PRICE_ID_GLOW_GLIDE}}',
+  'renew-butter': '{{PRICE_ID_RENEW_BUTTER}}',
+  'defend-spf':   '{{PRICE_ID_DEFEND_SPF}}',
+};
+
+// ── Read cart from localStorage ───────────────────────────────────────────────
+var CART = JSON.parse(localStorage.getItem('kong_cart') || '[]');
+
+// ── Check for success redirect ────────────────────────────────────────────────
+var urlParams = new URLSearchParams(window.location.search);
+var sessionId = urlParams.get('session_id');
+
+if (sessionId) {
+  // Show success screen, clear cart
+  document.getElementById('checkout-view').style.display = 'none';
+  document.getElementById('success-view').style.display  = 'block';
+  document.getElementById('successSessionId').textContent = 'Order ref: ' + sessionId;
+  localStorage.removeItem('kong_cart');
+
+} else {
+  // ── Render order summary ──────────────────────────────────────────────────
+  var orderItemsEl  = document.getElementById('orderItems');
+  var coBreakdown   = document.getElementById('coBreakdown');
+  var subtotalValEl = document.getElementById('subtotalVal');
+  var totalValEl    = document.getElementById('totalVal');
+  var shippingValEl = document.getElementById('shippingVal');
+
+  if (CART.length === 0) {
+    // Empty cart — keep placeholder, disable form
+    document.getElementById('checkout-form').innerHTML =
+      '<div style="padding:32px;text-align:center;color:rgba(255,255,255,.3);font-size:13px">' +
+      'Your cart is empty. <a href="shop.html" style="color:#20c17a">Go to shop →</a></div>';
+  } else {
+    // Render cart items
+    orderItemsEl.innerHTML = CART.map(function(item) {
+      return (
+        '<div class="order-item">' +
+          '<div class="oi-img">' +
+            '<img src="' + item.img + '" alt="' + item.name + '" loading="lazy"/>' +
+            '<div class="oi-qty-badge">' + item.qty + '</div>' +
+          '</div>' +
+          '<div class="oi-info">' +
+            '<div class="oi-name">' + item.name + '</div>' +
+            '<div class="oi-col">' + item.col + ' Collection</div>' +
+          '</div>' +
+          '<div class="oi-price">' + item.price + '</div>' +
+        '</div>'
+      );
+    }).join('');
+
+    // Calculate totals
+    var subtotal = CART.reduce(function(s, i) {
+      return s + parseFloat(i.price.replace(/[^0-9.]/g, '')) * i.qty;
+    }, 0);
+    var shipping = subtotal >= 30 ? 0 : 3.99;
+    var total    = subtotal + shipping;
+
+    coBreakdown.style.display   = 'flex';
+    subtotalValEl.textContent   = '£' + subtotal.toFixed(2);
+    shippingValEl.textContent   = shipping === 0 ? 'Free' : '£' + shipping.toFixed(2);
+    totalValEl.textContent      = '£' + total.toFixed(2);
+
+    // ── Initialise Stripe ───────────────────────────────────────────────────
+    // Publishable key is safe to expose in client-side code.
+    var stripe = Stripe(
+      // TODO: Replace with your live publishable key for production.
+      // Get it from: https://dashboard.stripe.com/apikeys
+      '{{STRIPE_PUBLISHABLE_KEY}}',
+      { betas: ['custom_checkout_payment_form_1'] }
+    );
+
+    // Build line_items payload for the server
+    var items = CART.map(function(item) {
+      return {
+        priceId:  PRICE_MAP[item.id] || '{{PRICE_ID}}',
+        quantity: item.qty,
+      };
+    });
+
+    // Appearance config — matches Stripe Checkout Studio settings
+    var appearance = {
+      theme:  'stripe',
+      labels: 'auto',
+      inputs: 'spaced',
+      variables: {
+        borderRadius:    '4px',
+        colorBackground: '#ffffff',
+        colorDanger:     '#df1b41',
+        colorPrimary:    '#0570de',
+        colorSuccess:    '#00c853',
+        colorText:       '#30313d',
+        fontFamily:      'default',
+        fontSizeBase:    '16px',
+        spacingUnit:     '4px',
+      },
+    };
+
+    // Fetch client_secret from our serverless function
+    var clientSecretPromise = fetch('/api/create-checkout-session', {
+      method:  'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body:    JSON.stringify({ items: items }),
+    })
+    .then(function(res) {
+      if (!res.ok) throw new Error('Server error: ' + res.status);
+      return res.json();
+    })
+    .then(function(json) {
+      if (!json.client_secret) throw new Error('No client_secret returned');
+      return json.client_secret;
+    });
+
+    // Initialise Checkout Form SDK and mount the embedded form
+    var checkout = stripe.initCheckoutFormSdk({
+      clientSecret: clientSecretPromise,
+      appearance:   appearance,
+    });
+
+    // Remove loading spinner, mount form
+    document.getElementById('checkout-form-loading').style.display = 'none';
+    var checkoutForm = checkout.createForm({ layout: 'expanded' });
+    checkoutForm.mount('#checkout-form');
+
+    // Load payment actions and wire the confirm handler
+    checkout.loadActions().then(function(loadActionsResult) {
+      if (loadActionsResult.type === 'success') {
+        checkoutForm.on('confirm', function(event) {
+          loadActionsResult.actions
+            .confirm({ formConfirmEvent: event })
+            .catch(function(error) {
+              console.error('Payment confirmation error:', error);
+              var errEl = document.getElementById('checkout-error');
+              errEl.style.display = 'block';
+              errEl.textContent   = error.message || 'Payment failed. Please try again.';
+            });
+        });
+      } else {
+        throw new Error('loadActions failed: ' + loadActionsResult.type);
+      }
+    })
+    .catch(function(err) {
+      console.error('Stripe init error:', err);
+      document.getElementById('checkout-form-loading').style.display = 'none';
+      document.getElementById('checkout-form').innerHTML =
+        '<div style="padding:24px;background:rgba(224,85,112,.1);border:1px solid rgba(224,85,112,.25);border-radius:12px;font-size:13px;color:#e05570">' +
+        '⚠️ Could not load payment form. Please check your Stripe configuration and try again.' +
+        '</div>';
+    });
+  }
+}
+</script>
+</body>
+</html>

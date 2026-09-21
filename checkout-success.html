@@ -1,0 +1,56 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8"/>
+<meta name="viewport" content="width=device-width,initial-scale=1"/>
+<title>Order Confirmed | Kong Tattoo Care</title>
+<link rel="preconnect" href="https://fonts.googleapis.com"/>
+<link href="https://fonts.googleapis.com/css2?family=Bebas+Neue&family=Inter:wght@300;400;500;600;700&display=swap" rel="stylesheet"/>
+<style>
+*{margin:0;padding:0;box-sizing:border-box}
+body{font-family:'Inter',sans-serif;background:#0a0a0c;color:#fff;min-height:100vh;display:flex;flex-direction:column;align-items:center;justify-content:center;padding:24px;-webkit-font-smoothing:antialiased}
+.success-wrap{max-width:500px;width:100%;text-align:center}
+.success-icon{width:80px;height:80px;border-radius:50%;background:linear-gradient(135deg,#20c17a,#38a4f8);display:flex;align-items:center;justify-content:center;font-size:36px;margin:0 auto 32px;box-shadow:0 0 0 16px rgba(32,193,122,.08),0 0 0 32px rgba(32,193,122,.04)}
+.logo{font-family:'Bebas Neue',sans-serif;font-size:20px;letter-spacing:.14em;margin-bottom:40px;color:rgba(255,255,255,.4)}
+.logo span{background:linear-gradient(135deg,#20c17a,#38a4f8);-webkit-background-clip:text;-webkit-text-fill-color:transparent}
+h1{font-family:'Bebas Neue',sans-serif;font-size:clamp(44px,7vw,72px);letter-spacing:.02em;line-height:.9;margin-bottom:14px}
+h1 em{font-style:normal;background:linear-gradient(135deg,#20c17a,#38a4f8);-webkit-background-clip:text;-webkit-text-fill-color:transparent}
+.sub{font-size:14px;color:rgba(255,255,255,.4);line-height:1.8;margin-bottom:28px;font-weight:300}
+.ref-box{display:inline-block;background:rgba(255,255,255,.05);border:1px solid rgba(255,255,255,.09);border-radius:10px;padding:10px 20px;font-size:11px;letter-spacing:.06em;color:rgba(255,255,255,.3);margin-bottom:36px;font-family:monospace}
+.btn{display:inline-block;background:linear-gradient(135deg,#20c17a,#38a4f8);color:#fff;font-size:12px;font-weight:600;letter-spacing:.1em;text-transform:uppercase;padding:14px 32px;border-radius:11px;text-decoration:none;box-shadow:0 4px 24px rgba(32,193,122,.4);transition:opacity .2s}
+.btn:hover{opacity:.88}
+.what-next{margin-top:40px;padding:24px;border-radius:16px;background:rgba(255,255,255,.04);border:1px solid rgba(255,255,255,.07);text-align:left}
+.what-next h3{font-family:'Bebas Neue',sans-serif;font-size:18px;letter-spacing:.05em;margin-bottom:14px;color:rgba(255,255,255,.6)}
+.step{display:flex;gap:12px;margin-bottom:12px;font-size:12.5px;color:rgba(255,255,255,.38);line-height:1.6;align-items:flex-start}
+.step-num{min-width:20px;height:20px;border-radius:50%;background:rgba(32,193,122,.15);color:#20c17a;font-size:10px;font-weight:700;display:flex;align-items:center;justify-content:center;margin-top:1px;flex-shrink:0}
+</style>
+</head>
+<body>
+<div class="success-wrap">
+  <div class="logo">KONG<span>.</span></div>
+  <div class="success-icon">✓</div>
+  <h1>Order <em>Confirmed!</em></h1>
+  <p class="sub">Thank you for your purchase. Your Kong products are now being prepared for dispatch. You'll receive a confirmation email shortly.</p>
+  <div class="ref-box" id="sessionRef">Processing order…</div>
+  <br/>
+  <a href="index.html" class="btn">Back to Homepage</a>
+  <div class="what-next">
+    <h3>What Happens Next</h3>
+    <div class="step"><div class="step-num">1</div><span>Confirmation email sent to your inbox within a few minutes.</span></div>
+    <div class="step"><div class="step-num">2</div><span>Your order is picked and packed at our UK warehouse.</span></div>
+    <div class="step"><div class="step-num">3</div><span>Dispatched within 1–2 working days. You'll get a tracking number by email.</span></div>
+    <div class="step"><div class="step-num">4</div><span>Delivered to your door. UK standard 2–3 days, express available.</span></div>
+  </div>
+</div>
+<script>
+var params = new URLSearchParams(window.location.search);
+var sid = params.get('session_id');
+if (sid) {
+  document.getElementById('sessionRef').textContent = 'Order ref: ' + sid.slice(0, 24) + '…';
+  localStorage.removeItem('kong_cart');
+} else {
+  document.getElementById('sessionRef').style.display = 'none';
+}
+</script>
+</body>
+</html>
