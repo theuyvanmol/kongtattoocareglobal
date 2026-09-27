@@ -108,6 +108,7 @@
   @keyframes breathe{50%{transform:scale(1.12)}}@keyframes float{50%{transform:translateY(-15px) rotate(2deg)}}@media(max-width:900px){.grid{grid-template-columns:repeat(2,1fr)}.navlinks{display:none}}@media(max-width:650px){.announce{font-size:9px}.nav{height:68px;padding:0 15px}.logo img{width:105px}.logo b{font-size:10px}.hero{min-height:52vh;padding-top:90px}.hero h1{font-size:24vw}.scroll{display:none}.toolbar{grid-template-columns:1fr}.right-tools{display:grid;grid-template-columns:1fr 1fr}.search{width:100%}.grid{grid-template-columns:1fr}.visual{height:110vw;max-height:510px}.quick{transform:none}.cta{min-height:380px}.footer{align-items:flex-start;flex-direction:column;gap:22px}}@media(prefers-reduced-motion:reduce){*{animation:none!important;transition:none!important}}
   </style>
 <meta name="single-file-build" content="Shop images, videos, CSS and JavaScript embedded">
+<script src="/assets/i18n.js" defer></script>
 </head>
 <body class="collection-page">
 <div class="announce"><span>Free Shipping</span><b>·</b><span>90 Day Returns</span><b>·</b><span>Trusted by Artists</span></div>
@@ -173,7 +174,7 @@ document.querySelectorAll('.filter').forEach(b=>b.onclick=()=>{document.querySel
   var cur=document.getElementById('langCurrent');
   if(!btn||!menu)return;
   btn.addEventListener('click',function(e){e.stopPropagation();var open=menu.classList.toggle('open');btn.setAttribute('aria-expanded',String(open));});
-  menu.querySelectorAll('.lang-opt').forEach(opt=>{opt.addEventListener('click',function(){const href=opt.dataset.href;if(href)window.location.href=href;menu.classList.remove('open');btn.setAttribute('aria-expanded','false');});});});
+  // Items populated and wired by /assets/i18n.js});
   document.addEventListener('click',function(){menu.classList.remove('open');btn.setAttribute('aria-expanded','false');});
 })();
 </script>
