@@ -103,12 +103,12 @@ header{display:flex;align-items:center;justify-content:space-between}
 
 /* Gallery strip — mobile first */
 .gallery-strip{display:flex;justify-content:center;gap:8px;padding:12px 16px 16px;background:var(--bg)}
-.gthumb{width:64px;height:64px;border-radius:12px;border:2px solid rgba(255,255,255,.12);background:rgba(255,255,255,.05);padding:0;overflow:hidden;cursor:pointer;transition:border-color .2s,transform .15s;flex-shrink:0}
+.gthumb{width:72px;height:72px;border-radius:12px;border:2px solid rgba(255,255,255,.12);background:rgba(255,255,255,.05);padding:0;overflow:hidden;cursor:pointer;transition:border-color .2s,transform .15s;flex-shrink:0}
 .gthumb.active{border-color:var(--accent);box-shadow:0 0 0 1px var(--accent)}
 .gthumb:hover{border-color:rgba(255,255,255,.35);transform:scale(1.06)}
 .gthumb-inner{display:block;width:100%;height:100%;background-size:cover;background-position:center}
 @media(max-width:600px){
-  .gthumb{width:56px;height:56px}
+  .gthumb{width:60px;height:60px}
   .gallery-strip{padding:10px 16px 12px}
   /* Mobile: product image larger on small screens */
   .product-img{height:min(52vh,480px)}
@@ -151,7 +151,7 @@ header{display:flex;align-items:center;justify-content:space-between}
     .system{overflow:hidden}.system-head{display:flex;justify-content:space-between;align-items:end;gap:24px;margin-bottom:34px}.product-rail{display:grid;grid-template-columns:repeat(5,minmax(220px,1fr));gap:13px}.mini-product{position:relative;min-height:390px;border:1px solid rgba(255,255,255,.08);border-radius:26px;background:linear-gradient(160deg,rgba(255,255,255,.06),rgba(255,255,255,.015));padding:20px;overflow:hidden;cursor:pointer}.mini-product img{width:100%;height:260px;object-fit:contain;transition:.4s}.mini-product:hover img{transform:translateY(-8px) scale(1.03)}.mini-product small{color:#35d79a;font-weight:800;text-transform:uppercase;letter-spacing:.14em}.mini-product h3{font:800 25px/1 'Barlow Condensed';text-transform:uppercase;margin:8px 0}.mini-product strong{font-size:14px}
     .shipping{background:linear-gradient(135deg,#10151d,#080a0f)}.shipping-grid{display:grid;grid-template-columns:repeat(4,1fr);gap:1px;background:rgba(255,255,255,.09);border:1px solid rgba(255,255,255,.09);border-radius:28px;overflow:hidden;margin-top:38px}.ship-card{background:#0d1118;padding:34px 28px;min-height:220px}.ship-icon{font-size:30px}.ship-card h3{font:800 26px/1 'Barlow Condensed';text-transform:uppercase;margin:28px 0 12px}.ship-card p{font-size:13px;line-height:1.65;color:var(--muted);margin:0}.shop-footer{padding:42px clamp(22px,6vw,96px);display:flex;align-items:center;justify-content:space-between;border-top:1px solid rgba(255,255,255,.08);color:var(--muted);font-size:12px}.shop-footer img{width:130px}
     @keyframes float{50%{transform:translateY(-11px) rotate(-.8deg)}}@keyframes orbit{to{transform:rotate(360deg)}}
-    @media(max-width:850px){.app{min-height:680px}.header-title,.back span{display:none}header{height:72px;padding:12px 18px}.logo img{width:108px;height:42px}.logo b{font-size:11px}.stage{grid-template-columns:1fr;grid-template-rows:auto 1fr;padding:78px 18px 102px;gap:0;text-align:center}.copy{display:contents}.eyebrow{position:absolute;top:90px;left:50%;transform:translateX(-50%);white-space:nowrap}.copy h1{position:absolute;top:113px;left:12px;right:12px;margin:0;font-size:clamp(50px,16vw,76px);line-height:.8;z-index:5;pointer-events:none}.copy h1 span{display:inline;margin-left:.12em}.desc{position:absolute;left:30px;right:30px;bottom:110px;margin:0 auto;font-size:13px;line-height:1.5;z-index:4}.chips{display:none}.visual{height:auto;align-self:stretch;padding:96px 0 88px}.product-img{height:min(53vh,510px);max-width:100%}.halo{width:min(94vw,540px)}.number{right:0;font-size:70vw}.swipe-hint{bottom:75px}.nav-arrow{display:none}.dock{left:12px;right:12px;bottom:max(10px,env(safe-area-inset-bottom));height:66px;border-radius:21px;padding:9px 9px 9px 15px;gap:10px}.pager{display:none}.price{font-size:25px;margin-left:0}.quantity{height:46px;margin-left:auto}.quantity button{width:35px}.buy{height:46px;min-width:130px;padding:0 17px}.sheet-card{top:auto;height:min(78svh,700px);border-left:0;border-top:1px solid rgba(255,255,255,.1);border-radius:28px 28px 0 0;transform:translateY(100%)}.sheet.open .sheet-card{transform:none}.hero-badge{top:175px;right:18px}.scroll-cue{display:none}.usage{grid-template-columns:1fr}.usage-sticky{position:static}.video-head,.system-head{align-items:start;flex-direction:column}.video-grid{grid-template-columns:1fr}.video-card{height:125vw;max-height:570px}.product-rail{display:flex;overflow-x:auto;scroll-snap-type:x mandatory;padding-bottom:12px}.mini-product{min-width:76vw;scroll-snap-align:start}.shipping-grid{grid-template-columns:1fr}.ship-card{min-height:auto}.shop-footer{align-items:flex-start;gap:20px;flex-direction:column}}
+    @media(max-width:850px){.app{min-height:680px}.header-title,.back span{display:none}header{height:72px;padding:12px 18px}.logo img{width:108px;height:42px}.logo b{font-size:11px}.stage{grid-template-columns:1fr;grid-template-rows:auto 1fr;padding:80px 20px 160px;gap:0;text-align:center;overflow-x:hidden}.copy{display:contents}.eyebrow{position:absolute;top:90px;left:50%;transform:translateX(-50%);white-space:nowrap}.copy h1{position:absolute;top:113px;left:12px;right:12px;margin:0;font-size:clamp(44px,14vw,68px);line-height:.8;z-index:5;pointer-events:none}.copy h1 span{display:inline;margin-left:.12em}.desc{position:absolute;left:30px;right:30px;bottom:110px;margin:0 auto;font-size:13px;line-height:1.5;z-index:4}.chips{display:none}.visual{height:auto;align-self:stretch;padding:20px 0 40px}.product-img{height:min(45vh,380px);max-width:100%}.halo{width:min(94vw,540px)}.number{right:0;font-size:70vw}.swipe-hint{bottom:75px}.nav-arrow{display:none}.dock{left:12px;right:12px;bottom:max(10px,env(safe-area-inset-bottom));height:66px;border-radius:21px;padding:9px 9px 9px 15px;gap:10px}.pager{display:none}.price{font-size:25px;margin-left:0}.quantity{height:46px;margin-left:auto}.quantity button{width:35px}.buy{height:46px;min-width:130px;padding:0 17px}.sheet-card{top:auto;height:min(78svh,700px);border-left:0;border-top:1px solid rgba(255,255,255,.1);border-radius:28px 28px 0 0;transform:translateY(100%)}.sheet.open .sheet-card{transform:none}.hero-badge{top:175px;right:18px}.scroll-cue{display:none}.usage{grid-template-columns:1fr}.usage-sticky{position:static}.video-head,.system-head{align-items:start;flex-direction:column}.video-grid{grid-template-columns:1fr}.video-card{height:125vw;max-height:570px}.product-rail{display:flex;overflow-x:auto;scroll-snap-type:x mandatory;padding-bottom:12px}.mini-product{min-width:76vw;scroll-snap-align:start}.shipping-grid{grid-template-columns:1fr}.ship-card{min-height:auto}.shop-footer{align-items:flex-start;gap:20px;flex-direction:column}}
     @media(max-height:700px) and (min-width:851px){.stage{padding-top:76px}.visual{height:64vh}.product-img{height:59vh}.copy h1{font-size:78px}.dock{height:64px}.header-title{display:none}}
     @media(prefers-reduced-motion:reduce){*{animation:none!important;scroll-behavior:auto!important;transition-duration:.01ms!important}}
   </style>
@@ -174,11 +174,19 @@ header{display:flex;align-items:center;justify-content:space-between}
           <span id="langCurrent">UK / GBP</span>
           <svg class="lang-caret" width="10" height="10" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><path d="M6 9l6 6 6-6"/></svg>
         </button>
-        <ul class="lang-menu" id="langMenu" role="listbox" aria-label="Language and currency">
-          <li role="option" class="lang-opt active" data-val="UK / GBP">🇬🇧 UK / GBP</li>
-          <li role="option" class="lang-opt" data-val="US / USD">🇺🇸 US / USD</li>
-          <li role="option" class="lang-opt" data-val="EU / EUR">🇪🇺 EU / EUR</li>
-          <li role="option" class="lang-opt" data-val="AU / AUD">🇦🇺 AU / AUD</li>
+        <ul class="lang-menu" id="langMenu" role="listbox" aria-label="Language and currency" style="max-height:220px;overflow-y:auto">
+          <li role="option" class="lang-opt active" data-href="/">🇬🇧 EN / GBP</li>
+          <li role="option" class="lang-opt" data-href="/lang/de">🇩🇪 Deutsch</li>
+          <li role="option" class="lang-opt" data-href="/lang/pt">🇵🇹 Português</li>
+          <li role="option" class="lang-opt" data-href="/lang/ru">🇷🇺 Русский</li>
+          <li role="option" class="lang-opt" data-href="/lang/nl">🇳🇱 Nederlands</li>
+          <li role="option" class="lang-opt" data-href="/lang/sv">🇸🇪 Svenska</li>
+          <li role="option" class="lang-opt" data-href="/lang/no">🇳🇴 Norsk</li>
+          <li role="option" class="lang-opt" data-href="/lang/cs">🇨🇿 Čeština</li>
+          <li role="option" class="lang-opt" data-href="/lang/hr">🇭🇷 Hrvatski</li>
+          <li role="option" class="lang-opt" data-href="/lang/bs">🇧🇦 Bosnian</li>
+          <li role="option" class="lang-opt" data-href="/lang/kk">🇰🇿 Қазақша</li>
+          <li role="option" class="lang-opt" data-href="/lang/sr">🇷🇸 Srpski</li>
         </ul>
       </div>
       <a class="signin-link" href="login.html">Sign In</a>
@@ -199,10 +207,12 @@ header{display:flex;align-items:center;justify-content:space-between}
     </div>
   </section>
   <!-- Gallery thumbnails -->
-  <div class="gallery-strip" id="galleryStrip">
+  <div class="gallery-strip" id="galleryStrip" style="border-top:1px solid rgba(255,255,255,.08);border-bottom:1px solid rgba(255,255,255,.08)">
     <button class="gthumb active" data-idx="0" aria-label="Image 1"><span class="gthumb-inner" id="gt0"></span></button>
     <button class="gthumb" data-idx="1" aria-label="Image 2"><span class="gthumb-inner" id="gt1"></span></button>
     <button class="gthumb" data-idx="2" aria-label="Image 3"><span class="gthumb-inner" id="gt2"></span></button>
+    <button class="gthumb" data-idx="3" aria-label="Image 4"><span class="gthumb-inner" id="gt3"></span></button>
+    <button class="gthumb" data-idx="4" aria-label="Image 5"><span class="gthumb-inner" id="gt4"></span></button>
   </div>
   <button class="nav-arrow prev" id="prev" aria-label="Previous product">←</button><button class="nav-arrow next" id="next" aria-label="Next product">→</button>
   <div class="dock">
@@ -276,9 +286,9 @@ const thumbEls=document.querySelectorAll('.gthumb');
 
 function updateGallery(){
   const p=products[current];
-  // Set all 3 thumbnails to the product image (with slight variation via JS filter)
-  const filters=['none','brightness(1.1) saturate(1.15)','contrast(1.05) brightness(.95)'];
-  for(let i=0;i<3;i++){
+  // Set all 5 thumbnails to the product image (with variation via CSS filter)
+  const filters=['none','brightness(1.12) saturate(1.2)','contrast(1.08) brightness(.93)','hue-rotate(15deg) saturate(1.1)','contrast(1.4) brightness(1.05) saturate(.8)'];
+  for(let i=0;i<5;i++){
     const el=document.getElementById('gt'+i);
     if(el){el.style.backgroundImage='url('+p.image+')';el.style.filter=filters[i];}
   }
@@ -293,7 +303,7 @@ thumbEls.forEach((btn,i)=>{
     galleryIdx=i;
     thumbEls.forEach((t,j)=>t.classList.toggle('active',j===i));
     // Subtle visual feedback — apply matching filter to hero image
-    const filters=['none','brightness(1.1) saturate(1.15)','contrast(1.05) brightness(.95)'];
+    const filters=['none','brightness(1.12) saturate(1.2)','contrast(1.08) brightness(.93)','hue-rotate(15deg) saturate(1.1)','contrast(1.4) brightness(1.05) saturate(.8)'];
     document.getElementById('productImg').style.filter=filters[i];
     setTimeout(()=>{document.getElementById('productImg').style.filter='none';},800);
   });
@@ -352,15 +362,7 @@ const _origGo=go;
     const open=menu.classList.toggle('open');
     btn.setAttribute('aria-expanded',String(open));
   });
-  menu.querySelectorAll('.lang-opt').forEach(opt=>{
-    opt.addEventListener('click',()=>{
-      cur.textContent=opt.dataset.val;
-      menu.querySelectorAll('.lang-opt').forEach(o=>o.classList.remove('active'));
-      opt.classList.add('active');
-      menu.classList.remove('open');
-      btn.setAttribute('aria-expanded','false');
-    });
-  });
+  menu.querySelectorAll('.lang-opt').forEach(opt=>{opt.addEventListener('click',function(){const href=opt.dataset.href;if(href)window.location.href=href;menu.classList.remove('open');btn.setAttribute('aria-expanded','false');});});
   document.addEventListener('click',()=>{
     menu.classList.remove('open');
     btn.setAttribute('aria-expanded','false');

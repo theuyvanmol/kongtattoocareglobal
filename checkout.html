@@ -205,11 +205,19 @@ body{background:#06090c}
           <span id="langCurrent">UK / GBP</span>
           <svg class="lang-caret" width="10" height="10" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><path d="M6 9l6 6 6-6"/></svg>
         </button>
-        <ul class="lang-menu" id="langMenu" role="listbox" aria-label="Language and currency">
-          <li role="option" class="lang-opt active" data-val="UK / GBP">🇬🇧 UK / GBP</li>
-          <li role="option" class="lang-opt" data-val="US / USD">🇺🇸 US / USD</li>
-          <li role="option" class="lang-opt" data-val="EU / EUR">🇪🇺 EU / EUR</li>
-          <li role="option" class="lang-opt" data-val="AU / AUD">🇦🇺 AU / AUD</li>
+        <ul class="lang-menu" id="langMenu" role="listbox" aria-label="Language and currency" style="max-height:220px;overflow-y:auto">
+          <li role="option" class="lang-opt active" data-href="/">🇬🇧 EN / GBP</li>
+          <li role="option" class="lang-opt" data-href="/lang/de">🇩🇪 Deutsch</li>
+          <li role="option" class="lang-opt" data-href="/lang/pt">🇵🇹 Português</li>
+          <li role="option" class="lang-opt" data-href="/lang/ru">🇷🇺 Русский</li>
+          <li role="option" class="lang-opt" data-href="/lang/nl">🇳🇱 Nederlands</li>
+          <li role="option" class="lang-opt" data-href="/lang/sv">🇸🇪 Svenska</li>
+          <li role="option" class="lang-opt" data-href="/lang/no">🇳🇴 Norsk</li>
+          <li role="option" class="lang-opt" data-href="/lang/cs">🇨🇿 Čeština</li>
+          <li role="option" class="lang-opt" data-href="/lang/hr">🇭🇷 Hrvatski</li>
+          <li role="option" class="lang-opt" data-href="/lang/bs">🇧🇦 Bosnian</li>
+          <li role="option" class="lang-opt" data-href="/lang/kk">🇰🇿 Қазақша</li>
+          <li role="option" class="lang-opt" data-href="/lang/sr">🇷🇸 Srpski</li>
         </ul>
       </div>
       <a class="signin-link" href="login.html">Sign In</a><a class="region" href="login.html" style="border:1px solid rgba(255,255,255,.18);border-radius:14px;padding:8px 13px;">Sign In</a><a class="bag" href="shop-all.html" aria-label="Open shopping bag">Bag <span>0</span></a></div>
@@ -333,6 +341,16 @@ if(reducedMotion){collectionFilms.forEach(video=>video.pause())}else{
   document.getElementById('total').textContent='£'+(subtotal/100).toFixed(2);
 })();
 function handleCheckout(e){e.preventDefault();alert('Payment processing coming soon. Thank you!');return false;}
+</script>
+<script>
+(function(){
+  var btn=document.getElementById('langBtn');
+  var menu=document.getElementById('langMenu');
+  if(!btn||!menu)return;
+  btn.addEventListener('click',function(e){e.stopPropagation();var open=menu.classList.toggle('open');btn.setAttribute('aria-expanded',open);});
+  document.addEventListener('click',function(e){if(!btn.contains(e.target)&&!menu.contains(e.target)){menu.classList.remove('open');btn.setAttribute('aria-expanded','false');}});
+  menu.querySelectorAll('.lang-opt').forEach(function(opt){opt.addEventListener('click',function(){var href=opt.dataset.href;if(href)window.location.href=href;menu.classList.remove('open');btn.setAttribute('aria-expanded','false');});});
+})();
 </script>
 </body>
 </html>

@@ -75,6 +75,17 @@
 .lang-opt:hover{background:rgba(255,255,255,.08);color:#fff}
 .lang-opt.active{color:var(--acid,#b8f34b)}
 
+
+/* Hamburger & overlay nav */
+.nav-hamburger{display:none;flex-direction:column;justify-content:center;align-items:center;gap:5px;width:40px;height:40px;background:none;border:none;cursor:pointer;padding:4px}
+.nav-hamburger span{display:block;width:22px;height:2px;background:#fff;border-radius:2px;transition:transform .3s,opacity .3s}
+.nav-overlay{position:fixed;inset:0;z-index:9998;background:#05080b;display:flex;flex-direction:column;align-items:center;justify-content:center;gap:32px;transform:translateX(100%);transition:transform .35s cubic-bezier(.4,0,.2,1)}
+.nav-overlay.open{transform:translateX(0)}
+.nav-ol-link{font:900 52px/1 "Barlow Condensed",sans-serif;text-transform:uppercase;color:#fff;text-decoration:none;transition:color .15s}
+.nav-ol-link:hover{color:#b8f34b}
+.nav-overlay-close{position:absolute;top:24px;right:24px;background:none;border:none;color:#fff;font-size:28px;cursor:pointer;width:44px;height:44px;display:flex;align-items:center;justify-content:center}
+@media(max-width:768px){.nav-hamburger{display:flex}}
+@media(min-width:769px){.nav-hamburger{display:none}.nav-overlay{display:none!important}}
 </style><style data-inline-source="store-refresh.css">
 :root{--store-cream:#f4f0e7;--store-ink:#090d10}
 .collection-page .announce{background:#b8f34b;color:#05080b;font:700 11px/1 Inter,sans-serif;letter-spacing:1.5px;text-align:center;padding:9px 16px;text-transform:uppercase;display:flex;justify-content:center;align-items:center;gap:10px}.collection-page .hero{min-height:66vh}.collection-page .hero:after{content:"KONG";right:1vw;font-size:min(25vw,390px)}.collection-page .shop{background:var(--store-cream);color:var(--store-ink);padding-top:64px}.collection-page .toolbar{border-color:rgba(9,13,16,.16)}.collection-page .filter-label,.collection-page .count{color:rgba(9,13,16,.58)}.collection-page .filter{background:transparent;border-color:rgba(9,13,16,.2);color:var(--store-ink)}.collection-page .filter:hover,.collection-page .filter.active{background:var(--store-ink);color:#fff}.collection-page .search,.collection-page .sort{background:#fff;border-color:rgba(9,13,16,.16);color:var(--store-ink)}.collection-page .search::placeholder{color:rgba(9,13,16,.45)}.collection-page .card{background:#fff;border-color:rgba(9,13,16,.12);color:var(--store-ink);box-shadow:0 16px 40px rgba(22,25,28,.08)}.collection-page .card:hover{border-color:rgba(9,13,16,.28)}.collection-page .visual{background:radial-gradient(circle at 50% 45%,rgba(var(--rgb),.54),transparent 62%),linear-gradient(145deg,rgba(var(--rgb),.2),#e9e5dd)}.collection-page .visual:before{border-color:rgba(255,255,255,.4)}.collection-page .badge{background:rgba(255,255,255,.72);color:var(--store-ink);border-color:rgba(255,255,255,.7)}.collection-page .description{color:rgba(9,13,16,.62)}.collection-page .view i{background:rgba(9,13,16,.08)}.collection-page .empty{color:rgba(9,13,16,.6)}.collection-page .cta{margin-top:72px}
@@ -106,13 +117,21 @@
           <span id="langCurrent">UK / GBP</span>
           <svg class="lang-caret" width="10" height="10" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><path d="M6 9l6 6 6-6"/></svg>
         </button>
-        <ul class="lang-menu" id="langMenu" role="listbox" aria-label="Language and currency">
-          <li role="option" class="lang-opt active" data-val="UK / GBP">🇬🇧 UK / GBP</li>
-          <li role="option" class="lang-opt" data-val="US / USD">🇺🇸 US / USD</li>
-          <li role="option" class="lang-opt" data-val="EU / EUR">🇪🇺 EU / EUR</li>
-          <li role="option" class="lang-opt" data-val="AU / AUD">🇦🇺 AU / AUD</li>
+        <ul class="lang-menu" id="langMenu" role="listbox" aria-label="Language and currency" style="max-height:220px;overflow-y:auto">
+          <li role="option" class="lang-opt active" data-href="/">🇬🇧 EN / GBP</li>
+          <li role="option" class="lang-opt" data-href="/lang/de">🇩🇪 Deutsch</li>
+          <li role="option" class="lang-opt" data-href="/lang/pt">🇵🇹 Português</li>
+          <li role="option" class="lang-opt" data-href="/lang/ru">🇷🇺 Русский</li>
+          <li role="option" class="lang-opt" data-href="/lang/nl">🇳🇱 Nederlands</li>
+          <li role="option" class="lang-opt" data-href="/lang/sv">🇸🇪 Svenska</li>
+          <li role="option" class="lang-opt" data-href="/lang/no">🇳🇴 Norsk</li>
+          <li role="option" class="lang-opt" data-href="/lang/cs">🇨🇿 Čeština</li>
+          <li role="option" class="lang-opt" data-href="/lang/hr">🇭🇷 Hrvatski</li>
+          <li role="option" class="lang-opt" data-href="/lang/bs">🇧🇦 Bosnian</li>
+          <li role="option" class="lang-opt" data-href="/lang/kk">🇰🇿 Қазақша</li>
+          <li role="option" class="lang-opt" data-href="/lang/sr">🇷🇸 Srpski</li>
         </ul>
-      </div><a class="signin-link" href="login.html">Sign In</a><button class="bag" aria-label="Shopping bag">▢<span id="count">0</span></button></div></header>
+      </div><a class="signin-link" href="login.html">Sign In</a><button class="bag" aria-label="Shopping bag">▢<span id="count">0</span></button><button class="nav-hamburger" id="navHamburger" aria-label="Open menu" onclick="document.getElementById('navOverlay').classList.toggle('open');document.body.style.overflow=document.getElementById('navOverlay').classList.contains('open')?'hidden':''"><span></span><span></span><span></span></button></div></header>
 <section class="hero"><div class="hero-copy"><div class="kicker">KONG Tattoo Care UK</div><h1>FIND YOUR <span>STAGE.</span></h1><p>Professional care for every stage—from the artist's chair to healed, protected and vibrant skin.</p></div><a class="scroll" href="#products">Explore the range ↓</a></section>
 <main class="shop" id="products">
   <div class="toolbar"><div><div class="filter-label">Filter by collection</div><div class="filters"><button class="filter active" data-filter="all">All products</button><button class="filter" data-filter="renew">Renew</button><button class="filter" data-filter="expert">Expert</button><button class="filter" data-filter="defend">Defend</button></div></div><div class="right-tools"><input class="search" id="search" type="search" placeholder="Search products…" aria-label="Search products"><select class="sort" id="sort" aria-label="Sort products"><option value="featured">Featured</option><option value="low">Price: Low to high</option><option value="high">Price: High to low</option><option value="az">Name: A–Z</option></select></div></div>
@@ -154,8 +173,15 @@ document.querySelectorAll('.filter').forEach(b=>b.onclick=()=>{document.querySel
   var cur=document.getElementById('langCurrent');
   if(!btn||!menu)return;
   btn.addEventListener('click',function(e){e.stopPropagation();var open=menu.classList.toggle('open');btn.setAttribute('aria-expanded',String(open));});
-  menu.querySelectorAll('.lang-opt').forEach(function(opt){opt.addEventListener('click',function(){cur.textContent=opt.dataset.val;menu.querySelectorAll('.lang-opt').forEach(function(o){o.classList.remove('active');});opt.classList.add('active');menu.classList.remove('open');btn.setAttribute('aria-expanded','false');});});
+  menu.querySelectorAll('.lang-opt').forEach(opt=>{opt.addEventListener('click',function(){const href=opt.dataset.href;if(href)window.location.href=href;menu.classList.remove('open');btn.setAttribute('aria-expanded','false');});});});
   document.addEventListener('click',function(){menu.classList.remove('open');btn.setAttribute('aria-expanded','false');});
 })();
 </script>
+<div class="nav-overlay" id="navOverlay">
+  <button class="nav-overlay-close" id="navOverlayClose" aria-label="Close menu" onclick="document.getElementById('navOverlay').classList.remove('open');document.body.style.overflow=''">&#10005;</button>
+  <a href="index.html" class="nav-ol-link">Home</a>
+  <a href="shop-all.html" class="nav-ol-link">Shop</a>
+  <a href="about.html" class="nav-ol-link">About</a>
+  <a href="blog.html" class="nav-ol-link">Journal</a>
+</div>
 </body></html>

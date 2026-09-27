@@ -128,6 +128,17 @@ body{background:#06090c}
 .about-kong{padding-top:130px;background:radial-gradient(circle at 82% 18%,rgba(22,140,255,.16),transparent 30%),#060a0f}.about-kong .story-panel{display:grid;grid-template-columns:1.05fr .75fr;gap:50px;align-items:center;min-height:720px;background:radial-gradient(circle at 12% 85%,rgba(31,214,160,.15),transparent 34%),linear-gradient(135deg,#0e171c,#0a1017 58%,#14101a);color:#fff;overflow:hidden}.about-kong h2{color:#fff}.about-kong .about-copy>p{color:rgba(255,255,255,.6);font-size:17px;line-height:1.75;max-width:680px}.about-kong .glass-button{margin-top:16px}.about-kong .story-stats div{background:rgba(255,255,255,.055);border-color:rgba(255,255,255,.11)}.about-kong .story-stats span{color:rgba(255,255,255,.5)}.about-visual{height:100%;min-height:570px;position:relative;border-radius:30px;background:radial-gradient(circle at 50% 45%,rgba(184,243,75,.2),transparent 32%),linear-gradient(145deg,#143b35,#0a1219 58%,#15233a);overflow:hidden}.about-visual img{position:absolute;width:88%;height:78%;object-fit:contain;bottom:0;left:6%;filter:drop-shadow(0 32px 35px #000a)}.about-visual span{position:absolute;z-index:2;left:26px;top:25px;font:900 clamp(42px,5vw,78px)/.78 'Barlow Condensed';letter-spacing:-.04em}
 @media(max-width:1000px){.caught-grid{grid-template-columns:repeat(2,1fr)}.about-kong .story-panel{grid-template-columns:1fr}.about-visual{min-height:500px}}
 @media(max-width:760px){.caught-camera{padding:82px 14px}.caught-head{display:block;margin-bottom:34px}.caught-head h2{font-size:64px}.caught-head p{font-size:14px;margin-top:24px}.caught-grid{display:flex;overflow-x:auto;scroll-snap-type:x mandatory;scrollbar-width:none;margin-right:-14px;padding-right:14px}.caught-card{flex:0 0 84vw;height:480px;scroll-snap-align:start}.caught-wide,.caught-tall{grid-column:auto;grid-row:auto}.about-kong{padding-top:82px!important}.about-kong .story-panel{padding:24px!important;gap:34px}.about-kong .about-copy>p{font-size:15px}.about-visual{min-height:430px}}
+
+/* Hamburger & overlay nav */
+.nav-hamburger{display:none;flex-direction:column;justify-content:center;align-items:center;gap:5px;width:40px;height:40px;background:none;border:none;cursor:pointer;padding:4px}
+.nav-hamburger span{display:block;width:22px;height:2px;background:#fff;border-radius:2px;transition:transform .3s,opacity .3s}
+.nav-overlay{position:fixed;inset:0;z-index:9998;background:#05080b;display:flex;flex-direction:column;align-items:center;justify-content:center;gap:32px;transform:translateX(100%);transition:transform .35s cubic-bezier(.4,0,.2,1)}
+.nav-overlay.open{transform:translateX(0)}
+.nav-ol-link{font:900 52px/1 "Barlow Condensed",sans-serif;text-transform:uppercase;color:#fff;text-decoration:none;transition:color .15s}
+.nav-ol-link:hover{color:#b8f34b}
+.nav-overlay-close{position:absolute;top:24px;right:24px;background:none;border:none;color:#fff;font-size:28px;cursor:pointer;width:44px;height:44px;display:flex;align-items:center;justify-content:center}
+@media(max-width:768px){.nav-hamburger{display:flex}}
+@media(min-width:769px){.nav-hamburger{display:none}.nav-overlay{display:none!important}}
 </style>
 <style>
 .page-hero{padding:140px 5vw 80px;text-align:center;position:relative;z-index:1}
@@ -185,14 +196,22 @@ body{background:#06090c}
           <span id="langCurrent">UK / GBP</span>
           <svg class="lang-caret" width="10" height="10" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><path d="M6 9l6 6 6-6"/></svg>
         </button>
-        <ul class="lang-menu" id="langMenu" role="listbox" aria-label="Language and currency">
-          <li role="option" class="lang-opt active" data-val="UK / GBP">🇬🇧 UK / GBP</li>
-          <li role="option" class="lang-opt" data-val="US / USD">🇺🇸 US / USD</li>
-          <li role="option" class="lang-opt" data-val="EU / EUR">🇪🇺 EU / EUR</li>
-          <li role="option" class="lang-opt" data-val="AU / AUD">🇦🇺 AU / AUD</li>
+        <ul class="lang-menu" id="langMenu" role="listbox" aria-label="Language and currency" style="max-height:220px;overflow-y:auto">
+          <li role="option" class="lang-opt active" data-href="/">🇬🇧 EN / GBP</li>
+          <li role="option" class="lang-opt" data-href="/lang/de">🇩🇪 Deutsch</li>
+          <li role="option" class="lang-opt" data-href="/lang/pt">🇵🇹 Português</li>
+          <li role="option" class="lang-opt" data-href="/lang/ru">🇷🇺 Русский</li>
+          <li role="option" class="lang-opt" data-href="/lang/nl">🇳🇱 Nederlands</li>
+          <li role="option" class="lang-opt" data-href="/lang/sv">🇸🇪 Svenska</li>
+          <li role="option" class="lang-opt" data-href="/lang/no">🇳🇴 Norsk</li>
+          <li role="option" class="lang-opt" data-href="/lang/cs">🇨🇿 Čeština</li>
+          <li role="option" class="lang-opt" data-href="/lang/hr">🇭🇷 Hrvatski</li>
+          <li role="option" class="lang-opt" data-href="/lang/bs">🇧🇦 Bosnian</li>
+          <li role="option" class="lang-opt" data-href="/lang/kk">🇰🇿 Қазақша</li>
+          <li role="option" class="lang-opt" data-href="/lang/sr">🇷🇸 Srpski</li>
         </ul>
       </div>
-      <a class="signin-link" href="login.html">Sign In</a><a class="region" href="login.html" style="border:1px solid rgba(255,255,255,.18);border-radius:14px;padding:8px 13px;">Sign In</a><a class="bag" href="shop-all.html" aria-label="Open shopping bag">Bag <span>0</span></a></div>
+      <a class="signin-link" href="login.html">Sign In</a><a class="region" href="login.html" style="border:1px solid rgba(255,255,255,.18);border-radius:14px;padding:8px 13px;">Sign In</a><a class="bag" href="shop-all.html" aria-label="Open shopping bag">Bag <span>0</span></a><button class="nav-hamburger" id="navHamburger" aria-label="Open menu" onclick="document.getElementById('navOverlay').classList.toggle('open');document.body.style.overflow=document.getElementById('navOverlay').classList.contains('open')?'hidden':''"><span></span><span></span><span></span></button></div>
     <button class="menu" aria-label="Open navigation" aria-expanded="false"><span></span><span></span></button>
 </header>
 
@@ -308,6 +327,23 @@ if(reducedMotion){collectionFilms.forEach(video=>video.pause())}else{
   if(location.hash==='#bag'){setTimeout(function(){var b=document.querySelector('#bag');if(b)b.click()},80)}
 })();
 
+</script>
+<div class="nav-overlay" id="navOverlay">
+  <button class="nav-overlay-close" id="navOverlayClose" aria-label="Close menu" onclick="document.getElementById('navOverlay').classList.remove('open');document.body.style.overflow=''">&#10005;</button>
+  <a href="index.html" class="nav-ol-link">Home</a>
+  <a href="shop-all.html" class="nav-ol-link">Shop</a>
+  <a href="about.html" class="nav-ol-link">About</a>
+  <a href="blog.html" class="nav-ol-link">Journal</a>
+</div>
+<script>
+(function(){
+  var btn=document.getElementById('langBtn');
+  var menu=document.getElementById('langMenu');
+  if(!btn||!menu)return;
+  btn.addEventListener('click',function(e){e.stopPropagation();var open=menu.classList.toggle('open');btn.setAttribute('aria-expanded',open);});
+  document.addEventListener('click',function(e){if(!btn.contains(e.target)&&!menu.contains(e.target)){menu.classList.remove('open');btn.setAttribute('aria-expanded','false');}});
+  menu.querySelectorAll('.lang-opt').forEach(function(opt){opt.addEventListener('click',function(){var href=opt.dataset.href;if(href)window.location.href=href;menu.classList.remove('open');btn.setAttribute('aria-expanded','false');});});
+})();
 </script>
 </body>
 </html>
