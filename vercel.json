@@ -6,7 +6,13 @@
   "installCommand": null,
   "outputDirectory": ".",
   "rewrites": [
-    { "source": "/shop", "destination": "/shop-all.html" },
-    { "source": "/shop/:path*", "destination": "/shop-all.html" }
+    {
+      "source": "/shop",
+      "destination": "/shop-all"
+    },
+    {
+      "source": "/shop/:path*",
+      "destination": "/shop-all"
+    }
   ]
 }
