@@ -1,6 +1,12 @@
 {
-  "outputDirectory": ".",
+  "cleanUrls": true,
+  "trailingSlash": false,
+  "framework": null,
   "buildCommand": null,
   "installCommand": null,
-  "framework": null
+  "outputDirectory": ".",
+  "rewrites": [
+    { "source": "/shop", "destination": "/shop-all.html" },
+    { "source": "/shop/:path*", "destination": "/shop-all.html" }
+  ]
 }
