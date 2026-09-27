@@ -72,11 +72,7 @@ header{display:flex;align-items:center;justify-content:space-between}
 .signin-link:hover{border-color:rgba(255,255,255,.5);color:#fff}
 
 /* Gallery strip */
-.gallery-strip{display:flex;justify-content:center;gap:10px;padding:14px 16px 8px;background:var(--bg)}
-.gthumb{width:56px;height:56px;border-radius:10px;border:2px solid rgba(255,255,255,.12);background:rgba(255,255,255,.05);padding:0;overflow:hidden;cursor:pointer;transition:border-color .2s,transform .15s;flex-shrink:0}
-.gthumb.active{border-color:var(--accent)}
-.gthumb:hover{border-color:rgba(255,255,255,.35);transform:scale(1.06)}
-.gthumb-inner{display:block;width:100%;height:100%;background-size:cover;background-position:center}
+/* gallery CSS below */
 
 /* Build Your Aftercare */
 .aftercare{padding:60px 20px}
@@ -92,6 +88,37 @@ header{display:flex;align-items:center;justify-content:space-between}
 .ac-add{width:100%;padding:8px;border-radius:8px;border:none;background:var(--accent);color:#05080b;font:700 11px/1 Inter,sans-serif;letter-spacing:.5px;text-transform:uppercase;cursor:pointer;transition:opacity .15s}
 .ac-add:hover{opacity:.85}
 @media(min-width:600px){.aftercare-grid{grid-template-columns:repeat(4,1fr);max-width:800px}}
+
+/* Language dropdown */
+.lang-drop-wrap{position:relative}
+.lang-btn{display:flex;align-items:center;gap:6px;background:rgba(255,255,255,.07);border:1px solid rgba(255,255,255,.18);border-radius:20px;padding:7px 12px;color:rgba(255,255,255,.85);font:500 12px/1 Inter,sans-serif;cursor:pointer;white-space:nowrap;transition:border-color .2s,background .2s}
+.lang-btn:hover{border-color:rgba(255,255,255,.4);background:rgba(255,255,255,.11)}
+.lang-caret{transition:transform .2s}
+.lang-btn[aria-expanded="true"] .lang-caret{transform:rotate(180deg)}
+.lang-menu{position:absolute;right:0;top:calc(100% + 8px);background:#12171d;border:1px solid rgba(255,255,255,.14);border-radius:12px;padding:6px;min-width:148px;list-style:none;margin:0;z-index:999;opacity:0;pointer-events:none;transform:translateY(-6px);transition:opacity .18s,transform .18s}
+.lang-menu.open{opacity:1;pointer-events:all;transform:translateY(0)}
+.lang-opt{padding:9px 12px;border-radius:8px;font:500 13px/1 Inter,sans-serif;color:rgba(255,255,255,.75);cursor:pointer;transition:background .15s,color .15s}
+.lang-opt:hover{background:rgba(255,255,255,.08);color:#fff}
+.lang-opt.active{color:var(--accent)}
+
+/* Gallery strip — mobile first */
+.gallery-strip{display:flex;justify-content:center;gap:8px;padding:12px 16px 16px;background:var(--bg)}
+.gthumb{width:64px;height:64px;border-radius:12px;border:2px solid rgba(255,255,255,.12);background:rgba(255,255,255,.05);padding:0;overflow:hidden;cursor:pointer;transition:border-color .2s,transform .15s;flex-shrink:0}
+.gthumb.active{border-color:var(--accent);box-shadow:0 0 0 1px var(--accent)}
+.gthumb:hover{border-color:rgba(255,255,255,.35);transform:scale(1.06)}
+.gthumb-inner{display:block;width:100%;height:100%;background-size:cover;background-position:center}
+@media(max-width:600px){
+  .gthumb{width:56px;height:56px}
+  .gallery-strip{padding:10px 16px 12px}
+  /* Mobile: product image larger on small screens */
+  .product-img{height:min(52vh,480px)}
+  /* Aftercare grid — 2 col on mobile */
+  .aftercare-grid{grid-template-columns:1fr 1fr}
+  /* Aftercare section padding */
+  .aftercare{padding:40px 16px}
+  .ac-name{font-size:13px}
+}
+
 </style><style data-inline-source="store-refresh.css">
 :root{--store-cream:#f4f0e7;--store-ink:#090d10}
 .collection-page .announce{background:#c7ff4a}.collection-page .hero{min-height:66vh}.collection-page .hero:after{content:"KONG";right:1vw;font-size:min(25vw,390px)}.collection-page .shop{background:var(--store-cream);color:var(--store-ink);padding-top:64px}.collection-page .toolbar{border-color:rgba(9,13,16,.16)}.collection-page .filter-label,.collection-page .count{color:rgba(9,13,16,.58)}.collection-page .filter{background:transparent;border-color:rgba(9,13,16,.2);color:var(--store-ink)}.collection-page .filter:hover,.collection-page .filter.active{background:var(--store-ink);color:#fff}.collection-page .search,.collection-page .sort{background:#fff;border-color:rgba(9,13,16,.16);color:var(--store-ink)}.collection-page .search::placeholder{color:rgba(9,13,16,.45)}.collection-page .card{background:#fff;border-color:rgba(9,13,16,.12);color:var(--store-ink);box-shadow:0 16px 40px rgba(22,25,28,.08)}.collection-page .card:hover{border-color:rgba(9,13,16,.28)}.collection-page .visual{background:radial-gradient(circle at 50% 45%,rgba(var(--rgb),.54),transparent 62%),linear-gradient(145deg,rgba(var(--rgb),.2),#e9e5dd)}.collection-page .visual:before{border-color:rgba(255,255,255,.4)}.collection-page .badge{background:rgba(255,255,255,.72);color:var(--store-ink);border-color:rgba(255,255,255,.7)}.collection-page .description{color:rgba(9,13,16,.62)}.collection-page .view i{background:rgba(9,13,16,.08)}.collection-page .empty{color:rgba(9,13,16,.6)}.collection-page .cta{margin-top:72px}
@@ -140,7 +167,22 @@ header{display:flex;align-items:center;justify-content:space-between}
     <div class="header-title">Shop the system</div>
     <button class="icon-btn" id="bag" aria-label="Open shopping bag">▢<span class="bag-count" id="bagCount">0</span></button>
   
-    <div class="header-actions"><span class="region-label">UK / GBP</span><a class="signin-link" href="login.html">Sign In</a></div>
+    <div class="header-actions">
+      <div class="lang-drop-wrap">
+        <button class="lang-btn" id="langBtn" aria-haspopup="listbox" aria-expanded="false">
+          <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2"><circle cx="12" cy="12" r="10"/><path d="M2 12h20M12 2a15.3 15.3 0 0 1 4 10 15.3 15.3 0 0 1-4 10 15.3 15.3 0 0 1-4-10 15.3 15.3 0 0 1 4-10z"/></svg>
+          <span id="langCurrent">UK / GBP</span>
+          <svg class="lang-caret" width="10" height="10" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><path d="M6 9l6 6 6-6"/></svg>
+        </button>
+        <ul class="lang-menu" id="langMenu" role="listbox" aria-label="Language and currency">
+          <li role="option" class="lang-opt active" data-val="UK / GBP">🇬🇧 UK / GBP</li>
+          <li role="option" class="lang-opt" data-val="US / USD">🇺🇸 US / USD</li>
+          <li role="option" class="lang-opt" data-val="EU / EUR">🇪🇺 EU / EUR</li>
+          <li role="option" class="lang-opt" data-val="AU / AUD">🇦🇺 AU / AUD</li>
+        </ul>
+      </div>
+      <a class="signin-link" href="login.html">Sign In</a>
+    </div>
 </header>
   <section class="stage" aria-live="polite">
     <div class="copy">
@@ -298,6 +340,33 @@ function updateAftercareGrid(){
 const _origRender=render;
 // Override by patching after render call
 const _origGo=go;
+
+// === LANGUAGE DROPDOWN ===
+(function(){
+  const btn=document.getElementById('langBtn');
+  const menu=document.getElementById('langMenu');
+  const cur=document.getElementById('langCurrent');
+  if(!btn||!menu)return;
+  btn.addEventListener('click',(e)=>{
+    e.stopPropagation();
+    const open=menu.classList.toggle('open');
+    btn.setAttribute('aria-expanded',String(open));
+  });
+  menu.querySelectorAll('.lang-opt').forEach(opt=>{
+    opt.addEventListener('click',()=>{
+      cur.textContent=opt.dataset.val;
+      menu.querySelectorAll('.lang-opt').forEach(o=>o.classList.remove('active'));
+      opt.classList.add('active');
+      menu.classList.remove('open');
+      btn.setAttribute('aria-expanded','false');
+    });
+  });
+  document.addEventListener('click',()=>{
+    menu.classList.remove('open');
+    btn.setAttribute('aria-expanded','false');
+  });
+})();
+
 
 function showToast(){const t=$('#toast');t.classList.add('show');setTimeout(()=>t.classList.remove('show'),1500)}
 $('#stickyAdd').onclick=add;addEventListener('scroll',()=>{const visible=scrollY>innerHeight*.75;$('#stickyBuy').classList.toggle('show',visible);$('#stickyBuy').setAttribute('aria-hidden',String(!visible))},{passive:true});

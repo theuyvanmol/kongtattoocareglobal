@@ -144,6 +144,18 @@ body{background:#06090c}
 .blog-card h2{font-family:"Barlow Condensed",sans-serif;font-weight:900;font-size:1.75rem;text-transform:uppercase;color:#fff;line-height:1;margin-bottom:.6rem}
 .blog-card p{color:rgba(255,255,255,.55);font-size:.9rem;line-height:1.6}
 .blog-meta{margin-top:1rem;font-size:.78rem;color:rgba(255,255,255,.35);display:flex;gap:1rem}
+
+/* Language dropdown */
+.lang-drop-wrap{position:relative}
+.lang-btn{display:flex;align-items:center;gap:6px;background:rgba(255,255,255,.07);border:1px solid rgba(255,255,255,.18);border-radius:20px;padding:7px 12px;color:rgba(255,255,255,.85);font:500 12px/1 Inter,sans-serif;cursor:pointer;white-space:nowrap;transition:border-color .2s,background .2s}
+.lang-btn:hover{border-color:rgba(255,255,255,.4);background:rgba(255,255,255,.11)}
+.lang-caret{transition:transform .2s}
+.lang-btn[aria-expanded="true"] .lang-caret{transform:rotate(180deg)}
+.lang-menu{position:absolute;right:0;top:calc(100% + 8px);background:#12171d;border:1px solid rgba(255,255,255,.14);border-radius:12px;padding:6px;min-width:148px;list-style:none;margin:0;z-index:9999;opacity:0;pointer-events:none;transform:translateY(-6px);transition:opacity .18s,transform .18s}
+.lang-menu.open{opacity:1;pointer-events:all;transform:translateY(0)}
+.lang-opt{padding:9px 12px;border-radius:8px;font:500 13px/1 Inter,sans-serif;color:rgba(255,255,255,.75);cursor:pointer;transition:background .15s,color .15s}
+.lang-opt:hover{background:rgba(255,255,255,.08);color:#fff}
+.lang-opt.active{color:#b8f34b}
 </style>
 </head>
 <body>
@@ -158,7 +170,20 @@ body{background:#06090c}
       <a href="about.html">About</a>
       <a href="blog.html" aria-current="page">Journal</a>
     </nav>
-    <div class="nav-actions"><a class="region" href="shop-all.html">UK / GBP</a><a class="region" href="login.html" style="border:1px solid rgba(255,255,255,.18);border-radius:14px;padding:8px 13px;">Sign In</a><a class="bag" href="shop-all.html" aria-label="Open shopping bag">Bag <span>0</span></a></div>
+    <div class="nav-actions"><div class="lang-drop-wrap">
+        <button class="lang-btn" id="langBtn" aria-haspopup="listbox" aria-expanded="false">
+          <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2"><circle cx="12" cy="12" r="10"/><path d="M2 12h20M12 2a15.3 15.3 0 0 1 4 10 15.3 15.3 0 0 1-4 10 15.3 15.3 0 0 1-4-10 15.3 15.3 0 0 1 4-10z"/></svg>
+          <span id="langCurrent">UK / GBP</span>
+          <svg class="lang-caret" width="10" height="10" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><path d="M6 9l6 6 6-6"/></svg>
+        </button>
+        <ul class="lang-menu" id="langMenu" role="listbox" aria-label="Language and currency">
+          <li role="option" class="lang-opt active" data-val="UK / GBP">🇬🇧 UK / GBP</li>
+          <li role="option" class="lang-opt" data-val="US / USD">🇺🇸 US / USD</li>
+          <li role="option" class="lang-opt" data-val="EU / EUR">🇪🇺 EU / EUR</li>
+          <li role="option" class="lang-opt" data-val="AU / AUD">🇦🇺 AU / AUD</li>
+        </ul>
+      </div>
+      <a class="signin-link" href="login.html">Sign In</a><a class="region" href="login.html" style="border:1px solid rgba(255,255,255,.18);border-radius:14px;padding:8px 13px;">Sign In</a><a class="bag" href="shop-all.html" aria-label="Open shopping bag">Bag <span>0</span></a></div>
     <button class="menu" aria-label="Open navigation" aria-expanded="false"><span></span><span></span></button>
 </header>
 <main>
