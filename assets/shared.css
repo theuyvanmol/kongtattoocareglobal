@@ -1,0 +1,70 @@
+/* KONG Tattoo Care — Shared Nav & Base CSS */
+*,*::before,*::after{box-sizing:border-box;margin:0;padding:0}
+html{scroll-behavior:smooth}
+body{font-family:'Inter',system-ui,sans-serif;background:#06080e;color:#fff;min-height:100vh;overflow-x:hidden}
+
+/* ── Nav ── */
+#nav{position:fixed;top:0;left:0;right:0;z-index:900;display:flex;align-items:center;gap:0;padding:0 32px;height:72px;background:rgba(6,8,14,.82);backdrop-filter:blur(18px);-webkit-backdrop-filter:blur(18px);border-bottom:1px solid rgba(255,255,255,.07)}
+.nav-logo{font-family:'Barlow Condensed','Inter',sans-serif;font-weight:900;font-size:22px;letter-spacing:.04em;text-transform:uppercase;color:#fff;text-decoration:none;margin-right:auto}
+.nav-logo em{color:#20b278;font-style:normal}
+.nav-links{display:flex;align-items:center;gap:28px;margin-right:24px}
+.nav-links a{color:rgba(255,255,255,.72);font-size:13px;font-weight:500;text-decoration:none;letter-spacing:.02em;transition:color .2s}
+.nav-links a:hover{color:#fff}
+.nav-right{display:flex;align-items:center;gap:10px}
+.nav-icon-btn{background:rgba(255,255,255,.07);border:1px solid rgba(255,255,255,.12);border-radius:10px;color:rgba(255,255,255,.8);padding:8px 10px;font-size:15px;cursor:pointer;transition:background .2s;line-height:1}
+.nav-icon-btn:hover{background:rgba(255,255,255,.14)}
+.nav-cta{background:linear-gradient(135deg,#20b278,#38a4f8);color:#fff;font-size:12px;font-weight:700;letter-spacing:.08em;text-transform:uppercase;padding:10px 20px;border-radius:12px;border:none;cursor:pointer;transition:opacity .2s}
+.nav-cta:hover{opacity:.85}
+.cart-badge{display:none;align-items:center;justify-content:center}
+.cart-badge.show{display:flex}
+
+/* Language picker */
+.nav-lang{position:relative;display:flex;align-items:center;gap:6px;background:rgba(255,255,255,.07);border:1px solid rgba(255,255,255,.14);border-radius:20px;padding:6px 12px;cursor:pointer;font-size:13px;font-weight:500;color:rgba(255,255,255,.82);user-select:none;transition:background .2s}
+.nav-lang:hover{background:rgba(255,255,255,.12)}
+.lang-dropdown{position:absolute;right:0;top:calc(100% + 8px);background:#0e1218;border:1px solid rgba(255,255,255,.13);border-radius:12px;padding:6px;min-width:170px;max-height:260px;overflow-y:auto;z-index:9999;display:none;flex-direction:column;gap:2px}
+.lang-dropdown.open{display:flex}
+.lang-item{padding:9px 12px;border-radius:8px;font-size:13px;color:rgba(255,255,255,.75);cursor:pointer;transition:background .15s,color .15s;white-space:nowrap}
+.lang-item:hover{background:rgba(255,255,255,.08);color:#fff}
+.lang-item.active{color:#20b278}
+
+/* Hamburger */
+.nav-ham{display:none;flex-direction:column;gap:5px;background:none;border:none;cursor:pointer;padding:6px;margin-left:8px}
+.nav-ham span{display:block;width:22px;height:2px;background:#fff;border-radius:2px;transition:all .3s}
+
+/* Mobile nav overlay */
+#mob-nav{position:fixed;inset:0;z-index:9998;background:#05080b;display:flex;flex-direction:column;align-items:center;justify-content:center;gap:28px;transform:translateX(100%);transition:transform .35s cubic-bezier(.4,0,.2,1)}
+#mob-nav.open{transform:translateX(0)}
+#mob-nav a{font-family:'Barlow Condensed','Inter',sans-serif;font-weight:900;font-size:52px;line-height:1;text-transform:uppercase;color:#fff;text-decoration:none;transition:color .2s}
+#mob-nav a:hover{color:#20b278}
+#mob-close{position:absolute;top:24px;right:24px;background:none;border:none;color:rgba(255,255,255,.6);font-size:26px;cursor:pointer;line-height:1;padding:8px}
+.btn-grad{background:linear-gradient(135deg,#20b278,#38a4f8);color:#fff;font-size:14px;font-weight:700;letter-spacing:.06em;text-transform:uppercase;padding:14px 32px;border-radius:14px;border:none;cursor:pointer}
+
+/* Cart sidebar */
+#cart-sidebar{position:fixed;top:0;right:-380px;width:360px;max-width:95vw;height:100vh;background:#0e1218;border-left:1px solid rgba(255,255,255,.1);z-index:9997;display:flex;flex-direction:column;transition:right .35s cubic-bezier(.4,0,.2,1)}
+#cart-sidebar.open{right:0}
+.cart-header{display:flex;align-items:center;justify-content:space-between;padding:20px 24px;border-bottom:1px solid rgba(255,255,255,.08)}
+.cart-title{font-weight:700;font-size:16px}
+.cart-close{background:none;border:none;color:rgba(255,255,255,.6);font-size:20px;cursor:pointer;padding:4px}
+.cart-items{flex:1;overflow-y:auto;padding:16px 24px}
+.cart-footer{padding:20px 24px;border-top:1px solid rgba(255,255,255,.08)}
+.cart-subtotal{display:flex;justify-content:space-between;margin-bottom:14px;font-size:14px;color:rgba(255,255,255,.7)}
+.cart-checkout{display:block;width:100%;padding:14px;background:linear-gradient(135deg,#20b278,#38a4f8);color:#fff;font-weight:700;font-size:13px;letter-spacing:.06em;text-transform:uppercase;border:none;border-radius:12px;cursor:pointer;text-align:center;text-decoration:none}
+
+/* Hero pills */
+.hero-pills{display:flex;flex-wrap:wrap;gap:8px;margin-top:20px}
+.hero-pill{background:rgba(255,255,255,.08);border:1px solid rgba(255,255,255,.14);border-radius:999px;padding:6px 14px;font-size:12px;color:rgba(255,255,255,.7)}
+.hero-actions{display:flex;gap:12px;margin-top:28px;flex-wrap:wrap}
+.btn-glass{background:rgba(255,255,255,.07);border:1px solid rgba(255,255,255,.18);border-radius:12px;color:#fff;font-size:13px;font-weight:600;padding:12px 24px;cursor:pointer;text-decoration:none;transition:background .2s}
+.btn-glass:hover{background:rgba(255,255,255,.13)}
+
+/* ── Mobile ── */
+@media(max-width:768px){
+  #nav{padding:0 18px}
+  .nav-links{display:none}
+  .nav-cta{display:none}
+  .nav-ham{display:flex}
+  body.nav-open{overflow:hidden}
+}
+@media(min-width:769px){
+  #mob-nav{display:none!important}
+}

@@ -106,7 +106,7 @@ header{display:flex;align-items:center;justify-content:space-between}
 .gthumb{width:72px;height:72px;border-radius:12px;border:2px solid rgba(255,255,255,.12);background:rgba(255,255,255,.05);padding:0;overflow:hidden;cursor:pointer;transition:border-color .2s,transform .15s;flex-shrink:0}
 .gthumb.active{border-color:var(--accent);box-shadow:0 0 0 1px var(--accent)}
 .gthumb:hover{border-color:rgba(255,255,255,.35);transform:scale(1.06)}
-.gthumb-inner{display:block;width:100%;height:100%;background-size:cover;background-position:center}
+.gthumb-inner{display:block;width:100%;height:100%;object-fit:cover;object-position:center}
 @media(max-width:600px){
   .gthumb{width:60px;height:60px}
   .gallery-strip{padding:10px 16px 12px}
@@ -208,11 +208,11 @@ header{display:flex;align-items:center;justify-content:space-between}
   </section>
   <!-- Gallery thumbnails -->
   <div class="gallery-strip" id="galleryStrip" style="border-top:1px solid rgba(255,255,255,.08);border-bottom:1px solid rgba(255,255,255,.08)">
-    <button class="gthumb active" data-idx="0" aria-label="Image 1"><span class="gthumb-inner" id="gt0"></span></button>
-    <button class="gthumb" data-idx="1" aria-label="Image 2"><span class="gthumb-inner" id="gt1"></span></button>
-    <button class="gthumb" data-idx="2" aria-label="Image 3"><span class="gthumb-inner" id="gt2"></span></button>
-    <button class="gthumb" data-idx="3" aria-label="Image 4"><span class="gthumb-inner" id="gt3"></span></button>
-    <button class="gthumb" data-idx="4" aria-label="Image 5"><span class="gthumb-inner" id="gt4"></span></button>
+    <button class="gthumb active" data-idx="0" aria-label="Image 1"><img class="gthumb-inner" id="gt0" src="" alt=""></button>
+    <button class="gthumb" data-idx="1" aria-label="Image 2"><img class="gthumb-inner" id="gt1" src="" alt=""></button>
+    <button class="gthumb" data-idx="2" aria-label="Image 3"><img class="gthumb-inner" id="gt2" src="" alt=""></button>
+    <button class="gthumb" data-idx="3" aria-label="Image 4"><img class="gthumb-inner" id="gt3" src="" alt=""></button>
+    <button class="gthumb" data-idx="4" aria-label="Image 5"><img class="gthumb-inner" id="gt4" src="" alt=""></button>
   </div>
   <button class="nav-arrow prev" id="prev" aria-label="Previous product">←</button><button class="nav-arrow next" id="next" aria-label="Next product">→</button>
   <div class="dock">
@@ -286,16 +286,12 @@ const thumbEls=document.querySelectorAll('.gthumb');
 
 function updateGallery(){
   const p=products[current];
-  // Set all 5 thumbnails to the product image (with variation via CSS filter)
-  const filters=['none','brightness(1.12) saturate(1.2)','contrast(1.08) brightness(.93)','hue-rotate(15deg) saturate(1.1)','contrast(1.4) brightness(1.05) saturate(.8)'];
   for(let i=0;i<5;i++){
     const el=document.getElementById('gt'+i);
-    if(el){el.style.backgroundImage='url('+p.image+')';el.style.filter=filters[i];}
+    if(el){el.src=p.image;}
   }
-  // Reset to first thumb
   galleryIdx=0;
   thumbEls.forEach((t,i)=>t.classList.toggle('active',i===0));
-  // Show full product image (already set by render)
 }
 
 thumbEls.forEach((btn,i)=>{
