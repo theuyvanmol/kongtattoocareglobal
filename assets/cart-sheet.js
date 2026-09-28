@@ -6,6 +6,7 @@
   var style = document.createElement('style');
   style.textContent = `
   #kong-sheet-overlay{position:fixed;z-index:1200;inset:0;background:rgba(0,0,0,.55);backdrop-filter:blur(8px);opacity:0;pointer-events:none;transition:.3s}
+  @media(max-width:800px){#kong-sheet-overlay{background:rgba(5,8,11,.97)!important;backdrop-filter:none!important;-webkit-backdrop-filter:none!important}}
   #kong-sheet-overlay.open{opacity:1;pointer-events:auto}
   #kong-sheet{position:absolute;right:0;top:0;bottom:0;width:min(470px,100%);background:#0d1118;border-left:1px solid rgba(255,255,255,.1);padding:26px 22px;transform:translateX(100%);transition:.4s cubic-bezier(.2,.8,.2,1);display:flex;flex-direction:column;overflow-y:auto}
   #kong-sheet-overlay.open #kong-sheet{transform:none}
