@@ -26,7 +26,7 @@ module.exports = async (req, res) => {
         product_data: {
           name: item.name,
         },
-        unit_amount: item.price, // price is already in pence (e.g. 1399 = £13.99)
+        unit_amount: Math.round(item.price < 100 ? item.price * 100 : item.price), // handle both £18.99 and 1899p
       },
       quantity: item.qty || 1,
     }));
@@ -47,6 +47,6 @@ module.exports = async (req, res) => {
 
   } catch (err) {
     console.error('Stripe error:', err.message);
-    return res.status(500).json({ error: 'Payment session failed. Please try again.', detail: err.message });
+    return res.status(500).json({ error: err.message });
   }
 };
