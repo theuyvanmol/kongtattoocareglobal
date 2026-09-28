@@ -129,7 +129,7 @@
 
     /* ── APP DOCK (mobile bottom nav) ── */
     .app-dock{display:none;position:fixed;bottom:20px;left:50%;transform:translateX(-50%);z-index:90;background:rgba(13,17,23,.92);border:1px solid var(--border);backdrop-filter:blur(20px);-webkit-backdrop-filter:blur(20px);border-radius:999px;padding:10px 20px;gap:28px}
-    @media(max-width:800px){.app-dock{display:flex}}
+    @media(max-width:800px){.app-dock{display:none!important}}
     .app-dock-item{display:flex;flex-direction:column;align-items:center;gap:3px;color:rgba(240,240,238,.5);cursor:pointer;position:relative;transition:color .2s}
     .app-dock-item:hover,.app-dock-item.active{color:var(--fg)}
     .app-dock-item svg{width:22px;height:22px}
