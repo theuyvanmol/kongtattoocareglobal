@@ -24,7 +24,7 @@ module.exports = async (req, res) => {
       price_data: {
         currency: 'gbp',
         product_data: {
-          name: item.name,
+          name: item.name || item.title || item.label || item.id || 'KONG Product',
         },
         unit_amount: Math.round(item.price < 100 ? item.price * 100 : item.price), // handle both £18.99 and 1899p
       },
