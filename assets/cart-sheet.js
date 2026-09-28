@@ -113,7 +113,7 @@
   function updateAllBadges() {
     var cart = getCart();
     var count = cart.reduce(function (n, x) { return n + (x.qty || 0); }, 0);
-    document.querySelectorAll('.dock-cart-count, #bagCount, .bag-count').forEach(function (el) {
+    document.querySelectorAll('.dock-cart-count, #bagCount, .bag-count, #navBagCount, #count').forEach(function (el) {
       el.textContent = count;
       el.style.display = count > 0 ? '' : 'none';
     });
