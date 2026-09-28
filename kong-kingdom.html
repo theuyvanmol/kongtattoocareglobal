@@ -1,0 +1,438 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1"><meta name="theme-color" content="#05080b">
+  <title>Kong Kingdom · Kong Tattoo Care</title>
+  <meta name="description" content="Join the Kong Kingdom — follow us, become a studio partner, or join our affiliate programme.">
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Barlow+Condensed:wght@700;900&family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
+  <style>
+    *,*::before,*::after{box-sizing:border-box;margin:0;padding:0}
+    :root{--bg:#05080b;--fg:#f0f0ee;--accent:#b8f34b;--muted:#6b7280;--card:#0d1117;--border:rgba(255,255,255,.08)}
+    html{scroll-behavior:smooth}
+    body{background:var(--bg);color:var(--fg);font:400 16px/1.6 Inter,sans-serif;overflow-x:hidden}
+    a{color:inherit;text-decoration:none}
+
+    /* ── NAV ── */
+    .glass-nav{position:fixed;top:14px;left:50%;transform:translateX(-50%);z-index:100;width:min(880px,calc(100% - 28px));display:flex;align-items:center;justify-content:space-between;gap:12px;background:rgba(5,8,11,.72);border:1px solid var(--border);backdrop-filter:blur(16px);-webkit-backdrop-filter:blur(16px);border-radius:999px;padding:0 10px 0 22px;height:52px}
+    .glass-nav .logo{font:900 17px/1 'Barlow Condensed',sans-serif;letter-spacing:.04em;white-space:nowrap;flex-shrink:0}
+    .glass-nav nav{display:flex;gap:2px;flex:1;justify-content:center}
+    .glass-nav nav a{font:500 13px/1 Inter,sans-serif;padding:8px 14px;border-radius:999px;color:rgba(240,240,238,.7);transition:color .2s,background .2s;white-space:nowrap}
+    .glass-nav nav a:hover,.glass-nav nav a.active{color:var(--fg);background:rgba(255,255,255,.07)}
+    .glass-nav .lang-drop-wrap{position:relative}
+    .glass-nav select{background:none;border:none;color:rgba(240,240,238,.5);font:500 13px/1 Inter,sans-serif;cursor:pointer;padding:4px 6px;outline:none;appearance:none;-webkit-appearance:none}
+    .bag-btn{display:flex;align-items:center;gap:6px;background:var(--accent);color:#05080b;border:none;border-radius:999px;padding:8px 16px;font:700 13px/1 Inter,sans-serif;cursor:pointer;transition:filter .2s;position:relative;flex-shrink:0}
+    .bag-btn:hover{filter:brightness(1.08)}
+    .bag-count{display:none;position:absolute;top:-5px;right:-5px;background:#e53;color:#fff;border-radius:999px;font-size:10px;font-weight:700;line-height:1;padding:3px 5px;min-width:18px;text-align:center}
+    .bag-count.show{display:block}
+    .nav-hamburger{display:none;flex-direction:column;gap:5px;background:none;border:none;cursor:pointer;padding:8px}
+    .nav-hamburger span{display:block;width:22px;height:2px;background:var(--fg);border-radius:2px;transition:.3s}
+
+    /* ── HERO ── */
+    .kk-hero{min-height:100svh;display:flex;flex-direction:column;align-items:center;justify-content:center;text-align:center;padding:140px 24px 80px;position:relative;overflow:hidden}
+    .kk-hero::before{content:'';position:absolute;inset:0;background:radial-gradient(ellipse 120% 80% at 50% 0%,rgba(184,243,75,.08) 0%,transparent 60%)}
+    .kk-hero .eyebrow{font:700 12px/1 Inter,sans-serif;letter-spacing:.18em;text-transform:uppercase;color:var(--accent);margin-bottom:20px}
+    .kk-hero h1{font:900 clamp(64px,14vw,140px)/1 'Barlow Condensed',sans-serif;letter-spacing:-.02em;text-transform:uppercase;max-width:900px;margin:0 auto 24px}
+    .kk-hero h1 em{font-style:italic;color:var(--accent)}
+    .kk-hero p{font:400 17px/1.6 Inter,sans-serif;color:var(--muted);max-width:500px;margin:0 auto 40px}
+    .kk-hero-ctas{display:flex;gap:14px;flex-wrap:wrap;justify-content:center}
+    .btn-primary{display:inline-flex;align-items:center;gap:8px;background:var(--accent);color:#05080b;border:none;border-radius:999px;padding:14px 28px;font:700 14px/1 Inter,sans-serif;cursor:pointer;transition:filter .2s;text-decoration:none}
+    .btn-primary:hover{filter:brightness(1.08)}
+    .btn-ghost{display:inline-flex;align-items:center;gap:8px;background:transparent;color:var(--fg);border:1px solid var(--border);border-radius:999px;padding:14px 28px;font:600 14px/1 Inter,sans-serif;cursor:pointer;transition:border-color .2s,background .2s;text-decoration:none}
+    .btn-ghost:hover{border-color:rgba(255,255,255,.3);background:rgba(255,255,255,.04)}
+
+    /* ── SECTION LAYOUT ── */
+    section{padding:100px 24px}
+    .section-inner{max-width:1060px;margin:0 auto}
+    .section-label{font:700 11px/1 Inter,sans-serif;letter-spacing:.2em;text-transform:uppercase;color:var(--accent);margin-bottom:16px}
+    .section-heading{font:900 clamp(36px,6vw,64px)/1.05 'Barlow Condensed',sans-serif;letter-spacing:-.02em;text-transform:uppercase;margin-bottom:20px}
+    .section-sub{color:var(--muted);font-size:16px;line-height:1.65;max-width:580px}
+
+    /* ── SOCIALS ── */
+    .socials-section{background:var(--card);border-top:1px solid var(--border);border-bottom:1px solid var(--border)}
+    .social-grid{display:grid;grid-template-columns:1fr 1fr;gap:1px;background:var(--border);border:1px solid var(--border);border-radius:20px;overflow:hidden;margin-top:48px}
+    .social-card{background:var(--bg);padding:48px 40px;display:flex;flex-direction:column;gap:20px;transition:background .2s}
+    .social-card:hover{background:rgba(184,243,75,.04)}
+    .social-icon{width:48px;height:48px;border-radius:14px;display:flex;align-items:center;justify-content:center;flex-shrink:0}
+    .social-icon.tiktok{background:rgba(0,0,0,.6);border:1px solid rgba(255,255,255,.1)}
+    .social-icon.instagram{background:linear-gradient(135deg,#f09433,#e6683c,#dc2743,#cc2366,#bc1888)}
+    .social-card h3{font:900 32px/1 'Barlow Condensed',sans-serif;letter-spacing:-.01em;text-transform:uppercase}
+    .social-card p{color:var(--muted);font-size:15px;line-height:1.6;flex:1}
+    .social-handle{font:700 13px/1 Inter,sans-serif;color:var(--accent);letter-spacing:.02em}
+    .social-link{margin-top:auto;align-self:flex-start}
+
+    /* ── PARTNERS ── */
+    .partner-section{}
+    .partner-layout{display:grid;grid-template-columns:1fr 1fr;gap:60px;align-items:center;margin-top:60px}
+    .partner-benefits{display:flex;flex-direction:column;gap:20px;margin-top:32px}
+    .benefit-row{display:flex;gap:16px;align-items:flex-start}
+    .benefit-icon{width:40px;height:40px;border-radius:10px;background:rgba(184,243,75,.12);border:1px solid rgba(184,243,75,.2);display:flex;align-items:center;justify-content:center;flex-shrink:0;color:var(--accent)}
+    .benefit-text h4{font:700 15px/1 Inter,sans-serif;margin-bottom:4px}
+    .benefit-text p{font-size:14px;color:var(--muted);line-height:1.5}
+    .partner-form-box{background:var(--card);border:1px solid var(--border);border-radius:20px;padding:36px;display:flex;flex-direction:column;gap:18px}
+    .partner-form-box h3{font:900 26px/1 'Barlow Condensed',sans-serif;letter-spacing:-.01em;text-transform:uppercase}
+    .form-field{display:flex;flex-direction:column;gap:6px}
+    .form-field label{font:600 12px/1 Inter,sans-serif;letter-spacing:.08em;text-transform:uppercase;color:var(--muted)}
+    .form-field input,.form-field textarea,.form-field select{background:rgba(255,255,255,.04);border:1px solid var(--border);border-radius:10px;color:var(--fg);font:400 15px/1.4 Inter,sans-serif;padding:12px 14px;outline:none;transition:border-color .2s;width:100%;resize:vertical}
+    .form-field input:focus,.form-field textarea:focus,.form-field select:focus{border-color:rgba(184,243,75,.4)}
+    .form-field select{appearance:none;-webkit-appearance:none;cursor:pointer}
+    .form-submit{background:var(--accent);color:#05080b;border:none;border-radius:999px;padding:14px 28px;font:700 14px/1 Inter,sans-serif;cursor:pointer;transition:filter .2s;width:100%}
+    .form-submit:hover{filter:brightness(1.08)}
+
+    /* ── AFFILIATE ── */
+    .affiliate-section{background:var(--card);border-top:1px solid var(--border);border-bottom:1px solid var(--border)}
+    .affiliate-grid{display:grid;grid-template-columns:repeat(3,1fr);gap:24px;margin-top:48px}
+    .aff-card{background:var(--bg);border:1px solid var(--border);border-radius:18px;padding:32px;display:flex;flex-direction:column;gap:12px;transition:border-color .2s,transform .2s}
+    .aff-card:hover{border-color:rgba(184,243,75,.25);transform:translateY(-3px)}
+    .aff-num{font:900 48px/1 'Barlow Condensed',sans-serif;color:var(--accent);letter-spacing:-.02em}
+    .aff-card h3{font:700 17px/1.2 Inter,sans-serif}
+    .aff-card p{font-size:14px;color:var(--muted);line-height:1.6;flex:1}
+
+    /* ── CTA BANNER ── */
+    .cta-banner{padding:100px 24px;text-align:center;position:relative;overflow:hidden}
+    .cta-banner::before{content:'';position:absolute;inset:0;background:radial-gradient(ellipse 100% 120% at 50% 50%,rgba(184,243,75,.07) 0%,transparent 70%)}
+    .cta-banner h2{font:900 clamp(40px,8vw,80px)/1 'Barlow Condensed',sans-serif;letter-spacing:-.02em;text-transform:uppercase;margin-bottom:20px}
+    .cta-banner p{color:var(--muted);font-size:16px;margin-bottom:36px;max-width:440px;margin-left:auto;margin-right:auto}
+
+    /* ── FOOTER ── */
+    .site-footer{border-top:1px solid var(--border);padding:48px 24px;text-align:center;color:var(--muted);font-size:13px}
+    .site-footer .logo-foot{font:900 20px/1 'Barlow Condensed',sans-serif;letter-spacing:.04em;color:var(--fg);margin-bottom:16px}
+    .footer-links{display:flex;gap:20px;flex-wrap:wrap;justify-content:center;margin-bottom:20px}
+    .footer-links a{color:var(--muted);font-size:13px;transition:color .2s}
+    .footer-links a:hover{color:var(--fg)}
+
+    /* ── MOBILE NAV OVERLAY ── */
+    .nav-overlay{position:fixed;inset:0;z-index:99;background:rgba(5,8,11,.97);display:flex;flex-direction:column;align-items:center;justify-content:center;gap:32px;transform:translateX(100%);transition:transform .35s cubic-bezier(.4,0,.2,1)}
+    .nav-overlay.open{transform:translateX(0)}
+    .nav-overlay a{font:900 40px/1 'Barlow Condensed',sans-serif;letter-spacing:.02em;text-transform:uppercase;opacity:.8;transition:opacity .2s}
+    .nav-overlay a:hover{opacity:1;color:var(--accent)}
+    .nav-close{position:absolute;top:24px;right:24px;background:none;border:none;cursor:pointer;color:var(--fg);padding:8px}
+
+    /* ── RESPONSIVE ── */
+    @media(max-width:800px){
+      .glass-nav nav{display:none}
+      .glass-nav .lang-drop-wrap{display:none}
+      .glass-nav select{display:none}
+      .glass-nav{padding:0 10px 0 14px;width:calc(100% - 24px);left:12px;transform:none;top:10px}
+      .nav-hamburger{display:flex!important}
+      .social-grid{grid-template-columns:1fr}
+      .partner-layout{grid-template-columns:1fr;gap:40px}
+      .affiliate-grid{grid-template-columns:1fr;gap:16px}
+      .kk-hero-ctas{flex-direction:column;align-items:center}
+      .social-card{padding:32px 24px}
+    }
+    @media(max-width:480px){
+      section{padding:64px 20px}
+      .kk-hero{padding:120px 20px 60px}
+    }
+
+    /* ── APP DOCK (mobile bottom nav) ── */
+    .app-dock{display:none;position:fixed;bottom:20px;left:50%;transform:translateX(-50%);z-index:90;background:rgba(13,17,23,.92);border:1px solid var(--border);backdrop-filter:blur(20px);-webkit-backdrop-filter:blur(20px);border-radius:999px;padding:10px 20px;gap:28px}
+    @media(max-width:800px){.app-dock{display:flex}}
+    .app-dock-item{display:flex;flex-direction:column;align-items:center;gap:3px;color:rgba(240,240,238,.5);cursor:pointer;position:relative;transition:color .2s}
+    .app-dock-item:hover,.app-dock-item.active{color:var(--fg)}
+    .app-dock-item svg{width:22px;height:22px}
+    .app-dock-item span{font-size:9px;font-weight:600;letter-spacing:.06em}
+    .dock-cart-count{display:none;position:absolute;top:-3px;right:-3px;background:#e53;color:#fff;border-radius:999px;font-size:9px;font-weight:700;line-height:1;padding:2px 4px;min-width:16px;text-align:center}
+    .dock-cart-count.show{display:block}
+  </style>
+</head>
+<body>
+
+<!-- NAV -->
+<header class="glass-nav">
+  <a href="index.html" class="logo">KONG TATTOO CARE</a>
+  <nav>
+    <a href="index.html">Home</a>
+    <a href="shop-all.html">Shop</a>
+    <a href="product.html">Products</a>
+    <a href="kong-kingdom.html" class="active">Kong Kingdom</a>
+  </nav>
+  <div class="lang-drop-wrap">
+    <select aria-label="Region">
+      <option>🇬🇧 GBP</option>
+      <option>🇺🇸 USD</option>
+      <option>🇪🇺 EUR</option>
+    </select>
+  </div>
+  <button class="bag-btn" onclick="window.kongOpenCart&&window.kongOpenCart()">
+    <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M6 2L3 6v14a2 2 0 002 2h14a2 2 0 002-2V6l-3-4z"/><line x1="3" y1="6" x2="21" y2="6"/><path d="M16 10a4 4 0 01-8 0"/></svg>
+    Bag
+    <span class="bag-count" id="bagCount"></span>
+  </button>
+  <button class="nav-hamburger" id="hamburger" aria-label="Open navigation">
+    <span></span><span></span><span></span>
+  </button>
+</header>
+
+<!-- MOBILE NAV OVERLAY -->
+<div class="nav-overlay" id="navOverlay">
+  <button class="nav-close" id="navClose" aria-label="Close navigation">
+    <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><line x1="18" y1="6" x2="6" y2="18"/><line x1="6" y1="6" x2="18" y2="18"/></svg>
+  </button>
+  <a href="index.html">Home</a>
+  <a href="shop-all.html">Shop</a>
+  <a href="product.html">Products</a>
+  <a href="kong-kingdom.html">Kong Kingdom</a>
+</div>
+
+<!-- HERO -->
+<section class="kk-hero">
+  <p class="eyebrow">Welcome to</p>
+  <h1>Kong<br><em>Kingdom</em></h1>
+  <p>The inner circle for tattoo artists, studios, and creators who live and breathe ink. Follow, partner, earn.</p>
+  <div class="kk-hero-ctas">
+    <a href="#follow" class="btn-primary">
+      <svg width="16" height="16" viewBox="0 0 24 24" fill="currentColor"><path d="M12 2C6.48 2 2 6.48 2 12s4.48 10 10 10 10-4.48 10-10S17.52 2 12 2zm-2 14.5v-9l6 4.5-6 4.5z"/></svg>
+      Follow Us
+    </a>
+    <a href="#partner" class="btn-ghost">Become a Studio Partner</a>
+    <a href="#affiliate" class="btn-ghost">Join Affiliate</a>
+  </div>
+</section>
+
+<!-- FOLLOW US -->
+<section class="socials-section" id="follow">
+  <div class="section-inner">
+    <p class="section-label">Social</p>
+    <h2 class="section-heading">Follow the<br>Movement</h2>
+    <p class="section-sub">Stay up to date with drops, artist spotlights, and behind-the-scenes content from the world of Kong Tattoo Care.</p>
+
+    <div class="social-grid">
+      <!-- TikTok -->
+      <div class="social-card">
+        <div class="social-icon tiktok">
+          <svg width="24" height="24" viewBox="0 0 24 24" fill="#fff"><path d="M19.59 6.69a4.83 4.83 0 01-3.77-4.25V2h-3.45v13.67a2.89 2.89 0 01-2.88 2.5 2.89 2.89 0 01-2.89-2.89 2.89 2.89 0 012.89-2.89c.28 0 .54.04.79.1V9.01a6.27 6.27 0 00-.79-.05 6.34 6.34 0 00-6.34 6.34 6.34 6.34 0 006.34 6.34 6.34 6.34 0 006.33-6.34l-.01-8.69a8.17 8.17 0 004.79 1.55V4.73a4.85 4.85 0 01-1.02-.04z"/></svg>
+        </div>
+        <div class="social-handle">@kongtattoocareuk</div>
+        <h3>TikTok</h3>
+        <p>Short-form content — healing journeys, artist features, product demonstrations, and trending sounds from the studio floor.</p>
+        <a href="https://www.tiktok.com/@kongtattoocareuk" target="_blank" rel="noopener" class="btn-primary social-link">
+          <svg width="14" height="14" viewBox="0 0 24 24" fill="currentColor"><path d="M19.59 6.69a4.83 4.83 0 01-3.77-4.25V2h-3.45v13.67a2.89 2.89 0 01-2.88 2.5 2.89 2.89 0 01-2.89-2.89 2.89 2.89 0 012.89-2.89c.28 0 .54.04.79.1V9.01a6.27 6.27 0 00-.79-.05 6.34 6.34 0 00-6.34 6.34 6.34 6.34 0 006.34 6.34 6.34 6.34 0 006.33-6.34l-.01-8.69a8.17 8.17 0 004.79 1.55V4.73a4.85 4.85 0 01-1.02-.04z"/></svg>
+          Follow on TikTok
+        </a>
+      </div>
+
+      <!-- Instagram -->
+      <div class="social-card">
+        <div class="social-icon instagram">
+          <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="#fff" stroke-width="2"><rect x="2" y="2" width="20" height="20" rx="5"/><circle cx="12" cy="12" r="5"/><circle cx="17.5" cy="6.5" r="1.2" fill="#fff" stroke="none"/></svg>
+        </div>
+        <div class="social-handle">@kongtattoocareuk</div>
+        <h3>Instagram</h3>
+        <p>The main feed. Artist showcases, product drops, real healed results, and community content from studios across the UK and beyond.</p>
+        <a href="https://www.instagram.com/kongtattoocareuk/" target="_blank" rel="noopener" class="btn-ghost social-link" style="border-color:rgba(255,255,255,.2);background:linear-gradient(135deg,rgba(240,148,51,.15),rgba(188,24,136,.15))">
+          <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="2" y="2" width="20" height="20" rx="5"/><circle cx="12" cy="12" r="5"/><circle cx="17.5" cy="6.5" r="1.2" fill="currentColor" stroke="none"/></svg>
+          Follow on Instagram
+        </a>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- STUDIO PARTNER -->
+<section id="partner">
+  <div class="section-inner">
+    <div class="partner-layout">
+      <div>
+        <p class="section-label">Partnership</p>
+        <h2 class="section-heading">Become a<br>Studio Partner</h2>
+        <p class="section-sub">We work directly with tattoo studios across the UK to offer professional wholesale pricing, co-branded opportunities, and exclusive product access.</p>
+
+        <div class="partner-benefits">
+          <div class="benefit-row">
+            <div class="benefit-icon">
+              <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M12 2l3.09 6.26L22 9.27l-5 4.87 1.18 6.88L12 17.77l-6.18 3.25L7 14.14 2 9.27l6.91-1.01L12 2z"/></svg>
+            </div>
+            <div class="benefit-text">
+              <h4>Wholesale Pricing</h4>
+              <p>Access exclusive trade rates on all Kong Tattoo Care products, with tiered discounts based on volume.</p>
+            </div>
+          </div>
+          <div class="benefit-row">
+            <div class="benefit-icon">
+              <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="10"/><line x1="12" y1="8" x2="12" y2="12"/><line x1="12" y1="16" x2="12.01" y2="16"/></svg>
+            </div>
+            <div class="benefit-text">
+              <h4>Priority Support</h4>
+              <p>Dedicated account manager, priority fulfilment, and same-day response on all partner enquiries.</p>
+            </div>
+          </div>
+          <div class="benefit-row">
+            <div class="benefit-icon">
+              <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M17 21v-2a4 4 0 00-4-4H5a4 4 0 00-4 4v2"/><circle cx="9" cy="7" r="4"/><path d="M23 21v-2a4 4 0 00-3-3.87"/><path d="M16 3.13a4 4 0 010 7.75"/></svg>
+            </div>
+            <div class="benefit-text">
+              <h4>Feature Opportunities</h4>
+              <p>Get your studio showcased on our social media, website, and upcoming editorial campaigns.</p>
+            </div>
+          </div>
+          <div class="benefit-row">
+            <div class="benefit-icon">
+              <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="1" y="4" width="22" height="16" rx="2"/><line x1="1" y1="10" x2="23" y2="10"/></svg>
+            </div>
+            <div class="benefit-text">
+              <h4>Free Product Samples</h4>
+              <p>Receive a starter kit of samples to introduce Kong Tattoo Care to your clients at zero cost.</p>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <div class="partner-form-box">
+        <h3>Apply Now</h3>
+        <div class="form-field">
+          <label>Studio Name</label>
+          <input type="text" placeholder="Electric Ink Studio">
+        </div>
+        <div class="form-field">
+          <label>Your Name</label>
+          <input type="text" placeholder="Alex Smith">
+        </div>
+        <div class="form-field">
+          <label>Email</label>
+          <input type="email" placeholder="hello@yourstudio.com">
+        </div>
+        <div class="form-field">
+          <label>Phone (optional)</label>
+          <input type="tel" placeholder="+44 7700 000000">
+        </div>
+        <div class="form-field">
+          <label>Monthly Order Volume</label>
+          <select>
+            <option value="">Select estimate</option>
+            <option>Under £200/month</option>
+            <option>£200 – £500/month</option>
+            <option>£500 – £1,000/month</option>
+            <option>Over £1,000/month</option>
+          </select>
+        </div>
+        <div class="form-field">
+          <label>Tell us about your studio</label>
+          <textarea rows="3" placeholder="How many artists, your style focus, etc."></textarea>
+        </div>
+        <button class="form-submit" onclick="handlePartnerSubmit(this)">Send Application →</button>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- AFFILIATE -->
+<section class="affiliate-section" id="affiliate">
+  <div class="section-inner">
+    <p class="section-label">Affiliate Programme</p>
+    <h2 class="section-heading">Earn with<br>Every Drop</h2>
+    <p class="section-sub">Share Kong Tattoo Care with your community and earn commission on every sale. Perfect for artists, creators, and influencers in the tattoo space.</p>
+
+    <div class="affiliate-grid">
+      <div class="aff-card">
+        <div class="aff-num">15%</div>
+        <h3>Commission Rate</h3>
+        <p>Earn 15% on every sale made through your unique referral link, paid out monthly to your account.</p>
+      </div>
+      <div class="aff-card">
+        <div class="aff-num">30d</div>
+        <h3>Cookie Window</h3>
+        <p>Your link tracks purchases for 30 days after click — so you earn even if your followers buy later.</p>
+      </div>
+      <div class="aff-card">
+        <div class="aff-num">Free</div>
+        <h3>Product Kit</h3>
+        <p>All accepted affiliates receive a complimentary product kit to review, use, and feature in content.</p>
+      </div>
+    </div>
+
+    <div style="text-align:center;margin-top:48px">
+      <a href="mailto:partners@kongtattoocareuk.com?subject=Affiliate%20Programme%20Enquiry" class="btn-primary" style="font-size:15px;padding:16px 32px">
+        <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M4 4h16c1.1 0 2 .9 2 2v12c0 1.1-.9 2-2 2H4c-1.1 0-2-.9-2-2V6c0-1.1.9-2 2-2z"/><polyline points="22,6 12,13 2,6"/></svg>
+        Apply to Affiliate Programme
+      </a>
+      <p style="color:var(--muted);font-size:13px;margin-top:14px">We typically respond within 48 hours.</p>
+    </div>
+  </div>
+</section>
+
+<!-- CTA BANNER -->
+<section class="cta-banner">
+  <h2>Ready to Join<br>the <em style="font-style:italic;color:var(--accent)">Kingdom?</em></h2>
+  <p>Whether you're a studio owner, artist, or creator — there's a place for you here.</p>
+  <div class="kk-hero-ctas">
+    <a href="#partner" class="btn-primary">Apply as a Studio</a>
+    <a href="#affiliate" class="btn-ghost">Become an Affiliate</a>
+  </div>
+</section>
+
+<!-- FOOTER -->
+<footer class="site-footer">
+  <div class="logo-foot">KONG TATTOO CARE</div>
+  <div class="footer-links">
+    <a href="index.html">Home</a>
+    <a href="shop-all.html">Shop</a>
+    <a href="product.html">Products</a>
+    <a href="kong-kingdom.html">Kong Kingdom</a>
+    <a href="mailto:hello@kongtattoocareuk.com">Contact</a>
+  </div>
+  <p>© 2025 Kong Tattoo Care UK. All rights reserved.</p>
+</footer>
+
+<!-- MOBILE DOCK -->
+<nav class="app-dock">
+  <a class="app-dock-item" href="index.html">
+    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M3 9l9-7 9 7v11a2 2 0 01-2 2H5a2 2 0 01-2-2z"/><polyline points="9 22 9 12 15 12 15 22"/></svg>
+    <span>Home</span>
+  </a>
+  <a class="app-dock-item" href="shop-all.html">
+    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="9" cy="21" r="1"/><circle cx="20" cy="21" r="1"/><path d="M1 1h4l2.68 13.39a2 2 0 002 1.61h9.72a2 2 0 002-1.61L23 6H6"/></svg>
+    <span>Shop</span>
+  </a>
+  <a class="app-dock-item active" href="kong-kingdom.html">
+    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polygon points="12 2 15.09 8.26 22 9.27 17 14.14 18.18 21.02 12 17.77 5.82 21.02 7 14.14 2 9.27 8.91 8.26 12 2"/></svg>
+    <span>Kingdom</span>
+  </a>
+  <button class="app-dock-item" onclick="window.kongOpenCart&&window.kongOpenCart()" style="background:none;border:none;cursor:pointer">
+    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M6 2L3 6v14a2 2 0 002 2h14a2 2 0 002-2V6l-3-4z"/><line x1="3" y1="6" x2="21" y2="6"/><path d="M16 10a4 4 0 01-8 0"/></svg>
+    <span>Cart</span>
+    <span class="dock-cart-count" id="dockCartCount"></span>
+  </button>
+</nav>
+
+<script>
+// Hamburger nav
+const hamburger=document.getElementById('hamburger');
+const overlay=document.getElementById('navOverlay');
+const navClose=document.getElementById('navClose');
+if(hamburger)hamburger.onclick=()=>overlay.classList.add('open');
+if(navClose)navClose.onclick=()=>overlay.classList.remove('open');
+overlay&&overlay.addEventListener('click',e=>{if(e.target===overlay)overlay.classList.remove('open')});
+
+// Cart badge sync
+function syncBadge(){
+  try{
+    const cart=JSON.parse(localStorage.getItem('kong-cart-v2')||'[]');
+    const total=cart.reduce((a,b)=>a+(b.qty||1),0);
+    const bagCount=document.getElementById('bagCount');
+    const dockCartCount=document.getElementById('dockCartCount');
+    if(bagCount){bagCount.textContent=total||'';bagCount.classList.toggle('show',total>0)}
+    if(dockCartCount){dockCartCount.textContent=total||'';dockCartCount.classList.toggle('show',total>0)}
+  }catch(e){}
+}
+syncBadge();
+window.addEventListener('storage',syncBadge);
+window.addEventListener('kong-cart-update',syncBadge);
+
+// Partner form submit handler
+function handlePartnerSubmit(btn){
+  const name=btn.closest('.partner-form-box').querySelector('input[type="text"]').value;
+  const email=btn.closest('.partner-form-box').querySelector('input[type="email"]').value;
+  if(!name||!email){alert('Please fill in your studio name and email.');return;}
+  // In production, POST to /api/partner-enquiry
+  btn.textContent='Application Sent ✓';
+  btn.style.background='rgba(184,243,75,.2)';
+  btn.style.color='var(--accent)';
+  btn.disabled=true;
+}
+</script>
+<script src="/assets/cart-sheet.js" defer></script>
+</body>
+</html>
