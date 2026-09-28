@@ -47,6 +47,6 @@ module.exports = async (req, res) => {
 
   } catch (err) {
     console.error('Stripe error:', err.message);
-    return res.status(500).json({ error: 'Payment session failed. Please try again.' });
+    return res.status(500).json({ error: 'Payment session failed. Please try again.', detail: err.message });
   }
 };
