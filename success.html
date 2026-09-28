@@ -1,0 +1,48 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<title>Order Confirmed – KONG Tattoo Care UK</title>
+<meta name="description" content="Your KONG Tattoo Care order has been confirmed.">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Barlow+Condensed:ital,wght@0,900&family=Inter:wght@400;500;600&display=swap" rel="stylesheet">
+<style>
+:root{--bg:#05080b;--accent:#b8f34b;--ink:#f7f8fb;--muted:rgba(247,248,251,.5)}
+*{box-sizing:border-box;margin:0;padding:0}
+body{background:var(--bg);color:var(--ink);font-family:Inter,system-ui,sans-serif;min-height:100vh;display:flex;flex-direction:column;align-items:center;justify-content:center;padding:40px 20px;text-align:center}
+.check-circle{width:80px;height:80px;border-radius:50%;background:rgba(184,243,75,.15);border:2px solid var(--accent);display:grid;place-items:center;margin:0 auto 32px}
+.check-circle svg{width:40px;height:40px;stroke:var(--accent);stroke-width:2.5;fill:none;stroke-linecap:round;stroke-linejoin:round}
+h1{font-family:'Barlow Condensed',sans-serif;font-weight:900;font-size:clamp(2.5rem,7vw,4rem);text-transform:uppercase;letter-spacing:-.02em;margin-bottom:16px}
+h1 em{color:var(--accent);font-style:normal}
+p{color:var(--muted);font-size:1rem;line-height:1.6;max-width:480px;margin:0 auto 12px}
+.order-note{background:rgba(255,255,255,.05);border:1px solid rgba(255,255,255,.1);border-radius:16px;padding:20px 24px;margin:32px auto;max-width:400px;font-size:.9rem}
+.order-note strong{display:block;color:var(--ink);margin-bottom:6px}
+.cta-row{display:flex;gap:12px;justify-content:center;flex-wrap:wrap;margin-top:36px}
+.btn-primary{background:var(--accent);color:#000;font-weight:700;font-size:.95rem;padding:14px 32px;border-radius:99px;text-decoration:none;letter-spacing:.02em;transition:transform .15s,box-shadow .15s}
+.btn-primary:hover{transform:translateY(-2px);box-shadow:0 8px 24px rgba(184,243,75,.3)}
+.btn-ghost{border:1px solid rgba(255,255,255,.2);color:var(--ink);font-weight:500;font-size:.95rem;padding:14px 32px;border-radius:99px;text-decoration:none;transition:border-color .2s}
+.btn-ghost:hover{border-color:rgba(255,255,255,.5)}
+</style>
+</head>
+<body>
+<div class="check-circle">
+  <svg viewBox="0 0 24 24"><polyline points="20 6 9 17 4 12"/></svg>
+</div>
+<h1>Order <em>Confirmed.</em></h1>
+<p>Thanks for your order! You'll receive a confirmation email shortly with your order details and tracking information.</p>
+<p style="margin-top:8px">Your skin will thank you. 🤙</p>
+<div class="order-note">
+  <strong>What happens next?</strong>
+  We'll process and dispatch your order within 1–2 business days. Free UK delivery on all orders over £35.
+</div>
+<div class="cta-row">
+  <a href="/" class="btn-primary">Back to Home</a>
+  <a href="/shop-all" class="btn-ghost">Keep Shopping</a>
+</div>
+<script>
+  // Clear the cart after successful payment
+  try { localStorage.removeItem('kong-cart-v2'); } catch(e) {}
+</script>
+</body>
+</html>

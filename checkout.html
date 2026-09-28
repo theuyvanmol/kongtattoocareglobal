@@ -340,7 +340,35 @@ if(reducedMotion){collectionFilms.forEach(video=>video.pause())}else{
   document.getElementById('subtotal').textContent='£'+(subtotal/100).toFixed(2);
   document.getElementById('total').textContent='£'+(subtotal/100).toFixed(2);
 })();
-function handleCheckout(e){e.preventDefault();alert('Payment processing coming soon. Thank you!');return false;}
+async function handleCheckout(e){
+  e.preventDefault();
+  var cart=[];
+  try{cart=JSON.parse(localStorage.getItem('kong-cart-v2')||'[]')}catch(err){}
+  if(!cart.length){alert('Your cart is empty.');return false;}
+
+  var btn=document.querySelector('#checkout-form button[type=submit]');
+  var originalText=btn?btn.textContent:'';
+  if(btn){btn.disabled=true;btn.textContent='Processing…';}
+
+  try{
+    var res=await fetch('/api/checkout',{
+      method:'POST',
+      headers:{'Content-Type':'application/json'},
+      body:JSON.stringify({items:cart})
+    });
+    var data=await res.json();
+    if(data.url){
+      window.location.href=data.url;
+    }else{
+      alert(data.error||'Something went wrong. Please try again.');
+      if(btn){btn.disabled=false;btn.textContent=originalText;}
+    }
+  }catch(err){
+    alert('Connection error. Please try again.');
+    if(btn){btn.disabled=false;btn.textContent=originalText;}
+  }
+  return false;
+}
 </script>
 <script>
 (function(){
