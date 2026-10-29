@@ -93,6 +93,8 @@
           </div>
           <label class="kong-field-label">Email *</label>
           <input class="kong-input" id="kf-email" type="email" placeholder="you@email.com" required autocomplete="email">
+          <label class="kong-field-label">Phone number *</label>
+          <input class="kong-input" id="kf-phone" type="tel" placeholder="+44 7700 900000" required autocomplete="tel">
           <label class="kong-field-label">Address line 1 *</label>
           <input class="kong-input" id="kf-line1" type="text" placeholder="123 Street Name" required autocomplete="address-line1">
           <label class="kong-field-label">Address line 2</label>
@@ -307,7 +309,7 @@
 
   document.getElementById('kong-details-submit').onclick = async function () {
     // Validate required fields
-    var required = ['kf-first', 'kf-last', 'kf-email', 'kf-line1', 'kf-city', 'kf-postcode'];
+    var required = ['kf-first', 'kf-last', 'kf-email', 'kf-phone', 'kf-line1', 'kf-city', 'kf-postcode'];
     for (var i = 0; i < required.length; i++) {
       var inp = document.getElementById(required[i]);
       if (!inp.value.trim()) { inp.focus(); return; }
@@ -326,8 +328,11 @@
     var city      = document.getElementById('kf-city').value.trim();
     var postcode  = document.getElementById('kf-postcode').value.trim();
 
+    var phone = document.getElementById('kf-phone').value.trim();
     var body = {
       items: cart,
+      email: email,
+      phone: phone,
       shipping: {
         name: firstName + ' ' + lastName,
         line1: line1, line2: line2,
@@ -384,6 +389,7 @@
 
       // Store email for receipt
       document.getElementById('kong-pay-submit').dataset.email = email;
+      document.getElementById('kong-pay-submit').dataset.phone = phone;
       document.getElementById('kong-pay-submit').dataset.name = firstName + ' ' + lastName;
       document.getElementById('kong-pay-submit').dataset.line1 = line1;
       document.getElementById('kong-pay-submit').dataset.line2 = line2;
@@ -412,6 +418,17 @@
       confirmParams: {
         return_url: 'https://www.kongtattoocareglobal.com/success',
         receipt_email: ds.email || undefined,
+        payment_method_data: {
+          billing_details: {
+            name: ds.name || '',
+            email: ds.email || '',
+            phone: ds.phone || '',
+            address: {
+              line1: ds.line1 || '', line2: ds.line2 || '',
+              city: ds.city || '', postal_code: ds.postcode || '', country: 'GB'
+            }
+          }
+        },
         shipping: {
           name: ds.name || '',
           address: {

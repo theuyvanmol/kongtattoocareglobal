@@ -244,16 +244,17 @@ body{background:#06090c}
       <div class="checkout-step">Step 1 of 2</div>
       <h2 class="checkout-title">Delivery<br>Details</h2>
       <form id="checkout-form" onsubmit="return handleCheckout(event)">
-        <div class="form-group"><label>Email address</label><input type="email" placeholder="you@email.com" required></div>
+        <div class="form-group"><label>Email address</label><input type="email" id="checkout-email" placeholder="you@email.com" required autocomplete="email"></div>
+        <div class="form-group"><label>Phone number</label><input type="tel" id="checkout-phone" placeholder="+44 7700 900000" required autocomplete="tel"></div>
         <div class="form-row">
-          <div class="form-group"><label>First name</label><input type="text" placeholder="First" required></div>
-          <div class="form-group"><label>Last name</label><input type="text" placeholder="Last" required></div>
+          <div class="form-group"><label>First name</label><input type="text" id="checkout-first" placeholder="First" required autocomplete="given-name"></div>
+          <div class="form-group"><label>Last name</label><input type="text" id="checkout-last" placeholder="Last" required autocomplete="family-name"></div>
         </div>
-        <div class="form-group"><label>Address line 1</label><input type="text" placeholder="123 Street Name" required></div>
-        <div class="form-group"><label>Address line 2</label><input type="text" placeholder="Flat / unit (optional)"></div>
+        <div class="form-group"><label>Address line 1</label><input type="text" id="checkout-line1" placeholder="123 Street Name" required autocomplete="address-line1"></div>
+        <div class="form-group"><label>Address line 2</label><input type="text" id="checkout-line2" placeholder="Flat / unit (optional)" autocomplete="address-line2"></div>
         <div class="form-row">
-          <div class="form-group"><label>City</label><input type="text" placeholder="London" required></div>
-          <div class="form-group"><label>Postcode</label><input type="text" placeholder="EC1A 1BB" required></div>
+          <div class="form-group"><label>City</label><input type="text" id="checkout-city" placeholder="London" required autocomplete="address-level2"></div>
+          <div class="form-group"><label>Postcode</label><input type="text" id="checkout-postcode" placeholder="EC1A 1BB" required autocomplete="postal-code"></div>
         </div>
         <div class="form-group promo-group">
           <label>Discount code</label>
@@ -429,21 +430,17 @@ async function handleCheckout(e){
   }
 
   // Collect form fields
-  var allInputs = form.querySelectorAll('input');
-  var emailVal='', firstVal='', lastVal='', line1Val='', line2Val='', cityVal='', postVal='';
-  allInputs.forEach(function(inp){
-    var ph=(inp.placeholder||'').toLowerCase();
-    var lbl='';
-    var prev=inp.closest('.form-group');
-    if(prev){var l=prev.querySelector('label');if(l)lbl=l.textContent.toLowerCase();}
-    if(inp.type==='email'||lbl.includes('email')) emailVal=inp.value.trim();
-    else if(lbl.includes('first')) firstVal=inp.value.trim();
-    else if(lbl.includes('last')) lastVal=inp.value.trim();
-    else if(lbl.includes('address line 1')||ph.includes('123 street')) line1Val=inp.value.trim();
-    else if(lbl.includes('address line 2')||ph.includes('flat')) line2Val=inp.value.trim();
-    else if(lbl.includes('city')) cityVal=inp.value.trim();
-    else if(lbl.includes('postcode')||ph.includes('ec1a')) postVal=inp.value.trim();
-  });
+  var emailVal  = (document.getElementById('checkout-email')   ||{}).value||'';
+  var phoneVal  = (document.getElementById('checkout-phone')   ||{}).value||'';
+  var firstVal  = (document.getElementById('checkout-first')   ||{}).value||'';
+  var lastVal   = (document.getElementById('checkout-last')    ||{}).value||'';
+  var line1Val  = (document.getElementById('checkout-line1')   ||{}).value||'';
+  var line2Val  = (document.getElementById('checkout-line2')   ||{}).value||'';
+  var cityVal   = (document.getElementById('checkout-city')    ||{}).value||'';
+  var postVal   = (document.getElementById('checkout-postcode')||{}).value||'';
+  emailVal=emailVal.trim(); phoneVal=phoneVal.trim(); firstVal=firstVal.trim();
+  lastVal=lastVal.trim(); line1Val=line1Val.trim(); line2Val=line2Val.trim();
+  cityVal=cityVal.trim(); postVal=postVal.trim();
 
   var btn=document.querySelector('#checkout-form button[type=submit]');
   var originalText=btn?btn.textContent:'';
@@ -452,6 +449,8 @@ async function handleCheckout(e){
   try{
     var body={
       items: cart,
+      email: emailVal,
+      phone: phoneVal,
       shipping: {
         name: (firstVal+' '+lastVal).trim(),
         line1: line1Val, line2: line2Val,
@@ -492,6 +491,14 @@ async function handleCheckout(e){
         confirmParams:{
           return_url: window.location.origin+'/checkout-success.html',
           receipt_email: emailVal,
+          payment_method_data:{
+            billing_details:{
+              name:(firstVal+' '+lastVal).trim(),
+              email:emailVal,
+              phone:phoneVal,
+              address:{line1:line1Val,line2:line2Val||'',city:cityVal,postal_code:postVal,country:'GB'}
+            }
+          },
           shipping:{ name:(firstVal+' '+lastVal).trim(), address:{line1:line1Val,line2:line2Val||'',city:cityVal,postal_code:postVal,country:'GB'} }
         }
       });

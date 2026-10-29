@@ -10,7 +10,7 @@ module.exports = async (req, res) => {
 
   try {
     const stripe = new Stripe(process.env.STRIPE_SECRET_KEY);
-    const { items, promoCode, shipping } = req.body;
+    const { items, promoCode, shipping, email, phone } = req.body;
 
     if (!items || !items.length) return res.status(400).json({ error: 'No items in cart' });
 
@@ -63,6 +63,8 @@ module.exports = async (req, res) => {
     if (promoCodeId)    metadata.promo_code_id    = promoCodeId;
     if (promoCodeLabel) metadata.promo_code        = promoCodeLabel;
     if (discountAmount) metadata.discount_gbp      = (discountAmount / 100).toFixed(2);
+    if (email)          metadata.customer_email    = email;
+    if (phone)          metadata.customer_phone    = phone;
 
     // Build PaymentIntent params
     const piParams = {
@@ -70,6 +72,7 @@ module.exports = async (req, res) => {
       currency: 'gbp',
       automatic_payment_methods: { enabled: true },
       metadata,
+      ...(email && { receipt_email: email }),
     };
 
     // Attach shipping address if provided
