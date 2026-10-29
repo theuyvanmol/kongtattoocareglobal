@@ -388,13 +388,13 @@ document.addEventListener('DOMContentLoaded', function(){
         if(data.percentOff) discPence = Math.round(_cartPence * data.percentOff / 100);
         else if(data.amountOff) discPence = Math.min(data.amountOff, _cartPence);
         _appliedPromo = { code: data.code, percentOff: data.percentOff, amountOff: data.amountOff, discountPence: discPence };
-        var finalTotal = Math.max(0, _cartSubtotal - discPence);
+        var finalTotalPence = Math.max(0, _cartPence - discPence);
         // Update UI
         var discRow = document.getElementById('discount-row');
         document.getElementById('discount-label').textContent = data.percentOff ? data.percentOff+'% off ('+data.code+')' : 'Discount ('+data.code+')';
         document.getElementById('discount-amount').textContent = '-£'+(discPence/100).toFixed(2);
         discRow.style.display='';
-        document.getElementById('total').textContent='£'+(finalTotal/100).toFixed(2);
+        document.getElementById('total').textContent='£'+(finalTotalPence/100).toFixed(2);
         promoMsg.textContent='✓ Code applied! You save £'+(discPence/100).toFixed(2);
         promoMsg.className='valid';
         applyBtn.textContent='Applied ✓';
