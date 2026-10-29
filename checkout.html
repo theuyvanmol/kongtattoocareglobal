@@ -4,6 +4,7 @@
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width,initial-scale=1">
 <title>Checkout – KONG Tattoo Care UK</title>
+<script src="https://js.stripe.com/v3/"></script>
 <meta name="description" content="Secure checkout for KONG Tattoo Care UK.">
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link href="https://fonts.googleapis.com/css2?family=Barlow+Condensed:ital,wght@0,400;0,700;0,900;1,900&family=Inter:wght@400;500;600&display=swap" rel="stylesheet">
@@ -190,6 +191,15 @@ body{background:#06090c}
 .lang-opt{padding:9px 12px;border-radius:8px;font:500 13px/1 Inter,sans-serif;color:rgba(255,255,255,.75);cursor:pointer;transition:background .15s,color .15s}
 .lang-opt:hover{background:rgba(255,255,255,.08);color:#fff}
 .lang-opt.active{color:#b8f34b}
+
+.promo-group { margin-bottom: 1rem; }
+.promo-row { display: flex; gap: .5rem; }
+.promo-row input { flex: 1; }
+.btn-promo { padding: .6rem 1rem; background: transparent; border: 1px solid rgba(255,255,255,.3); color: #fff; border-radius: 8px; cursor: pointer; font-size: .9rem; white-space: nowrap; transition: background .2s; }
+.btn-promo:hover { background: rgba(255,255,255,.1); }
+.btn-promo:disabled { opacity: .5; cursor: not-allowed; }
+#promo-msg.valid { color: #4ade80; }
+#promo-msg.invalid { color: #f87171; }
 </style>
 </head>
 <body>
@@ -245,6 +255,14 @@ body{background:#06090c}
           <div class="form-group"><label>City</label><input type="text" placeholder="London" required></div>
           <div class="form-group"><label>Postcode</label><input type="text" placeholder="EC1A 1BB" required></div>
         </div>
+        <div class="form-group promo-group">
+          <label>Discount code</label>
+          <div class="promo-row">
+            <input type="text" id="promo-input" placeholder="Enter code e.g. DanKong10" autocomplete="off" style="text-transform:uppercase">
+            <button type="button" id="promo-apply-btn" class="btn-promo">Apply</button>
+          </div>
+          <div id="promo-msg" style="margin-top:.4rem;font-size:.85rem"></div>
+        </div>
         <hr class="divider">
         <button class="btn-submit" type="submit">Continue to Payment →</button>
       </form>
@@ -255,6 +273,7 @@ body{background:#06090c}
       <hr class="divider" style="margin:1rem 0">
       <div class="order-total-row"><span>Subtotal</span><span id="subtotal">£0.00</span></div>
       <div class="order-total-row"><span>Shipping</span><span>Free</span></div>
+      <div class="order-total-row" id="discount-row" style="display:none;color:#4ade80"><span id="discount-label">Discount</span><span id="discount-amount">-£0.00</span></div>
       <div class="order-total-row total"><span>Total</span><span id="total">£0.00</span></div>
     </div>
   </div>
@@ -324,45 +343,163 @@ if(reducedMotion){collectionFilms.forEach(video=>video.pause())}else{
 
 </script>
 <script>
+/* ── Cart display ─────────────────────────────────────────────────────── */
+var _cartSubtotal = 0;
+var _appliedPromo = null; // { code, percentOff, amountOff, discountPence }
+
 (function(){
   var cart=[];try{cart=JSON.parse(localStorage.getItem('kong-cart-v2')||'[]')}catch(e){}
   var emptyEl=document.getElementById('empty-state');
   var contentEl=document.getElementById('checkout-content');
   if(!cart.length){emptyEl.style.display='block';contentEl.style.display='none';return;}
   var itemsEl=document.getElementById('cart-items');
-  var subtotal=0;
+  _cartSubtotal=0;
   cart.forEach(function(item){
-    subtotal+=(item.price||0)*(item.qty||1);
+    _cartSubtotal+=(item.price||0)*(item.qty||1);
     var div=document.createElement('div');div.className='order-item';
     div.innerHTML='<div class="order-item-img"></div><div class="order-item-name">'+item.name+'<br><small style="color:rgba(255,255,255,.4)">Qty: '+(item.qty||1)+'</small></div><div class="order-item-price">£'+(((item.price||0)*(item.qty||1))/100).toFixed(2)+'</div>';
     itemsEl.appendChild(div);
   });
-  document.getElementById('subtotal').textContent='£'+(subtotal/100).toFixed(2);
-  document.getElementById('total').textContent='£'+(subtotal/100).toFixed(2);
+  document.getElementById('subtotal').textContent='£'+(_cartSubtotal/100).toFixed(2);
+  document.getElementById('total').textContent='£'+(_cartSubtotal/100).toFixed(2);
 })();
+
+/* ── Promo code Apply button ──────────────────────────────────────────── */
+document.addEventListener('DOMContentLoaded', function(){
+  var applyBtn = document.getElementById('promo-apply-btn');
+  var promoInput = document.getElementById('promo-input');
+  var promoMsg = document.getElementById('promo-msg');
+  if(!applyBtn) return;
+
+  applyBtn.addEventListener('click', async function(){
+    var code = (promoInput.value||'').trim().toUpperCase();
+    if(!code){ promoMsg.textContent='Please enter a code.'; promoMsg.className='invalid'; return; }
+    applyBtn.disabled=true; applyBtn.textContent='Checking…';
+    promoMsg.textContent=''; promoMsg.className='';
+    try{
+      var res = await fetch('/api/validate-promo',{
+        method:'POST', headers:{'Content-Type':'application/json'},
+        body: JSON.stringify({code})
+      });
+      var data = await res.json();
+      if(data.valid){
+        var discPence = 0;
+        if(data.percentOff) discPence = Math.round(_cartSubtotal * data.percentOff / 100);
+        else if(data.amountOff) discPence = Math.min(data.amountOff, _cartSubtotal);
+        _appliedPromo = { code: data.code, percentOff: data.percentOff, amountOff: data.amountOff, discountPence: discPence };
+        var finalTotal = Math.max(0, _cartSubtotal - discPence);
+        // Update UI
+        var discRow = document.getElementById('discount-row');
+        document.getElementById('discount-label').textContent = data.percentOff ? data.percentOff+'% off ('+data.code+')' : 'Discount ('+data.code+')';
+        document.getElementById('discount-amount').textContent = '-£'+(discPence/100).toFixed(2);
+        discRow.style.display='';
+        document.getElementById('total').textContent='£'+(finalTotal/100).toFixed(2);
+        promoMsg.textContent='✓ Code applied! You save £'+(discPence/100).toFixed(2);
+        promoMsg.className='valid';
+        applyBtn.textContent='Applied ✓';
+        promoInput.readOnly=true;
+      } else {
+        _appliedPromo=null;
+        promoMsg.textContent=data.error||'Invalid or expired code.';
+        promoMsg.className='invalid';
+        applyBtn.disabled=false; applyBtn.textContent='Apply';
+      }
+    }catch(err){
+      promoMsg.textContent='Could not check code. Try again.';
+      promoMsg.className='invalid';
+      applyBtn.disabled=false; applyBtn.textContent='Apply';
+    }
+  });
+});
+
+/* ── Stripe payment flow ──────────────────────────────────────────────── */
+var stripe = Stripe('pk_live_51UHzxYCwf19rs1JjKqQ0iyQPKCaEfDZZy4ELW3iuWvhtYoVqHGCkl4rOI4fAW3RqXLjAJO2qHJE0mBNJyUsTgzk00lEdAuP9b');
+
 async function handleCheckout(e){
   e.preventDefault();
   var cart=[];
   try{cart=JSON.parse(localStorage.getItem('kong-cart-v2')||'[]')}catch(err){}
   if(!cart.length){alert('Your cart is empty.');return false;}
 
+  var form = document.getElementById('checkout-form');
+  var inputs = form.querySelectorAll('input[required]');
+  for(var i=0;i<inputs.length;i++){
+    if(!inputs[i].value.trim()){inputs[i].focus();alert('Please fill in all required fields.');return false;}
+  }
+
+  // Collect form fields
+  var allInputs = form.querySelectorAll('input');
+  var emailVal='', firstVal='', lastVal='', line1Val='', line2Val='', cityVal='', postVal='';
+  allInputs.forEach(function(inp){
+    var ph=(inp.placeholder||'').toLowerCase();
+    var lbl='';
+    var prev=inp.closest('.form-group');
+    if(prev){var l=prev.querySelector('label');if(l)lbl=l.textContent.toLowerCase();}
+    if(inp.type==='email'||lbl.includes('email')) emailVal=inp.value.trim();
+    else if(lbl.includes('first')) firstVal=inp.value.trim();
+    else if(lbl.includes('last')) lastVal=inp.value.trim();
+    else if(lbl.includes('address line 1')||ph.includes('123 street')) line1Val=inp.value.trim();
+    else if(lbl.includes('address line 2')||ph.includes('flat')) line2Val=inp.value.trim();
+    else if(lbl.includes('city')) cityVal=inp.value.trim();
+    else if(lbl.includes('postcode')||ph.includes('ec1a')) postVal=inp.value.trim();
+  });
+
   var btn=document.querySelector('#checkout-form button[type=submit]');
   var originalText=btn?btn.textContent:'';
   if(btn){btn.disabled=true;btn.textContent='Processing…';}
 
   try{
-    var res=await fetch('/api/checkout',{
-      method:'POST',
-      headers:{'Content-Type':'application/json'},
-      body:JSON.stringify({items:cart})
+    var body={
+      items: cart,
+      shipping: {
+        name: (firstVal+' '+lastVal).trim(),
+        line1: line1Val, line2: line2Val,
+        city: cityVal, postcode: postVal, country:'GB'
+      }
+    };
+    if(_appliedPromo && _appliedPromo.code) body.promoCode = _appliedPromo.code;
+
+    var res=await fetch('/api/payment-intent',{
+      method:'POST', headers:{'Content-Type':'application/json'},
+      body: JSON.stringify(body)
     });
     var data=await res.json();
-    if(data.url){
-      window.location.href=data.url;
-    }else{
-      alert(data.error||'Something went wrong. Please try again.');
+    if(data.error){
+      alert(data.error);
       if(btn){btn.disabled=false;btn.textContent=originalText;}
+      return false;
     }
+
+    // Mount Stripe Elements payment form
+    var elements = stripe.elements({ clientSecret: data.clientSecret, appearance:{ theme:'night' } });
+    var paymentEl = elements.create('payment');
+
+    // Replace the checkout form with payment element
+    var formContainer = form.closest('.checkout-form-wrap')||form.parentElement;
+    var payDiv = document.createElement('div');
+    payDiv.id='stripe-payment-container';
+    payDiv.innerHTML='<h2 style="margin-bottom:1rem">Payment Details</h2><div id="payment-element"></div><p id="pay-msg" style="color:#f87171;margin-top:.5rem;font-size:.85rem"></p><button id="pay-btn" style="margin-top:1rem;width:100%;padding:.9rem;background:var(--accent,#b94f2a);color:#fff;border:none;border-radius:10px;font-size:1rem;cursor:pointer;font-weight:600">Pay Now</button>';
+    form.style.display='none';
+    formContainer.appendChild(payDiv);
+    paymentEl.mount('#payment-element');
+
+    document.getElementById('pay-btn').addEventListener('click', async function(){
+      var payBtn=document.getElementById('pay-btn');
+      payBtn.disabled=true; payBtn.textContent='Processing payment…';
+      var result = await stripe.confirmPayment({
+        elements,
+        confirmParams:{
+          return_url: window.location.origin+'/checkout-success.html',
+          receipt_email: emailVal,
+          shipping:{ name:(firstVal+' '+lastVal).trim(), address:{line1:line1Val,line2:line2Val||'',city:cityVal,postal_code:postVal,country:'GB'} }
+        }
+      });
+      if(result.error){
+        document.getElementById('pay-msg').textContent=result.error.message||'Payment failed. Please try again.';
+        payBtn.disabled=false; payBtn.textContent='Pay Now';
+      }
+    });
+
   }catch(err){
     alert('Connection error. Please try again.');
     if(btn){btn.disabled=false;btn.textContent=originalText;}
