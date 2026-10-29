@@ -357,11 +357,11 @@ var _appliedPromo = null; // { code, percentOff, amountOff, discountPence }
   cart.forEach(function(item){
     _cartSubtotal+=(item.price||0)*(item.qty||1);
     var div=document.createElement('div');div.className='order-item';
-    div.innerHTML='<div class="order-item-img"></div><div class="order-item-name">'+item.name+'<br><small style="color:rgba(255,255,255,.4)">Qty: '+(item.qty||1)+'</small></div><div class="order-item-price">£'+(((item.price||0)*(item.qty||1))/100).toFixed(2)+'</div>';
+    div.innerHTML='<div class="order-item-img"></div><div class="order-item-name">'+item.name+'<br><small style="color:rgba(255,255,255,.4)">Qty: '+(item.qty||1)+'</small></div><div class="order-item-price">£'+((item.price||0)*(item.qty||1)).toFixed(2)+'</div>';
     itemsEl.appendChild(div);
   });
-  document.getElementById('subtotal').textContent='£'+(_cartSubtotal/100).toFixed(2);
-  document.getElementById('total').textContent='£'+(_cartSubtotal/100).toFixed(2);
+  document.getElementById('subtotal').textContent='£'+(_cartSubtotal).toFixed(2);
+  document.getElementById('total').textContent='£'+(_cartSubtotal).toFixed(2);
 })();
 
 /* ── Promo code Apply button ──────────────────────────────────────────── */
@@ -384,8 +384,9 @@ document.addEventListener('DOMContentLoaded', function(){
       var data = await res.json();
       if(data.valid){
         var discPence = 0;
-        if(data.percentOff) discPence = Math.round(_cartSubtotal * data.percentOff / 100);
-        else if(data.amountOff) discPence = Math.min(data.amountOff, _cartSubtotal);
+        var _cartPence = Math.round(_cartSubtotal * 100);
+        if(data.percentOff) discPence = Math.round(_cartPence * data.percentOff / 100);
+        else if(data.amountOff) discPence = Math.min(data.amountOff, _cartPence);
         _appliedPromo = { code: data.code, percentOff: data.percentOff, amountOff: data.amountOff, discountPence: discPence };
         var finalTotal = Math.max(0, _cartSubtotal - discPence);
         // Update UI
