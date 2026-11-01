@@ -25,15 +25,16 @@ export default async function handler(req, res) {
     const thirtyDaysAgo = now - 30 * 24 * 3600;
     const sixtyDaysAgo = now - 60 * 24 * 3600;
 
-    // Run all Stripe calls in parallel
-    const [balance, charges30, charges60, chargesAll, payouts, customers, upcoming] = await Promise.all([
+    // Run all Stripe calls in parallel — check both charges and payment_intents (some accounts use one or the other)
+    const [balance, charges30, charges60, chargesAll, payouts, pi30, pi60, piAll] = await Promise.all([
       stripe('/balance'),
-      stripe('/charges', { limit: 100, created: { gte: thirtyDaysAgo }, expand: ['data.customer'] }),
+      stripe('/charges', { limit: 100, created: { gte: thirtyDaysAgo } }),
       stripe('/charges', { limit: 100, created: { gte: sixtyDaysAgo, lt: thirtyDaysAgo } }),
-      stripe('/charges', { limit: 100, expand: ['data.customer'] }), // for lifetime (most recent 100)
+      stripe('/charges', { limit: 100 }), // for lifetime (most recent 100)
       stripe('/payouts', { limit: 10 }),
-      stripe('/customers', { limit: 1, created: { gte: thirtyDaysAgo } }),
-      stripe('/invoices/upcoming', { customer: 'dummy' }).catch(() => null), // may not exist
+      stripe('/payment_intents', { limit: 100, created: { gte: thirtyDaysAgo } }).catch(() => ({ data: [] })),
+      stripe('/payment_intents', { limit: 100, created: { gte: sixtyDaysAgo, lt: thirtyDaysAgo } }).catch(() => ({ data: [] })),
+      stripe('/payment_intents', { limit: 100 }).catch(() => ({ data: [] })),
     ]);
 
     // ── Balance ────────────────────────────────────────────────────────
@@ -44,13 +45,22 @@ export default async function handler(req, res) {
     const pending = pendingGBP.amount || (balance.pending?.[0]?.amount ?? 0);
     const currency = balance.available?.[0]?.currency ?? 'gbp';
 
-    // ── Revenue 30d ────────────────────────────────────────────────────
-    const paid30 = (charges30.data || []).filter(c => c.status === 'succeeded' && !c.refunded);
-    const rev30 = paid30.reduce((s, c) => s + c.amount, 0);
+    // ── Revenue — prefer payment_intents when charges are sparse ──────
+    // Some Stripe accounts (Checkout / Payment Links) show empty /charges but have /payment_intents
+    const rawCharges30 = (charges30.data || []).filter(c => c.status === 'succeeded' && !c.refunded);
+    const rawPI30     = (pi30.data || []).filter(p => p.status === 'succeeded');
+    // Use payment_intents when they have more data OR when charges are empty
+    const usePI = rawPI30.length > 0 && rawPI30.length >= rawCharges30.length;
+    const getAmt = item => item.amount_received ?? item.amount ?? 0;
 
-    // Previous 30 days for growth calc
-    const paid60 = (charges60.data || []).filter(c => c.status === 'succeeded' && !c.refunded);
-    const rev60 = paid60.reduce((s, c) => s + c.amount, 0);
+    const paid30 = usePI ? rawPI30 : rawCharges30;
+    const rev30  = paid30.reduce((s, c) => s + getAmt(c), 0);
+
+    const rawPI60 = (pi60.data || []).filter(p => p.status === 'succeeded');
+    const paid60  = usePI
+      ? rawPI60
+      : (charges60.data || []).filter(c => c.status === 'succeeded' && !c.refunded);
+    const rev60 = paid60.reduce((s, c) => s + getAmt(c), 0);
     const revGrowth = rev60 ? Math.round(((rev30 - rev60) / rev60) * 100) : null;
 
     // ── Daily revenue for chart (last 30 days) ─────────────────────────
@@ -63,24 +73,24 @@ export default async function handler(req, res) {
     paid30.forEach(c => {
       const d = new Date(c.created * 1000);
       const key2 = d.toLocaleDateString('en-GB', { day: 'numeric', month: 'short' });
-      if (key2 in dailyMap) dailyMap[key2] += c.amount;
+      if (key2 in dailyMap) dailyMap[key2] += getAmt(c);
     });
     const dailyLabels = Object.keys(dailyMap).slice(-14); // last 14 days for chart
     const dailyValues = dailyLabels.map(k => (dailyMap[k] / 100).toFixed(2));
 
-    // ── Recent charges ─────────────────────────────────────────────────
-    const recent = (charges30.data || [])
-      .filter(c => c.status === 'succeeded')
-      .slice(0, 12)
-      .map(c => ({
-        id: c.id,
-        amount: c.amount,
-        currency: c.currency,
-        description: c.description || c.calculated_statement_descriptor || 'Payment',
-        customer_email: c.customer?.email || c.billing_details?.email || null,
-        created: c.created,
-        refunded: c.refunded,
-      }));
+    // ── Recent transactions ────────────────────────────────────────────
+    const recentSrc = usePI
+      ? (pi30.data || []).filter(p => p.status === 'succeeded')
+      : (charges30.data || []).filter(c => c.status === 'succeeded');
+    const recent = recentSrc.slice(0, 12).map(c => ({
+      id: c.id,
+      amount: getAmt(c),
+      currency: c.currency,
+      description: c.description || c.statement_descriptor || 'Payment',
+      customer_email: c.receipt_email || c.billing_details?.email || null,
+      created: c.created,
+      refunded: c.refunded || false,
+    }));
 
     // ── Payouts ────────────────────────────────────────────────────────
     const recentPayouts = (payouts.data || []).slice(0, 6).map(p => ({
@@ -91,12 +101,14 @@ export default async function handler(req, res) {
       arrival_date: p.arrival_date,
     }));
 
-    // ── Lifetime (most recent 100 charges as proxy indicator) ──────────────
-    const paidAll = (chargesAll.data || []).filter(c => c.status === 'succeeded' && !c.refunded);
-    const revLifetime = paidAll.reduce((s, c) => s + c.amount, 0);
+    // ── Lifetime (most recent 100 as proxy indicator) ──────────────────
+    const rawPaidAll = usePI
+      ? (piAll.data || []).filter(p => p.status === 'succeeded')
+      : (chargesAll.data || []).filter(c => c.status === 'succeeded' && !c.refunded);
+    const revLifetime = rawPaidAll.reduce((s, c) => s + getAmt(c), 0);
 
     // ── Totals ─────────────────────────────────────────────────────────
-    const refunds30 = paid30.filter(c => c.refunded).reduce((s, c) => s + c.amount_refunded, 0);
+    const refunds30 = usePI ? 0 : paid30.filter(c => c.refunded).reduce((s, c) => s + (c.amount_refunded || 0), 0);
     const txCount30 = paid30.length;
     const avgOrder = txCount30 ? Math.round(rev30 / txCount30) : 0;
 

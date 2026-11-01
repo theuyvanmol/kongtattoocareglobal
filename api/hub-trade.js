@@ -34,7 +34,7 @@ export default async function handler(req, res) {
 
   // Fetch all orders with studio name
   const ordersRes = await fetch(
-    `${supabaseUrl}/rest/v1/trade_orders?select=*,profiles(display_name)&order=created_at.desc&limit=200`,
+    `${supabaseUrl}/rest/v1/trade_orders?select=*,studio:studio_id(display_name)&order=created_at.desc&limit=200`,
     { headers: { apikey: serviceKey, Authorization: `Bearer ${serviceKey}` } }
   );
   const orders = await ordersRes.json();

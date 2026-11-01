@@ -973,8 +973,8 @@ async function loadAdminOverview() {
   document.getElementById('sa-items').textContent = r4.count??'—';
   // Activity feed: merge stock_requests + trade_orders
   const [{ data: recentReqs }, { data: recentTrades }] = await Promise.all([
-    sb.from('stock_requests').select('*,profiles(display_name)').order('created_at',{ascending:false}).limit(5),
-    sb.from('trade_orders').select('*,profiles(display_name)').order('created_at',{ascending:false}).limit(5),
+    sb.from('stock_requests').select('*,studio:studio_id(display_name)').order('created_at',{ascending:false}).limit(5),
+    sb.from('trade_orders').select('*,studio:studio_id(display_name)').order('created_at',{ascending:false}).limit(5),
   ]);
   const allActivity = [
     ...(recentReqs||[]).map(r=>({...r, _type:'request', _time: new Date(r.created_at).getTime()})),
@@ -987,13 +987,13 @@ async function loadAdminOverview() {
       const summary=items2.slice(0,2).map(i=>`${i.product} ×${i.qty}`).join(', ')+(items2.length>2?` +${items2.length-2} more`:'');
       return `<div style="display:flex;gap:10px;align-items:flex-start;padding:9px 0;border-bottom:1px solid rgba(255,255,255,.04)">
         <div style="width:7px;height:7px;border-radius:50%;background:${r.status==='pending'?'var(--accent)':'var(--green)'};flex-shrink:0;margin-top:5px"></div>
-        <div style="flex:1;font-size:13px;color:var(--body)"><strong style="color:var(--fg)">${esc(r.profiles?.display_name||'Studio')}</strong> placed trade order — ${esc(summary)} — £${(r.total_gbp||0).toFixed(2)}</div>
+        <div style="flex:1;font-size:13px;color:var(--body)"><strong style="color:var(--fg)">${esc(r.studio?.display_name||'Studio')}</strong> placed trade order — ${esc(summary)} — £${(r.total_gbp||0).toFixed(2)}</div>
         <div style="font-size:10px;color:var(--subtle);flex-shrink:0">${timeAgo(r.created_at)}</div>
       </div>`;
     }
     return `<div style="display:flex;gap:10px;align-items:flex-start;padding:9px 0;border-bottom:1px solid rgba(255,255,255,.04)">
       <div style="width:7px;height:7px;border-radius:50%;background:${r.status==='approved'?'var(--green)':r.status==='pending'?'var(--amber)':'var(--red)'};flex-shrink:0;margin-top:5px"></div>
-      <div style="flex:1;font-size:13px;color:var(--body)"><strong style="color:var(--fg)">${esc(r.profiles?.display_name||'Studio')}</strong> requested ${r.qty}× ${esc(r.product)}</div>
+      <div style="flex:1;font-size:13px;color:var(--body)"><strong style="color:var(--fg)">${esc(r.studio?.display_name||'Studio')}</strong> requested ${r.qty}× ${esc(r.product)}</div>
       <div style="font-size:10px;color:var(--subtle);flex-shrink:0">${timeAgo(r.created_at)}</div>
     </div>`;
   }).join('') : '<div style="color:var(--subtle);padding:12px 0;font-size:13px">No activity yet</div>';
@@ -1062,23 +1062,23 @@ async function addStudio() {
 
 async function loadAllStock() {
   const [{ data: items },{ data: requests },{ data: tradeOrders }] = await Promise.all([
-    sb.from('stock_items').select('*,profiles(display_name)').order('created_at'),
-    sb.from('stock_requests').select('*,profiles(display_name)').eq('status','pending').order('created_at',{ascending:false}),
-    sb.from('trade_orders').select('*,profiles(display_name)').order('created_at',{ascending:false}).limit(50),
+    sb.from('stock_items').select('*,studio:studio_id(display_name)').order('created_at'),
+    sb.from('stock_requests').select('*,studio:studio_id(display_name)').eq('status','pending').order('created_at',{ascending:false}),
+    sb.from('trade_orders').select('*,studio:studio_id(display_name)').order('created_at',{ascending:false}).limit(50),
   ]);
   const st = document.getElementById('allstock-tbl');
   st.innerHTML = items?.length ? items.map(item=>{
     const total=(item.units||0)+(item.sold||0), pct=total?Math.round((item.units/total)*100):0, cls=pct<20?'cr':pct<40?'lo':'';
-    return `<tr><td class="td-n">${esc(item.profiles?.display_name||'—')}</td><td>${esc(item.product)}</td><td>${item.units||0}</td><td>${item.sold||0}</td><td><div class="pw" style="width:80px"><div class="pb ${cls}" style="width:${pct||2}%"></div></div></td></tr>`;
+    return `<tr><td class="td-n">${esc(item.studio?.display_name||'—')}</td><td>${esc(item.product)}</td><td>${item.units||0}</td><td>${item.sold||0}</td><td><div class="pw" style="width:80px"><div class="pb ${cls}" style="width:${pct||2}%"></div></div></td></tr>`;
   }).join('') : `<tr><td colspan="5" class="empty">No stock data yet</td></tr>`;
   const rq = document.getElementById('reqs-tbl');
-  rq.innerHTML = requests?.length ? requests.map(r=>`<tr><td class="td-n">${esc(r.profiles?.display_name||'—')}</td><td>${esc(r.product)}</td><td>${r.qty}</td><td>${timeAgo(r.created_at)}</td><td><button class="btn btn-p btn-sm" onclick="approveReq('${r.id}','${r.studio_id}',true,this)">Approve</button> <button class="btn btn-r btn-sm" onclick="approveReq('${r.id}','${r.studio_id}',false,this)">Decline</button></td></tr>`).join('') : `<tr><td colspan="5" class="empty">No pending requests</td></tr>`;
+  rq.innerHTML = requests?.length ? requests.map(r=>`<tr><td class="td-n">${esc(r.studio?.display_name||'—')}</td><td>${esc(r.product)}</td><td>${r.qty}</td><td>${timeAgo(r.created_at)}</td><td><button class="btn btn-p btn-sm" onclick="approveReq('${r.id}','${r.studio_id}',true,this)">Approve</button> <button class="btn btn-r btn-sm" onclick="approveReq('${r.id}','${r.studio_id}',false,this)">Decline</button></td></tr>`).join('') : `<tr><td colspan="5" class="empty">No pending requests</td></tr>`;
   const to = document.getElementById('trade-orders-admin-tbl');
   if(to) to.innerHTML = tradeOrders?.length ? tradeOrders.map(o=>{
     const items2=(o.items||[]);
     const summary=items2.slice(0,2).map(i=>`${i.product} ×${i.qty}`).join(', ')+(items2.length>2?` +${items2.length-2} more`:'');
     const statusPill = o.status==='pending'?'<span class="pill pill-pend">Pending</span>':o.status==='shipped'?'<span class="pill pill-ok">Shipped</span>':o.status==='delivered'?'<span class="pill pill-ok">Delivered</span>':o.status==='processing'?'<span class="pill" style="background:rgba(100,120,255,.15);color:#889">Processing</span>':'<span class="pill pill-out">'+esc(o.status)+'</span>';
-    return `<tr><td class="td-n">${esc(o.profiles?.display_name||'—')}</td><td>${esc(summary||'—')}</td><td>£${(o.total_gbp||0).toFixed(2)}</td><td>${timeAgo(o.created_at)}</td><td>${statusPill}</td><td><select class="input" style="padding:3px 6px;font-size:11px;height:auto" onchange="updateTradeOrderStatus('${o.id}',this.value)"><option value="">Update…</option><option value="processing">Processing</option><option value="shipped">Shipped</option><option value="delivered">Delivered</option><option value="cancelled">Cancelled</option></select></td></tr>`;
+    return `<tr><td class="td-n">${esc(o.studio?.display_name||'—')}</td><td>${esc(summary||'—')}</td><td>£${(o.total_gbp||0).toFixed(2)}</td><td>${timeAgo(o.created_at)}</td><td>${statusPill}</td><td><select class="input" style="padding:3px 6px;font-size:11px;height:auto" onchange="updateTradeOrderStatus('${o.id}',this.value)"><option value="">Update…</option><option value="processing">Processing</option><option value="shipped">Shipped</option><option value="delivered">Delivered</option><option value="cancelled">Cancelled</option></select></td></tr>`;
   }).join('') : `<tr><td colspan="6" class="empty">No trade orders yet</td></tr>`;
 }
 
@@ -1277,7 +1277,7 @@ async function loadStockDispatch() {
     if (!history||!history.length) { tbody.innerHTML='<tr><td colspan="6" class="empty">No dispatches yet</td></tr>'; }
     else {
       tbody.innerHTML = history.map(r=>`<tr>
-        <td>${r.profiles?.display_name||r.studio_id}</td>
+        <td>${r['profiles']?.display_name||r.studio_id}</td>
         <td>${r.product_name}</td>
         <td style="color:var(--accent);font-weight:700">+${r.qty}</td>
         <td style="color:var(--subtle)">${r.note||'—'}</td>
@@ -1290,14 +1290,14 @@ async function loadStockDispatch() {
   const snap = document.getElementById('dsp-snapshot');
   if (snap) {
     const { data: stocks } = await sb.from('stock_items')
-      .select('studio_id,product_name,quantity,profiles(display_name)')
+      .select('studio_id,product_name,quantity,studio:studio_id(display_name)')
       .order('studio_id').order('product_name');
     if (!stocks||!stocks.length) { snap.innerHTML='<div class="empty">No stock records yet</div>'; }
     else {
       // Group by studio
       const byStudio = {};
       stocks.forEach(s => {
-        const sName = s.profiles?.display_name || s.studio_id;
+        const sName = s.studio?.display_name || s.studio_id;
         if (!byStudio[sName]) byStudio[sName] = [];
         byStudio[sName].push(s);
       });
