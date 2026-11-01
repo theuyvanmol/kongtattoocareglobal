@@ -250,8 +250,23 @@ SUPABASE_SERVICE_ROLE_KEY=eyJhbGci...</code>
       </div>
 
       <div class="page" id="pg-studios">
+        <div class="card" style="max-width:540px;margin-bottom:14px">
+          <div class="sec-hd"><div class="sec-ttl">Add Studio Manually</div></div>
+          <div style="display:grid;gap:10px">
+            <div style="display:grid;grid-template-columns:1fr 1fr;gap:10px">
+              <div><label class="inp-lbl">Studio / Artist Name</label><input class="inp" id="add-studio-name" placeholder="e.g. DNT Tattoo"></div>
+              <div><label class="inp-lbl">Login Email</label><input class="inp" id="add-studio-email" placeholder="studio@example.com" type="email"></div>
+            </div>
+            <div style="display:grid;grid-template-columns:1fr 1fr;gap:10px">
+              <div><label class="inp-lbl">Password</label><input class="inp" id="add-studio-pw" placeholder="Temporary password" type="password"></div>
+              <div><label class="inp-lbl">Username (optional)</label><input class="inp" id="add-studio-username" placeholder="e.g. dnttattoo"></div>
+            </div>
+            <button class="btn btn-p" id="add-studio-btn" onclick="addStudio()">+ Add Studio</button>
+            <div id="add-studio-status" style="font-size:12px;color:var(--subtle)"></div>
+          </div>
+        </div>
         <div class="card">
-          <div class="sec-hd"><div class="sec-ttl">All Partner Studios</div></div>
+          <div class="sec-hd"><div class="sec-ttl">All Partner Studios</div><button class="btn btn-g btn-sm" onclick="loadStudios()">↻ Refresh</button></div>
           <div class="tw"><table><thead><tr><th>Studio / Artist</th><th>Email</th><th>Joined</th><th>Status</th></tr></thead>
           <tbody id="studios-tbl"><tr><td colspan="4" class="empty">Loading…</td></tr></tbody></table></div>
         </div>
@@ -267,6 +282,11 @@ SUPABASE_SERVICE_ROLE_KEY=eyJhbGci...</code>
           <div class="sec-hd"><div class="sec-ttl">Pending Stock Requests</div></div>
           <div class="tw"><table><thead><tr><th>Studio</th><th>Product</th><th>Qty</th><th>Submitted</th><th>Action</th></tr></thead>
           <tbody id="reqs-tbl"><tr><td colspan="5" class="empty">No pending requests</td></tr></tbody></table></div>
+        </div>
+        <div class="card">
+          <div class="sec-hd"><div class="sec-ttl">Trade Shop Orders</div><button class="btn btn-g btn-sm" onclick="loadAllStock()">↻ Refresh</button></div>
+          <div class="tw"><table><thead><tr><th>Studio</th><th>Items</th><th>Total</th><th>Placed</th><th>Status</th><th>Action</th></tr></thead>
+          <tbody id="trade-orders-admin-tbl"><tr><td colspan="6" class="empty">Loading…</td></tr></tbody></table></div>
         </div>
       </div>
 
@@ -945,18 +965,38 @@ async function loadAdminOverview() {
     sb.from('stock_requests').select('*',{count:'exact',head:true}).eq('status','pending'),
     sb.from('stock_items').select('*',{count:'exact',head:true}),
   ]);
+  // Count pending trade orders too
+  const { count: tradeCount } = await sb.from('trade_orders').select('*',{count:'exact',head:true}).eq('status','pending');
   document.getElementById('sa-studios').textContent = r1.count??'—';
   document.getElementById('sa-team').textContent = r2.count??'—';
-  document.getElementById('sa-requests').textContent = r3.count??'—';
+  document.getElementById('sa-requests').textContent = ((r3.count||0)+(tradeCount||0))||'0';
   document.getElementById('sa-items').textContent = r4.count??'—';
-  const { data: recent } = await sb.from('stock_requests').select('*,profiles(display_name)').order('created_at',{ascending:false}).limit(8);
+  // Activity feed: merge stock_requests + trade_orders
+  const [{ data: recentReqs }, { data: recentTrades }] = await Promise.all([
+    sb.from('stock_requests').select('*,profiles(display_name)').order('created_at',{ascending:false}).limit(5),
+    sb.from('trade_orders').select('*,profiles(display_name)').order('created_at',{ascending:false}).limit(5),
+  ]);
+  const allActivity = [
+    ...(recentReqs||[]).map(r=>({...r, _type:'request', _time: new Date(r.created_at).getTime()})),
+    ...(recentTrades||[]).map(t=>({...t, _type:'trade', _time: new Date(t.created_at).getTime()})),
+  ].sort((a,b)=>b._time-a._time).slice(0,8);
   const feed = document.getElementById('activity-feed');
-  feed.innerHTML = (recent&&recent.length) ? recent.map(r=>`
-    <div style="display:flex;gap:10px;align-items:flex-start;padding:9px 0;border-bottom:1px solid rgba(255,255,255,.04)">
+  feed.innerHTML = allActivity.length ? allActivity.map(r=>{
+    if(r._type==='trade'){
+      const items2=(r.items||[]);
+      const summary=items2.slice(0,2).map(i=>`${i.product} ×${i.qty}`).join(', ')+(items2.length>2?` +${items2.length-2} more`:'');
+      return `<div style="display:flex;gap:10px;align-items:flex-start;padding:9px 0;border-bottom:1px solid rgba(255,255,255,.04)">
+        <div style="width:7px;height:7px;border-radius:50%;background:${r.status==='pending'?'var(--accent)':'var(--green)'};flex-shrink:0;margin-top:5px"></div>
+        <div style="flex:1;font-size:13px;color:var(--body)"><strong style="color:var(--fg)">${esc(r.profiles?.display_name||'Studio')}</strong> placed trade order — ${esc(summary)} — £${(r.total_gbp||0).toFixed(2)}</div>
+        <div style="font-size:10px;color:var(--subtle);flex-shrink:0">${timeAgo(r.created_at)}</div>
+      </div>`;
+    }
+    return `<div style="display:flex;gap:10px;align-items:flex-start;padding:9px 0;border-bottom:1px solid rgba(255,255,255,.04)">
       <div style="width:7px;height:7px;border-radius:50%;background:${r.status==='approved'?'var(--green)':r.status==='pending'?'var(--amber)':'var(--red)'};flex-shrink:0;margin-top:5px"></div>
       <div style="flex:1;font-size:13px;color:var(--body)"><strong style="color:var(--fg)">${esc(r.profiles?.display_name||'Studio')}</strong> requested ${r.qty}× ${esc(r.product)}</div>
       <div style="font-size:10px;color:var(--subtle);flex-shrink:0">${timeAgo(r.created_at)}</div>
-    </div>`).join('') : '<div style="color:var(--subtle);padding:12px 0;font-size:13px">No activity yet</div>';
+    </div>`;
+  }).join('') : '<div style="color:var(--subtle);padding:12px 0;font-size:13px">No activity yet</div>';
   mkChart('ch-studios','bar',['Jan','Feb','Mar','Apr','May','Jun','Jul','Aug','Sep','Oct','Nov'],[1,1,2,2,3,3,4,4,5,r1.count||5,r1.count||5]);
 
   // Fetch Stripe + Analytics in parallel for overview cards
@@ -989,10 +1029,42 @@ async function loadStudios() {
   tb.innerHTML = data.map(u=>`<tr><td class="td-n">${esc(u.display_name)}</td><td>${esc(u.email)}</td><td>${fmt(u.created_at)}</td><td><span class="pill pill-ok">Active</span></td></tr>`).join('');
 }
 
+async function addStudio() {
+  const name = document.getElementById('add-studio-name').value.trim();
+  const email = document.getElementById('add-studio-email').value.trim();
+  const pw = document.getElementById('add-studio-pw').value;
+  const username = document.getElementById('add-studio-username').value.trim()||null;
+  const status = document.getElementById('add-studio-status');
+  const btn = document.getElementById('add-studio-btn');
+  if(!name||!email||!pw) { status.textContent='Name, email and password are required.'; status.style.color='var(--red)'; return; }
+  btn.disabled=true; btn.textContent='Adding…'; status.textContent='';
+  const { data: { session } } = await sb.auth.getSession();
+  const token = session?.access_token;
+  try {
+    const res = await fetch('/api/hub-add-studio', {
+      method:'POST',
+      headers:{'Content-Type':'application/json','Authorization':'Bearer '+token},
+      body: JSON.stringify({display_name:name, email, password:pw, username})
+    });
+    const json = await res.json();
+    if(!res.ok||json.error) { status.textContent='Error: '+(json.error||'Unknown error'); status.style.color='var(--red)'; }
+    else {
+      status.textContent='✓ Studio added successfully!'; status.style.color='var(--green)';
+      document.getElementById('add-studio-name').value='';
+      document.getElementById('add-studio-email').value='';
+      document.getElementById('add-studio-pw').value='';
+      document.getElementById('add-studio-username').value='';
+      loadStudios();
+    }
+  } catch(e) { status.textContent='Error: '+e.message; status.style.color='var(--red)'; }
+  btn.disabled=false; btn.textContent='+ Add Studio';
+}
+
 async function loadAllStock() {
-  const [{ data: items },{ data: requests }] = await Promise.all([
+  const [{ data: items },{ data: requests },{ data: tradeOrders }] = await Promise.all([
     sb.from('stock_items').select('*,profiles(display_name)').order('created_at'),
     sb.from('stock_requests').select('*,profiles(display_name)').eq('status','pending').order('created_at',{ascending:false}),
+    sb.from('trade_orders').select('*,profiles(display_name)').order('created_at',{ascending:false}).limit(50),
   ]);
   const st = document.getElementById('allstock-tbl');
   st.innerHTML = items?.length ? items.map(item=>{
@@ -1001,6 +1073,21 @@ async function loadAllStock() {
   }).join('') : `<tr><td colspan="5" class="empty">No stock data yet</td></tr>`;
   const rq = document.getElementById('reqs-tbl');
   rq.innerHTML = requests?.length ? requests.map(r=>`<tr><td class="td-n">${esc(r.profiles?.display_name||'—')}</td><td>${esc(r.product)}</td><td>${r.qty}</td><td>${timeAgo(r.created_at)}</td><td><button class="btn btn-p btn-sm" onclick="approveReq('${r.id}','${r.studio_id}',true,this)">Approve</button> <button class="btn btn-r btn-sm" onclick="approveReq('${r.id}','${r.studio_id}',false,this)">Decline</button></td></tr>`).join('') : `<tr><td colspan="5" class="empty">No pending requests</td></tr>`;
+  const to = document.getElementById('trade-orders-admin-tbl');
+  if(to) to.innerHTML = tradeOrders?.length ? tradeOrders.map(o=>{
+    const items2=(o.items||[]);
+    const summary=items2.slice(0,2).map(i=>`${i.product} ×${i.qty}`).join(', ')+(items2.length>2?` +${items2.length-2} more`:'');
+    const statusPill = o.status==='pending'?'<span class="pill pill-pend">Pending</span>':o.status==='shipped'?'<span class="pill pill-ok">Shipped</span>':o.status==='delivered'?'<span class="pill pill-ok">Delivered</span>':o.status==='processing'?'<span class="pill" style="background:rgba(100,120,255,.15);color:#889">Processing</span>':'<span class="pill pill-out">'+esc(o.status)+'</span>';
+    return `<tr><td class="td-n">${esc(o.profiles?.display_name||'—')}</td><td>${esc(summary||'—')}</td><td>£${(o.total_gbp||0).toFixed(2)}</td><td>${timeAgo(o.created_at)}</td><td>${statusPill}</td><td><select class="input" style="padding:3px 6px;font-size:11px;height:auto" onchange="updateTradeOrderStatus('${o.id}',this.value)"><option value="">Update…</option><option value="processing">Processing</option><option value="shipped">Shipped</option><option value="delivered">Delivered</option><option value="cancelled">Cancelled</option></select></td></tr>`;
+  }).join('') : `<tr><td colspan="6" class="empty">No trade orders yet</td></tr>`;
+}
+
+async function updateTradeOrderStatus(orderId, status) {
+  if(!status) return;
+  const { error } = await sb.from('trade_orders').update({status, updated_at: new Date().toISOString()}).eq('id', orderId);
+  if(error) return showToast('Error: '+error.message);
+  showToast('✓ Order status updated to '+status);
+  loadAllStock();
 }
 
 async function approveReq(reqId, studioId, approved, btn) {
@@ -1173,7 +1260,7 @@ async function loadStockDispatch() {
   // Populate studio dropdown
   const sel = document.getElementById('dsp-studio');
   if (sel && sel.options.length <= 1) {
-    const { data: studios } = await _sb.from('profiles').select('id,display_name').eq('role','studio').order('display_name');
+    const { data: studios } = await sb.from('profiles').select('id,display_name').eq('role','studio').order('display_name');
     sel.innerHTML = '';
     (studios||[]).forEach(s => {
       const o = document.createElement('option');
@@ -1182,7 +1269,7 @@ async function loadStockDispatch() {
     });
   }
   // Load dispatch history
-  const { data: history } = await _sb.from('stock_dispatches')
+  const { data: history } = await sb.from('stock_dispatches')
     .select('id,studio_id,product_name,qty,note,dispatched_by,created_at,profiles!stock_dispatches_studio_id_fkey(display_name),dispatcher:profiles!stock_dispatches_dispatched_by_fkey(display_name)')
     .order('created_at',{ascending:false}).limit(50);
   const tbody = document.getElementById('dsp-history-tbl');
@@ -1202,7 +1289,7 @@ async function loadStockDispatch() {
   // Stock snapshot per studio
   const snap = document.getElementById('dsp-snapshot');
   if (snap) {
-    const { data: stocks } = await _sb.from('stock_items')
+    const { data: stocks } = await sb.from('stock_items')
       .select('studio_id,product_name,quantity,profiles(display_name)')
       .order('studio_id').order('product_name');
     if (!stocks||!stocks.length) { snap.innerHTML='<div class="empty">No stock records yet</div>'; }
@@ -1234,19 +1321,19 @@ async function dispatchStock() {
   const qty = parseInt(document.getElementById('dsp-qty')?.value)||0;
   const note = document.getElementById('dsp-note')?.value||'';
   if (!studioId||!product||qty<1) { alert('Please select a studio, product and valid quantity.'); return; }
-  const userId = _sbUser?.id;
+  const userId = ME?.id;
   // Insert dispatch record
-  const { error: dErr } = await _sb.from('stock_dispatches').insert({
+  const { error: dErr } = await sb.from('stock_dispatches').insert({
     studio_id: studioId, product_name: product, qty, note, dispatched_by: userId
   });
   if (dErr) { alert('Error recording dispatch: '+dErr.message); return; }
   // Upsert stock_items for studio
-  const { data: existing } = await _sb.from('stock_items')
+  const { data: existing } = await sb.from('stock_items')
     .select('id,quantity').eq('studio_id',studioId).eq('product_name',product).single();
   if (existing) {
-    await _sb.from('stock_items').update({quantity: existing.quantity+qty}).eq('id',existing.id);
+    await sb.from('stock_items').update({quantity: existing.quantity+qty}).eq('id',existing.id);
   } else {
-    await _sb.from('stock_items').insert({studio_id:studioId, product_name:product, quantity:qty});
+    await sb.from('stock_items').insert({studio_id:studioId, product_name:product, quantity:qty});
   }
   document.getElementById('dsp-qty').value=1;
   document.getElementById('dsp-note').value='';
@@ -1319,8 +1406,9 @@ async function submitTradeOrder() {
   }));
   if (!items.length) { alert('Your cart is empty.'); return; }
   const total = items.reduce((s,i)=>s+i.unit_price*i.qty,0);
-  const userId = _sbUser?.id;
-  const { error } = await _sb.from('trade_orders').insert({
+  const userId = ME?.id;
+  if (!userId) { showToast('Not logged in — please refresh and try again.'); return; }
+  const { error } = await sb.from('trade_orders').insert({
     studio_id: userId,
     items: items,
     total_gbp: total,
@@ -1337,8 +1425,8 @@ async function submitTradeOrder() {
 async function loadTradeOrders() {
   const tbody = document.getElementById('trade-orders-tbl');
   if (!tbody) return;
-  const userId = _sbUser?.id;
-  const { data: orders } = await _sb.from('trade_orders')
+  const userId = ME?.id;
+  const { data: orders } = await sb.from('trade_orders')
     .select('*').eq('studio_id',userId).order('created_at',{ascending:false}).limit(20);
   if (!orders||!orders.length) { tbody.innerHTML='<tr><td colspan="4" class="empty">No orders yet</td></tr>'; return; }
   tbody.innerHTML = orders.map(o=>{
