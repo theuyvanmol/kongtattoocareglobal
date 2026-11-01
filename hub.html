@@ -568,8 +568,15 @@ document.getElementById('setup-sql-display').textContent = SETUP_SQL;
 })();
 
 async function loadProfile(authUser) {
-  const { data: profile } = await sb.from('profiles').select('*').eq('id', authUser.id).single();
+  console.log('[KONG] loadProfile called for', authUser.email, authUser.id);
+  const { data: profile, error: selErr } = await sb.from('profiles').select('*').eq('id', authUser.id).single();
+  console.log('[KONG] profile select result:', profile, selErr);
+  if (selErr && selErr.code !== 'PGRST116') {
+    // PGRST116 = row not found — anything else is a real error
+    throw new Error('Profile read failed: ' + selErr.message);
+  }
   if (!profile) {
+    console.log('[KONG] No profile found, inserting...');
     // Profile missing — insert one (trigger may not have fired)
     const { data: np, error: insertErr } = await sb.from('profiles').insert({
       id: authUser.id,
@@ -577,11 +584,13 @@ async function loadProfile(authUser) {
       display_name: authUser.user_metadata?.display_name || authUser.email.split('@')[0],
       role: 'studio',
     }).select().single();
-    if (insertErr) throw new Error('Could not load your profile: ' + insertErr.message);
+    console.log('[KONG] insert result:', np, insertErr);
+    if (insertErr) throw new Error('Could not create your profile: ' + insertErr.message);
     ME = np;
   } else {
     ME = profile;
   }
+  console.log('[KONG] ME set to:', ME);
   hideEl('loading-screen');
   launchApp();
 }
@@ -624,15 +633,13 @@ async function doLogin() {
   const btn = document.getElementById('login-btn');
   btn.disabled=true; btn.textContent='Signing in…';
   try {
+    console.log('[KONG] Attempting sign in for', email);
     const { data, error } = await sb.auth.signInWithPassword({ email, password: pass });
+    console.log('[KONG] signInWithPassword result:', data, error);
     if(error) throw error;
-    try {
-      await loadProfile(data.user);
-    } catch(profileErr) {
-      // Profile load failed — still signed in, force a page reload to retry
-      window.location.reload();
-    }
+    await loadProfile(data.user);
   } catch(e) {
+    console.error('[KONG] doLogin error:', e);
     setErr('login-err', e.message||'Login failed. Check your email and password.');
     btn.disabled=false; btn.textContent='ENTER HUB';
   }
