@@ -235,9 +235,16 @@ SUPABASE_SERVICE_ROLE_KEY=eyJhbGci...</code>
           <div class="stat"><div class="stat-lbl">Open Stock Requests</div><div class="stat-val" id="sa-requests">—</div></div>
           <div class="stat"><div class="stat-lbl">Products Tracked</div><div class="stat-val" id="sa-items">—</div></div>
         </div>
+        <!-- Revenue + Visitors row -->
+        <div class="stat-grid" style="margin-bottom:18px">
+          <div class="stat hi"><div class="stat-lbl">Revenue (30d)</div><div class="stat-val ac" id="ov-rev30">—</div><div class="stat-sub" id="ov-rev-growth"></div></div>
+          <div class="stat"><div class="stat-lbl">Lifetime Revenue</div><div class="stat-val" id="ov-lifetime">—</div></div>
+          <div class="stat"><div class="stat-lbl">Balance Available</div><div class="stat-val" id="ov-balance">—</div></div>
+          <div class="stat"><div class="stat-lbl">Site Visitors (30d)</div><div class="stat-val" id="ov-visitors">—</div></div>
+        </div>
         <div class="two-col">
           <div class="card"><div class="sec-hd"><div class="sec-ttl">Studio Growth</div></div><div class="chart-w"><canvas id="ch-studios"></canvas></div></div>
-          <div class="card"><div class="sec-hd"><div class="sec-ttl">Stock Requests</div></div><div class="chart-w"><canvas id="ch-reqs"></canvas></div></div>
+          <div class="card"><div class="sec-hd"><div class="sec-ttl">Daily Revenue — Last 14 Days</div></div><div class="chart-w"><canvas id="ch-ov-revenue"></canvas></div></div>
         </div>
         <div class="card"><div class="sec-hd"><div class="sec-ttl">Recent Activity</div></div><div id="activity-feed"><div style="padding:10px 0;color:var(--subtle);font-size:13px">Loading…</div></div></div>
       </div>
@@ -310,6 +317,7 @@ SUPABASE_SERVICE_ROLE_KEY=eyJhbGci...</code>
           <div class="stat-grid">
             <div class="stat hi"><div class="stat-lbl">Balance Available</div><div class="stat-val ac" id="sr-avail">—</div></div>
             <div class="stat"><div class="stat-lbl">Balance Pending</div><div class="stat-val" id="sr-pend">—</div></div>
+            <div class="stat"><div class="stat-lbl">Lifetime Revenue</div><div class="stat-val" id="sr-lifetime">—</div></div>
             <div class="stat"><div class="stat-lbl">Revenue (Last 30d)</div><div class="stat-val" id="sr-rev30">—</div><div class="stat-sub" id="sr-growth"></div></div>
             <div class="stat"><div class="stat-lbl">Orders (Last 30d)</div><div class="stat-val" id="sr-orders">—</div><div class="stat-sub" id="sr-avg"></div></div>
           </div>
@@ -950,7 +958,28 @@ async function loadAdminOverview() {
       <div style="font-size:10px;color:var(--subtle);flex-shrink:0">${timeAgo(r.created_at)}</div>
     </div>`).join('') : '<div style="color:var(--subtle);padding:12px 0;font-size:13px">No activity yet</div>';
   mkChart('ch-studios','bar',['Jan','Feb','Mar','Apr','May','Jun','Jul','Aug','Sep','Oct','Nov'],[1,1,2,2,3,3,4,4,5,r1.count||5,r1.count||5]);
-  mkChart('ch-reqs','line',['Jan','Feb','Mar','Apr','May','Jun','Jul','Aug','Sep','Oct','Nov'],[0,0,1,2,3,2,4,3,5,4,r3.count||4]);
+
+  // Fetch Stripe + Analytics in parallel for overview cards
+  try {
+    const [stripeData, analyticsData] = await Promise.all([
+      fetch('/api/hub-stripe').then(r=>r.json()).catch(()=>null),
+      fetch('/api/hub-analytics').then(r=>r.json()).catch(()=>null),
+    ]);
+    if(stripeData && !stripeData.error) {
+      const cur = (stripeData.balance?.currency||'gbp').toUpperCase();
+      const fmt2 = (amt) => (cur==='GBP'?'£':'$')+(amt/100).toFixed(2).replace(/\B(?=(\d{3})+(?!\d))/g,',');
+      document.getElementById('ov-rev30').textContent = fmt2(stripeData.revenue?.last30Days||0);
+      document.getElementById('ov-lifetime').textContent = fmt2(stripeData.revenue?.lifetime||0);
+      document.getElementById('ov-balance').textContent = fmt2(stripeData.balance?.available||0);
+      const g = stripeData.revenue?.growth;
+      const gEl = document.getElementById('ov-rev-growth');
+      if(g!==null && g!==undefined) { gEl.textContent=(g>=0?'▲ +':'▼ ')+g+'% vs prev 30d'; gEl.style.color=g>=0?'var(--green)':'var(--red)'; }
+      if(stripeData.chart?.labels?.length) mkChart('ch-ov-revenue','bar',stripeData.chart.labels,stripeData.chart.values.map(Number));
+    }
+    if(analyticsData) {
+      document.getElementById('ov-visitors').textContent = (analyticsData.pageviews?.total||0).toLocaleString();
+    }
+  } catch(e) { /* overview revenue cards remain as — */ }
 }
 
 async function loadStudios() {
@@ -1344,6 +1373,7 @@ async function loadStripeRevenue() {
 
     document.getElementById('sr-avail').textContent = fmt2(data.balance?.available||0);
     document.getElementById('sr-pend').textContent = fmt2(data.balance?.pending||0);
+    document.getElementById('sr-lifetime').textContent = fmt2(data.revenue?.lifetime||0);
     document.getElementById('sr-rev30').textContent = fmt2(data.revenue?.last30Days||0);
     document.getElementById('sr-orders').textContent = data.revenue?.txCount||0;
     document.getElementById('sr-avg').textContent = 'Avg: '+fmt2(data.revenue?.avgOrder||0);

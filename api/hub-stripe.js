@@ -26,10 +26,11 @@ export default async function handler(req, res) {
     const sixtyDaysAgo = now - 60 * 24 * 3600;
 
     // Run all Stripe calls in parallel
-    const [balance, charges30, charges60, payouts, customers, upcoming] = await Promise.all([
+    const [balance, charges30, charges60, chargesAll, payouts, customers, upcoming] = await Promise.all([
       stripe('/balance'),
       stripe('/charges', { limit: 100, created: { gte: thirtyDaysAgo }, expand: ['data.customer'] }),
       stripe('/charges', { limit: 100, created: { gte: sixtyDaysAgo, lt: thirtyDaysAgo } }),
+      stripe('/charges', { limit: 100, expand: ['data.customer'] }), // for lifetime (most recent 100)
       stripe('/payouts', { limit: 10 }),
       stripe('/customers', { limit: 1, created: { gte: thirtyDaysAgo } }),
       stripe('/invoices/upcoming', { customer: 'dummy' }).catch(() => null), // may not exist
@@ -90,6 +91,10 @@ export default async function handler(req, res) {
       arrival_date: p.arrival_date,
     }));
 
+    // ── Lifetime (most recent 100 charges as proxy indicator) ──────────────
+    const paidAll = (chargesAll.data || []).filter(c => c.status === 'succeeded' && !c.refunded);
+    const revLifetime = paidAll.reduce((s, c) => s + c.amount, 0);
+
     // ── Totals ─────────────────────────────────────────────────────────
     const refunds30 = paid30.filter(c => c.refunded).reduce((s, c) => s + c.amount_refunded, 0);
     const txCount30 = paid30.length;
@@ -104,6 +109,7 @@ export default async function handler(req, res) {
         refunds: refunds30,
         txCount: txCount30,
         avgOrder,
+        lifetime: revLifetime,
       },
       chart: { labels: dailyLabels, values: dailyValues },
       recentCharges: recent,
