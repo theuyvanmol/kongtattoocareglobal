@@ -363,6 +363,72 @@ SUPABASE_SERVICE_ROLE_KEY=eyJhbGci...</code>
         </div>
       </div>
 
+      <!-- STOCK DISPATCH PAGE (superadmin only) -->
+      <div class="page" id="pg-stock-dispatch">
+        <div class="card" style="max-width:560px;margin-bottom:18px">
+          <div class="sec-hd"><div class="sec-ttl">Send Stock to a Studio</div></div>
+          <label class="inp-lbl">Studio</label>
+          <select class="inp" id="dsp-studio" style="width:100%;margin-bottom:10px"></select>
+          <label class="inp-lbl">Product</label>
+          <select class="inp" id="dsp-product" style="width:100%;margin-bottom:10px">
+            <option>Kong Rapid Cream 5% 15g</option>
+            <option>Kong Rapid Cream 8% 15g</option>
+            <option>Kong Rapid Spray 30ml</option>
+            <option>Kong Tattoo Balm Coconut 50g</option>
+            <option>Kong Tattoo Balm Coconut 10g</option>
+            <option>Kong Tattoo Butter 150g</option>
+            <option>Kong Tattoo Sealant Spray 100ml</option>
+            <option>Kong Tattoo Care Stick 50g</option>
+            <option>Kong Tattoo Relief Cream 30g</option>
+            <option>Kong Tattoo Foam Cleanser 185g</option>
+            <option>Kong Tattoo Sunscreen 50g</option>
+            <option>Kong Tattoo Relief Serum 30g</option>
+            <option>Kong Piercing Spray 60g</option>
+            <option>Kong Tattoo Green Glide 150g</option>
+          </select>
+          <label class="inp-lbl">Units to Add</label>
+          <input class="inp" id="dsp-qty" type="number" min="1" value="1" style="width:120px;margin-bottom:10px">
+          <label class="inp-lbl">Note (optional)</label>
+          <input class="inp" id="dsp-note" placeholder="e.g. Monthly supply, invoice #123" style="margin-bottom:14px">
+          <button class="btn btn-p" onclick="dispatchStock()">+ Add Stock to Studio</button>
+        </div>
+        <div class="card">
+          <div class="sec-hd">
+            <div class="sec-ttl">Stock Dispatch History</div>
+            <button class="btn btn-g btn-sm" onclick="loadStockDispatch()">↻ Refresh</button>
+          </div>
+          <div class="tw"><table><thead><tr><th>Studio</th><th>Product</th><th>Units</th><th>Note</th><th>By</th><th>Date</th></tr></thead>
+          <tbody id="dsp-history-tbl"><tr><td colspan="6" class="empty">Loading…</td></tr></tbody></table></div>
+        </div>
+        <div class="card">
+          <div class="sec-hd"><div class="sec-ttl">Studio Stock Snapshot</div></div>
+          <div id="dsp-snapshot"><div class="empty">Loading…</div></div>
+        </div>
+      </div>
+
+      <!-- TRADE SHOP PAGE (studio + team) -->
+      <div class="page" id="pg-trade-shop">
+        <div style="display:flex;gap:16px;align-items:flex-start;flex-wrap:wrap;margin-bottom:18px">
+          <div style="flex:1;min-width:280px">
+            <div style="font-size:11px;color:var(--subtle);margin-bottom:4px;letter-spacing:.5px">Exclusive trade pricing for verified studios and artists.</div>
+          </div>
+          <div class="card" style="min-width:220px;margin-bottom:0;padding:14px 18px">
+            <div style="font-size:10px;text-transform:uppercase;letter-spacing:1px;color:var(--subtle);margin-bottom:6px">Cart Total</div>
+            <div style="font-family:'Syne',sans-serif;font-size:28px;font-weight:800;color:var(--accent)" id="cart-total">£0.00</div>
+            <div style="font-size:11px;color:var(--subtle);margin-bottom:12px" id="cart-items-count">0 items</div>
+            <button class="btn btn-p" style="width:100%" onclick="submitTradeOrder()">Place Order →</button>
+          </div>
+        </div>
+        <div id="trade-products" class="stat-grid" style="grid-template-columns:repeat(auto-fill,minmax(220px,1fr))">
+          <!-- Populated by loadTradeShop() -->
+        </div>
+        <div class="card" style="margin-top:4px">
+          <div class="sec-hd"><div class="sec-ttl">My Previous Orders</div><button class="btn btn-g btn-sm" onclick="loadTradeOrders()">↻ Refresh</button></div>
+          <div class="tw"><table><thead><tr><th>Date</th><th>Items</th><th>Total</th><th>Status</th></tr></thead>
+          <tbody id="trade-orders-tbl"><tr><td colspan="4" class="empty">No orders yet</td></tr></tbody></table></div>
+        </div>
+      </div>
+
       <!-- TEAM PAGES -->
       <div class="page" id="pg-team-overview">
         <div class="stat-grid">
@@ -785,15 +851,18 @@ const NAV = {
     {id:'pg-stripe',label:'Commission',icon:'credit'},
     {id:'pg-stripe-revenue',label:'Stripe Revenue',icon:'stripe'},
     {id:'pg-performance',label:'Performance',icon:'chart'},
+    {id:'pg-stock-dispatch',label:'Dispatch Stock',icon:'truck'},
   ],
   team:[
     {id:'pg-team-overview',label:'My Overview',icon:'grid'},
     {id:'pg-team-todo',label:'To-Do List',icon:'check'},
+    {id:'pg-trade-shop',label:'Trade Shop',icon:'shop'},
   ],
   studio:[
     {id:'pg-studio-overview',label:'Dashboard',icon:'grid'},
     {id:'pg-studio-stock',label:'My Stock',icon:'box'},
     {id:'pg-studio-request',label:'Request Stock',icon:'plus'},
+    {id:'pg-trade-shop',label:'Trade Shop',icon:'shop'},
     {id:'pg-studio-todo',label:'To-Do List',icon:'check'},
   ],
 };
@@ -808,8 +877,10 @@ const IC = {
   plus:'<svg viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="1.5"><path d="M8 2v12M2 8h12"/></svg>',
   stripe:'<svg viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="1.5"><rect x="1" y="3.5" width="14" height="9" rx="1.5"/><path d="M1 6.5h14"/><path d="M4 9.5h2.5m2.5 0h2"/></svg>',
   chart:'<svg viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="1.5"><polyline points="1,11 5,7 8,9 12,4 15,6"/><line x1="1" y1="14" x2="15" y2="14"/></svg>',
+  truck:'<svg viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="1.5"><path d="M1 3h10v8H1z"/><path d="M11 5.5h3l1.5 3V11h-4.5V5.5z"/><circle cx="3.5" cy="12.5" r="1.25"/><circle cx="12" cy="12.5" r="1.25"/></svg>',
+  shop:'<svg viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="1.5"><path d="M1 5h14l-1 9H2z"/><path d="M5 5V3a3 3 0 0 1 6 0v2"/><path d="M1 8h14"/></svg>',
 };
-const TITLES = {'pg-overview':'Overview','pg-studios':'All Studios','pg-stock':'Stock Control','pg-team':'Team Members','pg-assign':'Assign Studios','pg-stripe':'Commission','pg-stripe-revenue':'Stripe Revenue','pg-performance':'Website Performance','pg-team-overview':'My Overview','pg-team-todo':'To-Do List','pg-studio-overview':'Dashboard','pg-studio-stock':'My Stock','pg-studio-request':'Request Stock','pg-studio-todo':'To-Do List','pg-setup':'Setup Required'};
+const TITLES = {'pg-overview':'Overview','pg-studios':'All Studios','pg-stock':'Stock Control','pg-team':'Team Members','pg-assign':'Assign Studios','pg-stripe':'Commission','pg-stripe-revenue':'Stripe Revenue','pg-performance':'Website Performance','pg-stock-dispatch':'Dispatch Stock','pg-trade-shop':'Trade Shop','pg-team-overview':'My Overview','pg-team-todo':'To-Do List','pg-studio-overview':'Dashboard','pg-studio-stock':'My Stock','pg-studio-request':'Request Stock','pg-studio-todo':'To-Do List','pg-setup':'Setup Required'};
 
 function buildNav(role) {
   const nav = document.getElementById('sb-nav');
@@ -848,6 +919,8 @@ async function loadPage(id) {
     if(id==='pg-stripe')          return loadCommission();
     if(id==='pg-stripe-revenue')  return loadStripeRevenue();
     if(id==='pg-performance')     return loadPerformance();
+    if(id==='pg-stock-dispatch')  return loadStockDispatch();
+    if(id==='pg-trade-shop')      return loadTradeShop();
     if(id==='pg-team-overview')   return loadTeamOverview();
     if(id==='pg-team-todo')       return loadTodos('todo-list');
     if(id==='pg-studio-overview') return loadStudioOverview();
@@ -1064,6 +1137,192 @@ async function submitRequest() {
   showToast(`✓ Request for ${qty}× ${product} sent to KONG.`);
   document.getElementById('req-notes').value='';
   loadStudioRequests();
+}
+
+// ── STOCK DISPATCH (superadmin) ────────────────────────────────────────────────
+async function loadStockDispatch() {
+  // Populate studio dropdown
+  const sel = document.getElementById('dsp-studio');
+  if (sel && sel.options.length <= 1) {
+    const { data: studios } = await _sb.from('profiles').select('id,display_name').eq('role','studio').order('display_name');
+    sel.innerHTML = '';
+    (studios||[]).forEach(s => {
+      const o = document.createElement('option');
+      o.value = s.id; o.textContent = s.display_name;
+      sel.appendChild(o);
+    });
+  }
+  // Load dispatch history
+  const { data: history } = await _sb.from('stock_dispatches')
+    .select('id,studio_id,product_name,qty,note,dispatched_by,created_at,profiles!stock_dispatches_studio_id_fkey(display_name),dispatcher:profiles!stock_dispatches_dispatched_by_fkey(display_name)')
+    .order('created_at',{ascending:false}).limit(50);
+  const tbody = document.getElementById('dsp-history-tbl');
+  if (tbody) {
+    if (!history||!history.length) { tbody.innerHTML='<tr><td colspan="6" class="empty">No dispatches yet</td></tr>'; }
+    else {
+      tbody.innerHTML = history.map(r=>`<tr>
+        <td>${r.profiles?.display_name||r.studio_id}</td>
+        <td>${r.product_name}</td>
+        <td style="color:var(--accent);font-weight:700">+${r.qty}</td>
+        <td style="color:var(--subtle)">${r.note||'—'}</td>
+        <td>${r.dispatcher?.display_name||'Admin'}</td>
+        <td style="color:var(--subtle)">${new Date(r.created_at).toLocaleDateString('en-GB',{day:'numeric',month:'short',year:'numeric'})}</td>
+      </tr>`).join('');
+    }
+  }
+  // Stock snapshot per studio
+  const snap = document.getElementById('dsp-snapshot');
+  if (snap) {
+    const { data: stocks } = await _sb.from('stock_items')
+      .select('studio_id,product_name,quantity,profiles(display_name)')
+      .order('studio_id').order('product_name');
+    if (!stocks||!stocks.length) { snap.innerHTML='<div class="empty">No stock records yet</div>'; }
+    else {
+      // Group by studio
+      const byStudio = {};
+      stocks.forEach(s => {
+        const sName = s.profiles?.display_name || s.studio_id;
+        if (!byStudio[sName]) byStudio[sName] = [];
+        byStudio[sName].push(s);
+      });
+      snap.innerHTML = Object.entries(byStudio).map(([studio,items])=>`
+        <div style="margin-bottom:14px">
+          <div style="font-size:11px;text-transform:uppercase;letter-spacing:1px;color:var(--subtle);margin-bottom:6px">${studio}</div>
+          <div style="display:flex;flex-wrap:wrap;gap:6px">
+            ${items.map(i=>`<span style="background:var(--surface);border:1px solid var(--border);border-radius:6px;padding:4px 10px;font-size:12px">
+              ${i.product_name} <strong style="color:var(--accent)">${i.quantity}</strong>
+            </span>`).join('')}
+          </div>
+        </div>
+      `).join('');
+    }
+  }
+}
+
+async function dispatchStock() {
+  const studioId = document.getElementById('dsp-studio')?.value;
+  const product = document.getElementById('dsp-product')?.value;
+  const qty = parseInt(document.getElementById('dsp-qty')?.value)||0;
+  const note = document.getElementById('dsp-note')?.value||'';
+  if (!studioId||!product||qty<1) { alert('Please select a studio, product and valid quantity.'); return; }
+  const userId = _sbUser?.id;
+  // Insert dispatch record
+  const { error: dErr } = await _sb.from('stock_dispatches').insert({
+    studio_id: studioId, product_name: product, qty, note, dispatched_by: userId
+  });
+  if (dErr) { alert('Error recording dispatch: '+dErr.message); return; }
+  // Upsert stock_items for studio
+  const { data: existing } = await _sb.from('stock_items')
+    .select('id,quantity').eq('studio_id',studioId).eq('product_name',product).single();
+  if (existing) {
+    await _sb.from('stock_items').update({quantity: existing.quantity+qty}).eq('id',existing.id);
+  } else {
+    await _sb.from('stock_items').insert({studio_id:studioId, product_name:product, quantity:qty});
+  }
+  document.getElementById('dsp-qty').value=1;
+  document.getElementById('dsp-note').value='';
+  loadStockDispatch();
+}
+
+// ── TRADE SHOP ─────────────────────────────────────────────────────────────────
+const TRADE_PRODUCTS = [
+  {name:'Kong Rapid Cream 5% 15g',     trade:6.00,  rrp:15.00},
+  {name:'Kong Rapid Cream 8% 15g',     trade:7.00,  rrp:17.00},
+  {name:'Kong Rapid Spray 30ml',       trade:7.00,  rrp:15.00},
+  {name:'Kong Tattoo Balm Coconut 50g',trade:4.50,  rrp:9.99},
+  {name:'Kong Tattoo Balm Coconut 10g',trade:2.50,  rrp:5.99},
+  {name:'Kong Tattoo Butter 150g',     trade:7.50,  rrp:19.99},
+  {name:'Kong Tattoo Sealant Spray 100ml',trade:4.00,rrp:9.99},
+  {name:'Kong Tattoo Care Stick 50g',  trade:6.00,  rrp:12.99},
+  {name:'Kong Tattoo Relief Cream 30g',trade:4.00,  rrp:9.99},
+  {name:'Kong Tattoo Foam Cleanser 185g',trade:4.00,rrp:9.99},
+  {name:'Kong Tattoo Sunscreen 50g',   trade:6.00,  rrp:12.99},
+  {name:'Kong Tattoo Relief Serum 30g',trade:5.00,  rrp:12.99},
+  {name:'Kong Piercing Spray 60g',     trade:4.00,  rrp:9.99},
+  {name:'Kong Tattoo Green Glide 150g',trade:7.50,  rrp:19.99},
+];
+let _tradeCart = {};
+
+function loadTradeShop() {
+  _tradeCart = {};
+  updateCartDisplay();
+  const grid = document.getElementById('trade-products');
+  if (!grid) return;
+  grid.innerHTML = TRADE_PRODUCTS.map((p,i)=>`
+    <div class="card" style="padding:16px;display:flex;flex-direction:column;gap:8px">
+      <div style="font-size:13px;font-weight:600;line-height:1.3">${p.name}</div>
+      <div style="display:flex;align-items:baseline;gap:8px;margin-top:2px">
+        <span style="font-family:'Syne',sans-serif;font-size:20px;font-weight:800;color:var(--accent)">£${p.trade.toFixed(2)}</span>
+        <span style="font-size:11px;color:var(--subtle);text-decoration:line-through">RRP £${p.rrp.toFixed(2)}</span>
+        <span style="font-size:10px;background:var(--accent);color:#000;border-radius:4px;padding:1px 5px;font-weight:700">${Math.round((1-p.trade/p.rrp)*100)}% off</span>
+      </div>
+      <div style="display:flex;align-items:center;gap:8px;margin-top:4px">
+        <button onclick="adjustCart(${i},-1)" style="width:28px;height:28px;border:1px solid var(--border);border-radius:6px;background:var(--surface);color:var(--fg);font-size:16px;cursor:pointer;display:flex;align-items:center;justify-content:center">−</button>
+        <span id="cart-qty-${i}" style="min-width:24px;text-align:center;font-weight:600">0</span>
+        <button onclick="adjustCart(${i},1)" style="width:28px;height:28px;border:1px solid var(--border);border-radius:6px;background:var(--surface);color:var(--fg);font-size:16px;cursor:pointer;display:flex;align-items:center;justify-content:center">+</button>
+      </div>
+    </div>
+  `).join('');
+  loadTradeOrders();
+}
+
+function adjustCart(idx, delta) {
+  const current = _tradeCart[idx]||0;
+  const next = Math.max(0, current+delta);
+  if (next===0) delete _tradeCart[idx]; else _tradeCart[idx]=next;
+  const el = document.getElementById('cart-qty-'+idx);
+  if (el) el.textContent = next;
+  updateCartDisplay();
+}
+
+function updateCartDisplay() {
+  let total=0, count=0;
+  Object.entries(_tradeCart).forEach(([i,qty])=>{ total+=TRADE_PRODUCTS[i].trade*qty; count+=qty; });
+  const tot = document.getElementById('cart-total');
+  const cnt = document.getElementById('cart-items-count');
+  if(tot) tot.textContent='£'+total.toFixed(2);
+  if(cnt) cnt.textContent=count+' item'+(count===1?'':'s');
+}
+
+async function submitTradeOrder() {
+  const items = Object.entries(_tradeCart).map(([i,qty])=>({
+    product: TRADE_PRODUCTS[i].name, qty, unit_price: TRADE_PRODUCTS[i].trade
+  }));
+  if (!items.length) { alert('Your cart is empty.'); return; }
+  const total = items.reduce((s,i)=>s+i.unit_price*i.qty,0);
+  const userId = _sbUser?.id;
+  const { error } = await _sb.from('trade_orders').insert({
+    studio_id: userId,
+    items: items,
+    total_gbp: total,
+    status: 'pending'
+  });
+  if (error) { alert('Error placing order: '+error.message); return; }
+  alert('✓ Order placed! Our team will be in touch to confirm.');
+  _tradeCart = {};
+  TRADE_PRODUCTS.forEach((_,i)=>{ const el=document.getElementById('cart-qty-'+i); if(el)el.textContent='0'; });
+  updateCartDisplay();
+  loadTradeOrders();
+}
+
+async function loadTradeOrders() {
+  const tbody = document.getElementById('trade-orders-tbl');
+  if (!tbody) return;
+  const userId = _sbUser?.id;
+  const { data: orders } = await _sb.from('trade_orders')
+    .select('*').eq('studio_id',userId).order('created_at',{ascending:false}).limit(20);
+  if (!orders||!orders.length) { tbody.innerHTML='<tr><td colspan="4" class="empty">No orders yet</td></tr>'; return; }
+  tbody.innerHTML = orders.map(o=>{
+    const items = (o.items||[]);
+    const summary = items.slice(0,2).map(i=>`${i.product} ×${i.qty}`).join(', ')+(items.length>2?` +${items.length-2} more`:'');
+    const statusColor = o.status==='approved'?'var(--accent)':o.status==='declined'?'#ff4f4f':'var(--subtle)';
+    return `<tr>
+      <td>${new Date(o.created_at).toLocaleDateString('en-GB',{day:'numeric',month:'short',year:'numeric'})}</td>
+      <td style="font-size:12px">${summary}</td>
+      <td>£${parseFloat(o.total_gbp).toFixed(2)}</td>
+      <td><span style="color:${statusColor};font-weight:600;text-transform:capitalize">${o.status}</span></td>
+    </tr>`;
+  }).join('');
 }
 
 // ── STRIPE REVENUE ─────────────────────────────────────────────────────────────
