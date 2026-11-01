@@ -205,7 +205,7 @@ header{display:flex;align-items:center;justify-content:space-between}
           <li role="option" class="lang-opt" data-href="/lang/sr">🇷🇸 Srpski</li>
         </ul>
       </div>
-      <a class="signin-link" href="login.html">Sign In</a>
+      <a class="signin-link" href="/hub">Sign In</a>
     </div>
 </header>
   <section class="stage" aria-live="polite">
@@ -399,7 +399,7 @@ let sx=0,sy=0;$('#visual').addEventListener('pointerdown',e=>{sx=e.clientX;sy=e.
 // Initialize gallery and aftercare on load
 setTimeout(()=>{updateGallery();updateAftercareGrid();},50);
 document.querySelectorAll('.mini-product').forEach(card=>card.addEventListener('click',()=>{current=+card.dataset.product;qty=1;$('#qty').textContent=qty;render(1);window.scrollTo({top:0,behavior:'smooth'})}));
-  </script><nav class="mobile-app-dock" aria-label="Mobile navigation"><a class="app-dock-item" href="index.html"><svg viewBox="0 0 24 24"><path d="M3 11.5 12 4l9 7.5"/><path d="M5.5 10v10h13V10"/><path d="M9.5 20v-6h5v6"/></svg><span>Home</span></a><a class="app-dock-item active" href="shop-all.html"><svg viewBox="0 0 24 24"><path d="M4 8h16l-1 12H5L4 8Z"/><path d="M8 9V7a4 4 0 0 1 8 0v2"/></svg><span>Shop</span></a><a class="app-dock-item" href="shop.html#bag"><svg viewBox="0 0 24 24"><path d="M4 7h16l-1.5 13h-13L4 7Z"/><path d="M9 9V6a3 3 0 0 1 6 0v3"/></svg><span>Bag</span><b class="dock-cart-count">0</b></a><a class="app-dock-item" href="https://www.kongtattoocareglobal.com/login.html"><svg viewBox="0 0 24 24"><circle cx="12" cy="8" r="4"/><path d="M4.5 21a7.5 7.5 0 0 1 15 0"/></svg><span>Account</span></a></nav><script data-inline-source="app-ui.js">
+  </script><nav class="mobile-app-dock" aria-label="Mobile navigation"><a class="app-dock-item" href="index.html"><svg viewBox="0 0 24 24"><path d="M3 11.5 12 4l9 7.5"/><path d="M5.5 10v10h13V10"/><path d="M9.5 20v-6h5v6"/></svg><span>Home</span></a><a class="app-dock-item active" href="shop-all.html"><svg viewBox="0 0 24 24"><path d="M4 8h16l-1 12H5L4 8Z"/><path d="M8 9V7a4 4 0 0 1 8 0v2"/></svg><span>Shop</span></a><a class="app-dock-item" href="shop.html#bag"><svg viewBox="0 0 24 24"><path d="M4 7h16l-1.5 13h-13L4 7Z"/><path d="M9 9V6a3 3 0 0 1 6 0v3"/></svg><span>Bag</span><b class="dock-cart-count">0</b></a><a class="app-dock-item" href="/hub"><svg viewBox="0 0 24 24"><circle cx="12" cy="8" r="4"/><path d="M4.5 21a7.5 7.5 0 0 1 15 0"/></svg><span>Account</span></a></nav><script data-inline-source="app-ui.js">
 (function(){
   function count(){try{return JSON.parse(localStorage.getItem('kong-cart-v2')||'[]').reduce(function(n,x){return n+(x.qty||0)},0)}catch(e){return 0}}
   function update(){document.querySelectorAll('.dock-cart-count').forEach(function(el){el.textContent=count()})}
