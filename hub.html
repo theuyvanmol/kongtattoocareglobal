@@ -568,25 +568,22 @@ document.getElementById('setup-sql-display').textContent = SETUP_SQL;
 })();
 
 async function loadProfile(authUser) {
-  try {
-    let { data: profile } = await sb.from('profiles').select('*').eq('id', authUser.id).single();
-    if (!profile) {
-      const { data: np } = await sb.from('profiles').insert({
-        id: authUser.id,
-        email: authUser.email,
-        display_name: authUser.user_metadata?.display_name || authUser.email.split('@')[0],
-        role: 'studio',
-      }).select().single();
-      ME = np;
-    } else {
-      ME = profile;
-    }
-    hideEl('loading-screen');
-    launchApp();
-  } catch(e) {
-    hideEl('loading-screen');
-    showLogin();
+  const { data: profile } = await sb.from('profiles').select('*').eq('id', authUser.id).single();
+  if (!profile) {
+    // Profile missing — insert one (trigger may not have fired)
+    const { data: np, error: insertErr } = await sb.from('profiles').insert({
+      id: authUser.id,
+      email: authUser.email,
+      display_name: authUser.user_metadata?.display_name || authUser.email.split('@')[0],
+      role: 'studio',
+    }).select().single();
+    if (insertErr) throw new Error('Could not load your profile: ' + insertErr.message);
+    ME = np;
+  } else {
+    ME = profile;
   }
+  hideEl('loading-screen');
+  launchApp();
 }
 
 // ── AUTH ──────────────────────────────────────────────────────────────────────
@@ -629,7 +626,12 @@ async function doLogin() {
   try {
     const { data, error } = await sb.auth.signInWithPassword({ email, password: pass });
     if(error) throw error;
-    await loadProfile(data.user);
+    try {
+      await loadProfile(data.user);
+    } catch(profileErr) {
+      // Profile load failed — still signed in, force a page reload to retry
+      window.location.reload();
+    }
   } catch(e) {
     setErr('login-err', e.message||'Login failed. Check your email and password.');
     btn.disabled=false; btn.textContent='ENTER HUB';
