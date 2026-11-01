@@ -149,7 +149,7 @@ select.inp{cursor:pointer}
         <button class="tab-btn" onclick="showTab('register')">Register Studio</button>
       </div>
       <div class="auth-err" id="login-err"></div>
-      <div class="form-g"><label>Email</label><input id="li-email" type="email" placeholder="your@email.com" autocomplete="email"></div>
+      <div class="form-g"><label>Email or Username</label><input id="li-email" type="text" placeholder="email@example.com or username" autocomplete="username"></div>
       <div class="form-g"><label>Password</label><input id="li-pass" type="password" placeholder="Password" autocomplete="current-password" onkeydown="if(event.key==='Enter')doLogin()"></div>
       <a class="forgot-link" onclick="showTab('forgot')">Forgot password?</a>
       <button class="auth-btn" id="login-btn" onclick="doLogin()">ENTER HUB</button>
@@ -628,11 +628,24 @@ function setOk(id, msg) {
 
 async function doLogin() {
   setErr('login-err','');
-  const email = val('li-email'), pass = val('li-pass');
-  if(!email||!pass) return setErr('login-err','Enter your email and password.');
+  let loginId = val('li-email').trim(), pass = val('li-pass');
+  if(!loginId||!pass) return setErr('login-err','Enter your email or username and password.');
   const btn = document.getElementById('login-btn');
   btn.disabled=true; btn.textContent='Signing in…';
   try {
+    // If it doesn't look like an email, try to look up email by username
+    let email = loginId;
+    if (!loginId.includes('@')) {
+      console.log('[KONG] Looking up username:', loginId);
+      const { data: emailRow } = await sb.rpc('get_email_by_username', { uname: loginId });
+      console.log('[KONG] Username lookup result:', emailRow);
+      if (!emailRow) {
+        setErr('login-err', 'Username not found. Try signing in with your email.');
+        btn.disabled=false; btn.textContent='ENTER HUB';
+        return;
+      }
+      email = emailRow;
+    }
     console.log('[KONG] Attempting sign in for', email);
     const { data, error } = await sb.auth.signInWithPassword({ email, password: pass });
     console.log('[KONG] signInWithPassword result:', data, error);
@@ -640,7 +653,7 @@ async function doLogin() {
     await loadProfile(data.user);
   } catch(e) {
     console.error('[KONG] doLogin error:', e);
-    setErr('login-err', e.message||'Login failed. Check your email and password.');
+    setErr('login-err', e.message||'Login failed. Check your credentials.');
     btn.disabled=false; btn.textContent='ENTER HUB';
   }
 }
