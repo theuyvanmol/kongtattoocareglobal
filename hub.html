@@ -1,0 +1,978 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover">
+<title>KONG Hub</title>
+<meta name="robots" content="noindex,nofollow">
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Syne:wght@400;600;700;800&family=Inter:wght@300;400;500;600&display=swap">
+<script src="https://cdnjs.cloudflare.com/ajax/libs/Chart.js/4.4.1/chart.umd.min.js"></script>
+<style>
+:root {
+  --bg:        #0a0a0a;
+  --surface:   #111111;
+  --surface2:  #181818;
+  --border:    #232323;
+  --muted:     #3a3a3a;
+  --subtle:    #606060;
+  --body:      #aaaaaa;
+  --fg:        #f0f0f0;
+  --accent:    #c8ff00;
+  --accent-dim:#8fb300;
+  --accent-bg: rgba(200,255,0,0.07);
+  --red:       #ff4444;
+  --amber:     #ffaa00;
+  --blue:      #4488ff;
+  --green:     #00cc88;
+  --r:         10px;
+  --r-sm:      6px;
+  --sw:        220px;
+  color-scheme: dark;
+}
+*{box-sizing:border-box;margin:0;padding:0}
+html,body{height:100%;background:var(--bg);color:var(--fg);font-family:'Inter',system-ui,sans-serif;font-size:14px;line-height:1.5}
+
+/* ── SCREENS ── */
+.screen{display:none;min-height:100vh}
+.screen.active{display:block}
+#screen-login{display:flex;align-items:center;justify-content:center;
+  padding:max(24px,env(safe-area-inset-top,0px)) max(16px,env(safe-area-inset-right,0px)) max(24px,env(safe-area-inset-bottom,0px)) max(16px,env(safe-area-inset-left,0px));
+  background:var(--bg);position:relative;overflow:hidden}
+#screen-login::before{content:'';position:absolute;top:-180px;left:50%;transform:translateX(-50%);
+  width:560px;height:560px;background:radial-gradient(ellipse,rgba(200,255,0,0.07) 0%,transparent 70%);pointer-events:none}
+
+/* ── LOGIN BOX ── */
+.auth-box{width:100%;max-width:420px;background:var(--surface);border:1px solid var(--border);border-radius:16px;padding:40px 36px;position:relative;z-index:1}
+.auth-logo{text-align:center;margin-bottom:28px}
+.auth-logo .wm{font-family:'Syne',sans-serif;font-weight:800;font-size:34px;letter-spacing:-1px}
+.auth-logo .wm span{color:var(--accent)}
+.auth-logo .sub{font-size:10px;letter-spacing:3px;text-transform:uppercase;color:var(--subtle);margin-top:4px}
+.tab-row{display:grid;grid-template-columns:1fr 1fr;border:1px solid var(--border);border-radius:var(--r-sm);overflow:hidden;margin-bottom:24px}
+.tab-btn{padding:10px;background:none;border:none;color:var(--body);font-size:13px;font-weight:500;cursor:pointer;font-family:'Inter',sans-serif;transition:all .15s}
+.tab-btn.active{background:var(--accent-bg);color:var(--accent)}
+.form-g{margin-bottom:14px}
+.form-g label{display:block;font-size:10px;letter-spacing:1px;text-transform:uppercase;color:var(--subtle);margin-bottom:5px}
+.form-g input{width:100%;padding:10px 13px;background:var(--surface2);border:1px solid var(--border);border-radius:var(--r-sm);color:var(--fg);font-size:13px;font-family:'Inter',sans-serif;outline:none;transition:border-color .15s}
+.form-g input:focus{border-color:var(--accent)}
+.auth-btn{width:100%;padding:12px;background:var(--accent);color:#000;border:none;border-radius:var(--r-sm);font-family:'Syne',sans-serif;font-weight:700;font-size:13px;letter-spacing:.8px;cursor:pointer;margin-top:6px;transition:opacity .15s}
+.auth-btn:hover{opacity:.88}
+.auth-btn:disabled{opacity:.5;cursor:default}
+.auth-err{background:rgba(255,68,68,.1);border:1px solid rgba(255,68,68,.3);border-radius:var(--r-sm);color:var(--red);padding:9px 13px;font-size:12px;margin-bottom:14px;display:none}
+.auth-switch{text-align:center;color:var(--subtle);font-size:12px;margin-top:18px}
+.auth-switch a{color:var(--accent);cursor:pointer;text-decoration:none}
+
+/* ── APP SHELL ── */
+#screen-app{display:none;height:100%;flex-direction:row}
+#screen-app.active{display:flex}
+
+/* ── SIDEBAR ── */
+.sb{width:var(--sw);min-width:var(--sw);background:var(--surface);border-right:1px solid var(--border);display:flex;flex-direction:column;position:fixed;top:0;left:0;bottom:0;z-index:100;padding-bottom:env(safe-area-inset-bottom,0px)}
+.sb-head{padding:20px 18px 16px;border-bottom:1px solid var(--border)}
+.sb-logo{font-family:'Syne',sans-serif;font-weight:800;font-size:22px;color:var(--fg);letter-spacing:-.5px}
+.sb-logo span{color:var(--accent)}
+.sb-role{display:inline-block;margin-top:6px;font-size:9px;letter-spacing:2px;text-transform:uppercase;color:var(--accent);background:var(--accent-bg);border:1px solid rgba(200,255,0,.2);border-radius:4px;padding:2px 8px}
+.sb-nav{flex:1;overflow-y:auto;padding:10px 8px;display:flex;flex-direction:column;gap:2px}
+.nav-sec{font-size:9px;letter-spacing:2px;text-transform:uppercase;color:var(--muted);padding:10px 8px 4px}
+.nav-item{display:flex;align-items:center;gap:9px;padding:9px 10px;border-radius:var(--r-sm);color:var(--body);cursor:pointer;font-size:13px;font-weight:500;transition:all .12s;border:1px solid transparent}
+.nav-item svg{width:15px;height:15px;flex-shrink:0;opacity:.7}
+.nav-item:hover{background:var(--surface2);color:var(--fg)}
+.nav-item.active{background:var(--accent-bg);color:var(--accent);border-color:rgba(200,255,0,.15)}
+.nav-item.active svg{opacity:1}
+.sb-foot{padding:12px 10px;border-top:1px solid var(--border)}
+.u-chip{display:flex;align-items:center;gap:9px;padding:8px 10px;border-radius:var(--r-sm)}
+.u-av{width:30px;height:30px;border-radius:50%;background:var(--accent);color:#000;font-family:'Syne',sans-serif;font-weight:700;font-size:12px;display:flex;align-items:center;justify-content:center;flex-shrink:0}
+.u-info{min-width:0}
+.u-name{font-size:13px;font-weight:600;color:var(--fg);white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+.u-title{font-size:11px;color:var(--subtle)}
+.logout-btn{width:100%;margin-top:8px;padding:8px;background:none;border:1px solid var(--border);border-radius:var(--r-sm);color:var(--subtle);font-size:12px;cursor:pointer;transition:all .12s;font-family:'Inter',sans-serif}
+.logout-btn:hover{border-color:var(--red);color:var(--red)}
+
+/* ── MAIN ── */
+.main{margin-left:var(--sw);flex:1;overflow-y:auto;min-height:100vh}
+.topbar{position:sticky;top:0;background:rgba(10,10,10,.88);backdrop-filter:blur(12px);border-bottom:1px solid var(--border);padding:13px 26px;display:flex;align-items:center;justify-content:space-between;z-index:50}
+.pg-title{font-family:'Syne',sans-serif;font-size:17px;font-weight:700}
+.content{padding:22px 26px;max-width:1200px}
+
+/* ── COMPONENTS ── */
+.stat-grid{display:grid;grid-template-columns:repeat(auto-fit,minmax(180px,1fr));gap:13px;margin-bottom:22px}
+.stat{background:var(--surface);border:1px solid var(--border);border-radius:var(--r);padding:18px;position:relative;overflow:hidden}
+.stat::before{content:'';position:absolute;top:0;left:0;right:0;height:2px;background:var(--accent);opacity:.35}
+.stat.hi::before{opacity:1}
+.stat-lbl{font-size:10px;letter-spacing:1px;text-transform:uppercase;color:var(--subtle);margin-bottom:8px}
+.stat-val{font-family:'Syne',sans-serif;font-size:26px;font-weight:700;color:var(--fg);letter-spacing:-1px;font-variant-numeric:tabular-nums;line-height:1}
+.stat-val.ac{color:var(--accent)}
+.stat-d{font-size:11px;margin-top:6px;color:var(--green)}
+.stat-d.dn{color:var(--red)}
+.stat-d.ne{color:var(--subtle)}
+.card{background:var(--surface);border:1px solid var(--border);border-radius:var(--r);padding:18px;margin-bottom:18px}
+.sec-hd{display:flex;align-items:center;justify-content:space-between;margin-bottom:13px}
+.sec-ttl{font-family:'Syne',sans-serif;font-size:14px;font-weight:700;color:var(--fg)}
+.two-col{display:grid;grid-template-columns:1fr 1fr;gap:15px;margin-bottom:18px}
+.chart-w{position:relative;height:190px}
+.pill{display:inline-block;padding:3px 9px;border-radius:20px;font-size:11px;font-weight:600}
+.pill-ok{background:rgba(0,204,136,.12);color:var(--green)}
+.pill-lo{background:rgba(255,170,0,.12);color:var(--amber)}
+.pill-out{background:rgba(255,68,68,.12);color:var(--red)}
+.pill-pend{background:rgba(68,136,255,.12);color:var(--blue)}
+.pw{background:var(--surface2);border-radius:4px;height:6px;overflow:hidden}
+.pb{height:100%;border-radius:4px;background:var(--accent);transition:width .4s}
+.pb.lo{background:var(--amber)}
+.pb.cr{background:var(--red)}
+table{width:100%;border-collapse:collapse;font-size:13px}
+th{text-align:left;padding:9px 11px;font-size:9px;letter-spacing:1.5px;text-transform:uppercase;color:var(--subtle);border-bottom:1px solid var(--border);font-weight:500}
+td{padding:10px 11px;color:var(--body);border-bottom:1px solid rgba(255,255,255,.04);vertical-align:middle}
+tr:last-child td{border-bottom:none}
+tr:hover td{background:rgba(255,255,255,.02)}
+.td-n{color:var(--fg);font-weight:500}
+.tw{overflow-x:auto}
+.act{display:flex;flex-direction:column}
+.act-r{display:flex;gap:11px;align-items:flex-start;padding:10px 0;border-bottom:1px solid rgba(255,255,255,.04)}
+.act-r:last-child{border-bottom:none}
+.act-dot{width:7px;height:7px;border-radius:50%;margin-top:5px;flex-shrink:0}
+.act-dot.g{background:var(--green);box-shadow:0 0 5px var(--green)}
+.act-dot.a{background:var(--amber)}
+.act-dot.b{background:var(--blue)}
+.act-dot.r{background:var(--red)}
+.act-txt{font-size:13px;color:var(--body);flex:1}
+.act-txt strong{color:var(--fg)}
+.act-time{font-size:10px;color:var(--subtle);flex-shrink:0;margin-top:2px}
+.amb-list{display:flex;flex-direction:column;gap:9px}
+.amb-row{display:flex;align-items:center;gap:12px;background:var(--surface2);border-radius:var(--r-sm);padding:11px 13px;border:1px solid var(--border)}
+.amb-av{width:33px;height:33px;border-radius:50%;background:var(--accent);color:#000;font-family:'Syne',sans-serif;font-weight:700;font-size:12px;display:flex;align-items:center;justify-content:center;flex-shrink:0}
+.amb-inf{flex:1;min-width:0}
+.amb-nm{font-weight:600;color:var(--fg);font-size:13px}
+.amb-cd{font-size:11px;color:var(--subtle)}
+.amb-sl{text-align:right}
+.amb-slv{font-family:'Syne',sans-serif;font-weight:700;color:var(--accent);font-size:15px;font-variant-numeric:tabular-nums}
+.amb-sll{font-size:10px;color:var(--subtle)}
+.btn{padding:9px 16px;border-radius:var(--r-sm);font-size:13px;font-weight:600;cursor:pointer;border:none;font-family:'Syne',sans-serif;letter-spacing:.4px;transition:opacity .15s}
+.btn:hover{opacity:.85}
+.btn-p{background:var(--accent);color:#000}
+.btn-g{background:var(--surface2);color:var(--body);border:1px solid var(--border)}
+.btn-sm{padding:5px 11px;font-size:11px}
+.inp{width:100%;padding:10px 12px;background:var(--surface2);border:1px solid var(--border);border-radius:var(--r-sm);color:var(--fg);font-size:13px;font-family:'Inter',sans-serif;outline:none;margin-bottom:11px}
+.inp:focus{border-color:var(--accent)}
+.inp-lbl{font-size:10px;letter-spacing:1px;text-transform:uppercase;color:var(--subtle);margin-bottom:5px;display:block}
+.todo-list{display:flex;flex-direction:column;gap:7px}
+.todo-item{display:flex;align-items:center;gap:10px;padding:10px 12px;background:var(--surface2);border-radius:var(--r-sm);border:1px solid var(--border)}
+.todo-cb{width:16px;height:16px;border-radius:4px;border:1px solid var(--border);background:none;cursor:pointer;flex-shrink:0;display:flex;align-items:center;justify-content:center}
+.todo-cb.done{background:var(--accent);border-color:var(--accent);color:#000}
+.todo-txt{flex:1;font-size:13px;color:var(--fg)}
+.todo-txt.done{text-decoration:line-through;color:var(--subtle)}
+.todo-del{background:none;border:none;color:var(--muted);cursor:pointer;font-size:16px;line-height:1;padding:2px 5px}
+.todo-del:hover{color:var(--red)}
+.badge{display:inline-flex;align-items:center;gap:5px;padding:3px 10px;border-radius:20px;font-size:11px;font-weight:500}
+.badge-live{background:rgba(0,204,136,.12);color:var(--green);border:1px solid rgba(0,204,136,.25)}
+.page{display:none}
+.page.active{display:block}
+.empty{text-align:center;padding:32px;color:var(--subtle);font-size:13px}
+#toast{position:fixed;bottom:22px;right:22px;background:var(--surface2);border:1px solid var(--accent);border-radius:var(--r);padding:13px 17px;color:var(--fg);font-size:13px;z-index:999;display:none;max-width:300px;box-shadow:0 8px 32px rgba(0,0,0,.5)}
+.hbg{display:none;align-items:center;justify-content:center;width:32px;height:32px;border:1px solid var(--border);border-radius:var(--r-sm);background:var(--surface2);cursor:pointer;flex-direction:column;gap:4px}
+.hbg span{display:block;width:15px;height:2px;background:var(--body);border-radius:2px}
+@media(max-width:720px){
+  :root{--sw:0px}
+  .sb{transform:translateX(-220px);transition:transform .2s}
+  .sb.open{transform:translateX(0)}
+  .main{margin-left:0}
+  .content{padding:14px}
+  .two-col{grid-template-columns:1fr}
+  .stat-grid{grid-template-columns:1fr 1fr}
+  .topbar{padding:11px 14px}
+  .hbg{display:flex!important}
+}
+</style>
+</head>
+<body>
+
+<!-- ── LOGIN / REGISTER ────────────────────────────────────── -->
+<div id="screen-login" class="screen active">
+  <div class="auth-box">
+    <div class="auth-logo">
+      <div class="wm">KONG<span>.</span></div>
+      <div class="sub">Partner Hub</div>
+    </div>
+
+    <!-- Login form -->
+    <div id="form-login">
+      <div class="tab-row">
+        <button class="tab-btn active" onclick="showAuthTab('login')">Sign in</button>
+        <button class="tab-btn" onclick="showAuthTab('register')">Register Studio</button>
+      </div>
+      <div class="auth-err" id="login-err"></div>
+      <div class="form-g"><label>Email</label><input id="li-email" type="email" placeholder="your@email.com" autocomplete="email"></div>
+      <div class="form-g"><label>Password</label><input id="li-pass" type="password" placeholder="Password" autocomplete="current-password"></div>
+      <button class="auth-btn" onclick="doLogin()">ENTER HUB</button>
+    </div>
+
+    <!-- Register form -->
+    <div id="form-register" style="display:none">
+      <div class="tab-row">
+        <button class="tab-btn" onclick="showAuthTab('login')">Sign in</button>
+        <button class="tab-btn active" onclick="showAuthTab('register')">Register Studio</button>
+      </div>
+      <div class="auth-err" id="reg-err"></div>
+      <div class="form-g"><label>Studio / Artist Name</label><input id="rg-name" type="text" placeholder="e.g. Black Ink Studio or Jay Rodriguez" autocomplete="organization"></div>
+      <div class="form-g"><label>Email</label><input id="rg-email" type="email" placeholder="studio@email.com" autocomplete="email"></div>
+      <div class="form-g"><label>Password</label><input id="rg-pass" type="password" placeholder="Min 8 characters" autocomplete="new-password"></div>
+      <button class="auth-btn" onclick="doRegister()">CREATE ACCOUNT</button>
+      <div class="auth-switch">Already have an account? <a onclick="showAuthTab('login')">Sign in</a></div>
+    </div>
+  </div>
+</div>
+
+<!-- ── APP ─────────────────────────────────────────────────── -->
+<div id="screen-app" class="screen">
+  <nav class="sb" id="sidebar">
+    <div class="sb-head">
+      <div class="sb-logo">KONG<span>.</span></div>
+      <div class="sb-role" id="role-badge">Studio</div>
+    </div>
+    <div class="sb-nav" id="sb-nav"></div>
+    <div class="sb-foot">
+      <div class="u-chip">
+        <div class="u-av" id="u-av">K</div>
+        <div class="u-info">
+          <div class="u-name" id="u-name">—</div>
+          <div class="u-title" id="u-title">—</div>
+        </div>
+      </div>
+      <button class="logout-btn" onclick="doLogout()">Sign out</button>
+    </div>
+  </nav>
+
+  <div class="main">
+    <div class="topbar">
+      <div style="display:flex;align-items:center;gap:11px">
+        <div class="hbg" id="hbg" onclick="document.getElementById('sidebar').classList.toggle('open')"><span></span><span></span><span></span></div>
+        <div class="pg-title" id="pg-title">Overview</div>
+      </div>
+      <div style="display:flex;align-items:center;gap:10px">
+        <div class="badge badge-live">● Live</div>
+        <div id="tb-date" style="font-size:11px;color:var(--subtle)"></div>
+      </div>
+    </div>
+
+    <div class="content" id="main-content">
+
+      <!-- ══ SUPERADMIN PAGES ══════════════════════════════════════ -->
+      <div class="page" id="pg-overview">
+        <div class="stat-grid">
+          <div class="stat hi"><div class="stat-lbl">Revenue MTD</div><div class="stat-val ac" id="sa-revenue">—</div><div class="stat-d">Stripe gross</div></div>
+          <div class="stat"><div class="stat-lbl">Active Studios</div><div class="stat-val" id="sa-studios">—</div></div>
+          <div class="stat"><div class="stat-lbl">Team Members</div><div class="stat-val" id="sa-team">—</div></div>
+          <div class="stat"><div class="stat-lbl">Open Requests</div><div class="stat-val" id="sa-requests">—</div></div>
+        </div>
+        <div class="two-col">
+          <div class="card"><div class="sec-hd"><div class="sec-ttl">Revenue (30d)</div></div><div class="chart-w"><canvas id="ch-rev"></canvas></div></div>
+          <div class="card"><div class="sec-hd"><div class="sec-ttl">Visitors (30d)</div></div><div class="chart-w"><canvas id="ch-vis"></canvas></div></div>
+        </div>
+        <div class="card">
+          <div class="sec-hd"><div class="sec-ttl">Live Activity</div></div>
+          <div class="act" id="activity-feed">
+            <div class="act-r"><div class="act-dot g"></div><div class="act-txt"><strong>System ready</strong> — KONG Hub is live</div><div class="act-time">now</div></div>
+          </div>
+        </div>
+      </div>
+
+      <div class="page" id="pg-studios">
+        <div class="card">
+          <div class="sec-hd"><div class="sec-ttl">All Partner Studios</div></div>
+          <div class="tw"><table><thead><tr><th>Studio / Artist</th><th>Email</th><th>Joined</th><th>Stock Items</th><th>Status</th></tr></thead>
+          <tbody id="studios-tbl"><tr><td colspan="5" class="empty">Loading…</td></tr></tbody></table></div>
+        </div>
+      </div>
+
+      <div class="page" id="pg-stock">
+        <div class="card">
+          <div class="sec-hd"><div class="sec-ttl">Stock — All Studios</div></div>
+          <div class="tw"><table><thead><tr><th>Studio</th><th>Product</th><th>Units</th><th>Sold (Total)</th><th>Level</th><th>Status</th></tr></thead>
+          <tbody id="allstock-tbl"><tr><td colspan="6" class="empty">Loading…</td></tr></tbody></table></div>
+        </div>
+        <div class="card">
+          <div class="sec-hd"><div class="sec-ttl">Pending Stock Requests</div></div>
+          <div class="tw"><table><thead><tr><th>Studio</th><th>Product</th><th>Qty</th><th>Submitted</th><th>Action</th></tr></thead>
+          <tbody id="reqs-tbl"><tr><td colspan="5" class="empty">No pending requests</td></tr></tbody></table></div>
+        </div>
+      </div>
+
+      <div class="page" id="pg-team">
+        <div class="card" style="max-width:480px">
+          <div class="sec-hd"><div class="sec-ttl">Add Team Member</div></div>
+          <label class="inp-lbl">Full Name</label><input class="inp" id="tm-name" placeholder="Name">
+          <label class="inp-lbl">Email</label><input class="inp" id="tm-email" type="email" placeholder="team@kong.com">
+          <label class="inp-lbl">Password</label><input class="inp" id="tm-pass" type="password" placeholder="Min 8 characters">
+          <label class="inp-lbl">Commission Code (optional — tracks their studio sales)</label><input class="inp" id="tm-code" placeholder="e.g. JAY2025">
+          <button class="btn btn-p" onclick="createTeamMember()">Add Team Member</button>
+        </div>
+        <div class="card">
+          <div class="sec-hd"><div class="sec-ttl">Team Commission Overview</div></div>
+          <div class="amb-list" id="team-commission-list"><div class="empty">Loading…</div></div>
+        </div>
+      </div>
+
+      <div class="page" id="pg-stripe">
+        <div class="stat-grid">
+          <div class="stat hi"><div class="stat-lbl">Gross Revenue MTD</div><div class="stat-val ac">£4,821</div><div class="stat-d">↑ 18%</div></div>
+          <div class="stat"><div class="stat-lbl">Net Revenue</div><div class="stat-val">£4,617</div><div class="stat-d ne">After fees</div></div>
+          <div class="stat"><div class="stat-lbl">Payments</div><div class="stat-val">127</div><div class="stat-d">98.4% success</div></div>
+          <div class="stat"><div class="stat-lbl">Refunds</div><div class="stat-val">2</div><div class="stat-d dn">£68 refunded</div></div>
+          <div class="stat"><div class="stat-lbl">Discount Uses</div><div class="stat-val">43</div><div class="stat-d ne">£186 total off</div></div>
+          <div class="stat"><div class="stat-lbl">Avg Order</div><div class="stat-val">£37.96</div><div class="stat-d">↑ £4.20</div></div>
+        </div>
+        <div class="card">
+          <div class="sec-hd"><div class="sec-ttl">Ambassador / Team Commission</div></div>
+          <div class="amb-list">
+            <div class="amb-row"><div class="amb-av">D</div><div class="amb-inf"><div class="amb-nm">Dan</div><div class="amb-cd">DanKong10 · 10% · 14 uses</div></div><div class="amb-sl"><div class="amb-slv">£432</div><div class="amb-sll">Revenue driven</div></div></div>
+            <div class="amb-row"><div class="amb-av">L</div><div class="amb-inf"><div class="amb-nm">Lauren</div><div class="amb-cd">LaurenKong10 · 10% · 11 uses</div></div><div class="amb-sl"><div class="amb-slv">£318</div><div class="amb-sll">Revenue driven</div></div></div>
+            <div class="amb-row"><div class="amb-av">M</div><div class="amb-inf"><div class="amb-nm">Micky</div><div class="amb-cd">MickyKong10 · 10% · 9 uses</div></div><div class="amb-sl"><div class="amb-slv">£278</div><div class="amb-sll">Revenue driven</div></div></div>
+            <div class="amb-row"><div class="amb-av">W</div><div class="amb-inf"><div class="amb-nm">Willa</div><div class="amb-cd">WillaKong10 · 10% · 6 uses</div></div><div class="amb-sl"><div class="amb-slv">£192</div><div class="amb-sll">Revenue driven</div></div></div>
+            <div class="amb-row"><div class="amb-av">DN</div><div class="amb-inf"><div class="amb-nm">DNT</div><div class="amb-cd">DNTKong10 · 10% · 3 uses</div></div><div class="amb-sl"><div class="amb-slv">£97</div><div class="amb-sll">Revenue driven</div></div></div>
+          </div>
+        </div>
+        <div class="card">
+          <div class="sec-hd"><div class="sec-ttl">Recent Transactions</div></div>
+          <div class="tw"><table><thead><tr><th>Order</th><th>Customer</th><th>Amount</th><th>Promo</th><th>Date</th><th>Status</th></tr></thead>
+          <tbody>
+            <tr><td class="td-n">#1038</td><td>Sarah M.</td><td>£54.00</td><td>—</td><td>Today 14:22</td><td><span class="pill pill-ok">Paid</span></td></tr>
+            <tr><td class="td-n">#1037</td><td>James K.</td><td>£43.20</td><td>DanKong10</td><td>Today 12:41</td><td><span class="pill pill-ok">Paid</span></td></tr>
+            <tr><td class="td-n">#1036</td><td>Emily R.</td><td>£29.99</td><td>—</td><td>Yesterday</td><td><span class="pill pill-ok">Paid</span></td></tr>
+            <tr><td class="td-n">#1035</td><td>Tom A.</td><td>£68.00</td><td>LaurenKong10</td><td>Yesterday</td><td><span class="pill pill-out">Refunded</span></td></tr>
+          </tbody></table></div>
+        </div>
+      </div>
+
+      <div class="page" id="pg-traffic">
+        <div class="stat-grid">
+          <div class="stat hi"><div class="stat-lbl">Visits (7d)</div><div class="stat-val ac">3,412</div><div class="stat-d">↑ 24%</div></div>
+          <div class="stat"><div class="stat-lbl">Unique Visitors</div><div class="stat-val">2,891</div><div class="stat-d">↑ 19%</div></div>
+          <div class="stat"><div class="stat-lbl">Avg Session</div><div class="stat-val">2:34</div><div class="stat-d ne">Minutes</div></div>
+          <div class="stat"><div class="stat-lbl">Bounce Rate</div><div class="stat-val">38%</div><div class="stat-d">↓ 4% improved</div></div>
+          <div class="stat"><div class="stat-lbl">Cart Starts</div><div class="stat-val">412</div><div class="stat-d ne">12% rate</div></div>
+          <div class="stat"><div class="stat-lbl">Conversions</div><div class="stat-val">127</div><div class="stat-d">30.8% of carts</div></div>
+        </div>
+        <div class="card"><div class="sec-hd"><div class="sec-ttl">Traffic (30d)</div></div><div class="chart-w" style="height:220px"><canvas id="ch-traffic"></canvas></div></div>
+        <div class="two-col">
+          <div class="card"><div class="sec-hd"><div class="sec-ttl">Top Pages</div></div>
+          <table><thead><tr><th>Page</th><th>Views</th></tr></thead><tbody>
+            <tr><td class="td-n">/</td><td>1,248</td></tr>
+            <tr><td class="td-n">/products/numb-spray</td><td>634</td></tr>
+            <tr><td class="td-n">/products/numb-cream</td><td>521</td></tr>
+            <tr><td class="td-n">/checkout</td><td>412</td></tr>
+            <tr><td class="td-n">/products/glow-balm</td><td>307</td></tr>
+          </tbody></table></div>
+          <div class="card"><div class="sec-hd"><div class="sec-ttl">Traffic Sources</div></div><div class="chart-w" style="height:170px"><canvas id="ch-src"></canvas></div></div>
+        </div>
+      </div>
+
+      <!-- ══ TEAM PAGES ════════════════════════════════════════════ -->
+      <div class="page" id="pg-team-overview">
+        <div class="stat-grid">
+          <div class="stat hi"><div class="stat-lbl">My Commission (MTD)</div><div class="stat-val ac" id="t-commission">£0</div></div>
+          <div class="stat"><div class="stat-lbl">New Studios Signed</div><div class="stat-val" id="t-newstudios">0</div></div>
+          <div class="stat"><div class="stat-lbl">Code Uses (Stripe)</div><div class="stat-val" id="t-codeuses">0</div></div>
+          <div class="stat"><div class="stat-lbl">Assigned Studios</div><div class="stat-val" id="t-assigned">0</div></div>
+        </div>
+        <div class="card">
+          <div class="sec-hd"><div class="sec-ttl">My Commission Code</div></div>
+          <div style="padding:14px;background:var(--surface2);border-radius:var(--r-sm);border:1px solid var(--border)">
+            <div style="font-size:11px;color:var(--subtle);margin-bottom:6px">Your code — earns commission every time it's used on Stripe:</div>
+            <div style="font-family:'Syne',sans-serif;font-size:22px;font-weight:800;color:var(--accent)" id="t-mycode">—</div>
+          </div>
+        </div>
+        <div class="card">
+          <div class="sec-hd"><div class="sec-ttl">My Assigned Studios</div></div>
+          <div class="tw"><table><thead><tr><th>Studio</th><th>Email</th><th>Stock Items</th><th>Joined</th></tr></thead>
+          <tbody id="t-studios-tbl"><tr><td colspan="4" class="empty">No studios assigned yet</td></tr></tbody></table></div>
+        </div>
+      </div>
+
+      <div class="page" id="pg-team-todo">
+        <div class="card" style="max-width:600px">
+          <div class="sec-hd"><div class="sec-ttl">To-Do List</div>
+            <div style="display:flex;gap:8px">
+              <input class="inp" id="todo-input" placeholder="Add a task…" style="margin:0;flex:1" onkeydown="if(event.key==='Enter')addTodo()">
+              <button class="btn btn-p btn-sm" onclick="addTodo()">Add</button>
+            </div>
+          </div>
+          <div class="todo-list" id="todo-list"><div class="empty">No tasks yet — add one above</div></div>
+        </div>
+      </div>
+
+      <div class="page" id="pg-team-commission">
+        <div class="stat-grid">
+          <div class="stat hi"><div class="stat-lbl">Total Earned</div><div class="stat-val ac" id="tc-total">£0</div></div>
+          <div class="stat"><div class="stat-lbl">New Studio Deals</div><div class="stat-val" id="tc-studios">0</div></div>
+          <div class="stat"><div class="stat-lbl">Stripe Code Uses</div><div class="stat-val" id="tc-uses">0</div></div>
+        </div>
+        <div class="card">
+          <div class="sec-hd"><div class="sec-ttl">Commission History</div></div>
+          <div class="empty" style="padding:24px">Commission events will appear here as your code is used on Stripe or you sign a new studio partner.</div>
+        </div>
+      </div>
+
+      <!-- ══ STUDIO PAGES ══════════════════════════════════════════ -->
+      <div class="page" id="pg-studio-overview">
+        <div class="stat-grid">
+          <div class="stat hi"><div class="stat-lbl">My Revenue (MTD)</div><div class="stat-val ac" id="st-rev">—</div></div>
+          <div class="stat"><div class="stat-lbl">Orders</div><div class="stat-val" id="st-orders">—</div></div>
+          <div class="stat"><div class="stat-lbl">Products Stocked</div><div class="stat-val" id="st-prods">—</div></div>
+          <div class="stat"><div class="stat-lbl">Pending Requests</div><div class="stat-val" id="st-pend">—</div></div>
+        </div>
+        <div class="card">
+          <div class="sec-hd"><div class="sec-ttl">My Stock Levels</div></div>
+          <div style="display:flex;flex-direction:column;gap:13px" id="st-levels"><div class="empty">Loading…</div></div>
+        </div>
+      </div>
+
+      <div class="page" id="pg-studio-stock">
+        <div class="card">
+          <div class="sec-hd"><div class="sec-ttl">My Inventory</div></div>
+          <div class="tw"><table><thead><tr><th>Product</th><th>In Stock</th><th>Sold (Total)</th><th>Level</th><th>Status</th></tr></thead>
+          <tbody id="st-stock-tbl"><tr><td colspan="5" class="empty">Loading…</td></tr></tbody></table></div>
+        </div>
+      </div>
+
+      <div class="page" id="pg-studio-request">
+        <div class="card" style="max-width:480px">
+          <div class="sec-hd"><div class="sec-ttl">Request Stock from KONG</div></div>
+          <label class="inp-lbl">Product</label>
+          <select class="inp" id="req-prod">
+            <option>Numb Spray 100ml</option>
+            <option>Numb Cream 60g</option>
+            <option>Glow Balm 30ml</option>
+            <option>Renew Butter 50ml</option>
+            <option>KONG Numb Kit (Bundle)</option>
+          </select>
+          <label class="inp-lbl">Quantity</label>
+          <input class="inp" id="req-qty" type="number" min="1" value="12">
+          <label class="inp-lbl">Notes (optional)</label>
+          <input class="inp" id="req-notes" placeholder="e.g. Urgent or preferred delivery date">
+          <button class="btn btn-p" onclick="submitStockRequest()">Send Request to KONG</button>
+        </div>
+        <div class="card">
+          <div class="sec-hd"><div class="sec-ttl">My Requests</div></div>
+          <div class="tw"><table><thead><tr><th>Product</th><th>Qty</th><th>Submitted</th><th>Status</th></tr></thead>
+          <tbody id="st-reqs-tbl"><tr><td colspan="4" class="empty">No requests yet</td></tr></tbody></table></div>
+        </div>
+      </div>
+
+      <div class="page" id="pg-studio-todo">
+        <div class="card" style="max-width:600px">
+          <div class="sec-hd"><div class="sec-ttl">To-Do List</div>
+            <div style="display:flex;gap:8px">
+              <input class="inp" id="studio-todo-input" placeholder="Add a task…" style="margin:0;flex:1" onkeydown="if(event.key==='Enter')addTodo()">
+              <button class="btn btn-p btn-sm" onclick="addTodo()">Add</button>
+            </div>
+          </div>
+          <div class="todo-list" id="todo-list-studio"><div class="empty">No tasks yet</div></div>
+        </div>
+      </div>
+
+    </div><!-- /content -->
+  </div><!-- /main -->
+</div><!-- /app -->
+
+<div id="toast"></div>
+
+<script>
+// ── STATE ────────────────────────────────────────────────────────────
+let ME = null;
+let charts = {};
+
+// ── AUTH UI ───────────────────────────────────────────────────────────
+function showAuthTab(tab) {
+  document.getElementById('form-login').style.display    = tab === 'login'    ? '' : 'none';
+  document.getElementById('form-register').style.display = tab === 'register' ? '' : 'none';
+}
+
+function showErr(id, msg) {
+  const el = document.getElementById(id);
+  el.textContent = msg;
+  el.style.display = msg ? 'block' : 'none';
+}
+
+async function doLogin() {
+  showErr('login-err', '');
+  const email = document.getElementById('li-email').value.trim();
+  const pass  = document.getElementById('li-pass').value;
+  if (!email || !pass) return showErr('login-err', 'Please enter your email and password.');
+  try {
+    const r = await api('/api/hub-auth', { action: 'login', email, password: pass });
+    ME = r.user;
+    launchApp();
+  } catch(e) { showErr('login-err', e.message); }
+}
+
+async function doRegister() {
+  showErr('reg-err', '');
+  const name  = document.getElementById('rg-name').value.trim();
+  const email = document.getElementById('rg-email').value.trim();
+  const pass  = document.getElementById('rg-pass').value;
+  if (!name || !email || !pass) return showErr('reg-err', 'All fields are required.');
+  try {
+    const r = await api('/api/hub-auth', { action: 'register', studioName: name, email, password: pass });
+    ME = r.user;
+    launchApp();
+  } catch(e) { showErr('reg-err', e.message); }
+}
+
+async function doLogout() {
+  await api('/api/hub-auth', { action: 'logout' }).catch(()=>{});
+  ME = null;
+  Object.values(charts).forEach(c => { try { c.destroy() } catch(e){} });
+  charts = {};
+  document.getElementById('screen-app').classList.remove('active');
+  document.getElementById('screen-app').style.display = 'none';
+  document.getElementById('screen-login').style.display = 'flex';
+}
+
+// ── API ───────────────────────────────────────────────────────────────
+async function api(path, body, method) {
+  const opts = {
+    method: body ? 'POST' : (method || 'GET'),
+    credentials: 'include',
+    headers: { 'Content-Type': 'application/json' },
+  };
+  if (body) opts.body = JSON.stringify(body);
+  const r = await fetch(path, opts);
+  const j = await r.json();
+  if (!r.ok) throw new Error(j.error || 'Something went wrong');
+  return j;
+}
+
+async function apiGet(path) {
+  const r = await fetch(path, { credentials: 'include' });
+  const j = await r.json();
+  if (!r.ok) throw new Error(j.error || 'Error');
+  return j;
+}
+
+// ── APP LAUNCH ────────────────────────────────────────────────────────
+function launchApp() {
+  document.getElementById('screen-login').style.display = 'none';
+  document.getElementById('screen-app').style.display = 'flex';
+  document.getElementById('screen-app').classList.add('active');
+
+  const role = ME.role;
+  const initials = (ME.displayName || 'K').split(' ').map(w=>w[0]).join('').toUpperCase().slice(0,2);
+  document.getElementById('u-av').textContent    = initials;
+  document.getElementById('u-name').textContent  = ME.displayName;
+  document.getElementById('u-title').textContent = role === 'superadmin' ? 'Super Admin' : role === 'team' ? 'Team Member' : 'Studio / Artist';
+  document.getElementById('role-badge').textContent = role === 'superadmin' ? 'Admin' : role === 'team' ? 'Team' : 'Studio';
+  document.getElementById('tb-date').textContent = new Date().toLocaleDateString('en-GB',{day:'numeric',month:'short',year:'numeric'});
+
+  buildNav(role);
+
+  const firstPage = {
+    superadmin: 'overview',
+    team: 'team-overview',
+    studio: 'studio-overview',
+  }[role] || 'studio-overview';
+
+  showPage(firstPage);
+}
+
+// ── NAV ───────────────────────────────────────────────────────────────
+const NAV_DEFS = {
+  superadmin: [
+    { id:'overview',  label:'Overview',      icon:'grid'   },
+    { id:'studios',   label:'All Studios',   icon:'users'  },
+    { id:'stock',     label:'Stock Control', icon:'box'    },
+    { id:'team',      label:'Team Members',  icon:'team'   },
+    { id:'stripe',    label:'Stripe & Sales',icon:'credit' },
+    { id:'traffic',   label:'Site Traffic',  icon:'chart'  },
+  ],
+  team: [
+    { id:'team-overview',  label:'My Overview',  icon:'grid'   },
+    { id:'team-todo',      label:'To-Do List',   icon:'check'  },
+    { id:'team-commission',label:'My Commission', icon:'credit' },
+  ],
+  studio: [
+    { id:'studio-overview', label:'My Dashboard', icon:'grid'   },
+    { id:'studio-stock',    label:'My Stock',     icon:'box'    },
+    { id:'studio-request',  label:'Request Stock',icon:'plus'   },
+    { id:'studio-todo',     label:'To-Do List',   icon:'check'  },
+  ],
+};
+
+const SVG = {
+  grid:  '<svg viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="1.5"><rect x="1" y="1" width="5.5" height="5.5" rx="1"/><rect x="9.5" y="1" width="5.5" height="5.5" rx="1"/><rect x="1" y="9.5" width="5.5" height="5.5" rx="1"/><rect x="9.5" y="9.5" width="5.5" height="5.5" rx="1"/></svg>',
+  users: '<svg viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="1.5"><circle cx="6" cy="5" r="3"/><path d="M1 13c0-2.761 2.239-4 5-4s5 1.239 5 4"/><circle cx="12" cy="5" r="2"/><path d="M14.5 13c0-1.657-1.12-2.8-2.5-3"/></svg>',
+  box:   '<svg viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="1.5"><path d="M8 1.5l5.5 3v5l-5.5 3-5.5-3v-5z"/><path d="M8 1.5v11.5"/><path d="M2.5 4.5l5.5 3 5.5-3"/></svg>',
+  team:  '<svg viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="1.5"><circle cx="5" cy="5" r="2.5"/><circle cx="11" cy="5" r="2.5"/><path d="M1 13c0-2 1.79-3.5 4-3.5s4 1.5 4 3.5"/><path d="M9 11c.5-.3 1.2-.5 2-.5 2.21 0 4 1.5 4 3.5"/></svg>',
+  credit:'<svg viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="1.5"><rect x="1" y="3.5" width="14" height="9" rx="1.5"/><path d="M1 6.5h14"/><path d="M4 10h3"/></svg>',
+  chart: '<svg viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="1.5"><path d="M1 12L5 7l3 3 4-5 3 3"/><path d="M1 14h14"/></svg>',
+  plus:  '<svg viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="1.5"><path d="M8 2v12M2 8h12"/></svg>',
+  check: '<svg viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="1.5"><path d="M2 8l4 4 8-8"/></svg>',
+};
+
+function buildNav(role) {
+  const nav = document.getElementById('sb-nav');
+  nav.innerHTML = '';
+  const items = NAV_DEFS[role] || [];
+  const sec = document.createElement('div');
+  sec.className = 'nav-sec';
+  sec.textContent = role === 'superadmin' ? 'Management' : role === 'team' ? 'My Portal' : 'My Studio';
+  nav.appendChild(sec);
+  items.forEach(item => {
+    const el = document.createElement('div');
+    el.className = 'nav-item';
+    el.id = 'nav-' + item.id;
+    el.innerHTML = (SVG[item.icon] || '') + item.label;
+    el.onclick = () => showPage(item.id);
+    nav.appendChild(el);
+  });
+}
+
+// ── PAGE TITLES ───────────────────────────────────────────────────────
+const PAGE_TITLES = {
+  'overview':'Overview','studios':'All Studios','stock':'Stock Control','team':'Team Members',
+  'stripe':'Stripe & Sales','traffic':'Site Traffic',
+  'team-overview':'My Overview','team-todo':'To-Do List','team-commission':'My Commission',
+  'studio-overview':'My Dashboard','studio-stock':'My Stock','studio-request':'Request Stock','studio-todo':'To-Do List',
+};
+
+function showPage(id) {
+  document.querySelectorAll('.page').forEach(p => p.classList.remove('active'));
+  document.querySelectorAll('.nav-item').forEach(n => n.classList.remove('active'));
+  const page = document.getElementById('pg-' + id);
+  if (page) page.classList.add('active');
+  const nav = document.getElementById('nav-' + id);
+  if (nav) nav.classList.add('active');
+  document.getElementById('pg-title').textContent = PAGE_TITLES[id] || id;
+  document.getElementById('sidebar').classList.remove('open');
+  setTimeout(() => loadPage(id), 50);
+}
+
+// ── PAGE LOADERS ──────────────────────────────────────────────────────
+async function loadPage(id) {
+  if (id === 'overview')       return loadAdminOverview();
+  if (id === 'studios')        return loadStudiosPage();
+  if (id === 'stock')          return loadStockPage();
+  if (id === 'team')           return loadTeamPage();
+  if (id === 'team-overview')  return loadTeamOverview();
+  if (id === 'team-todo')      return loadTodos('todo-list');
+  if (id === 'team-commission')return loadMyCommission();
+  if (id === 'studio-overview')return loadStudioOverview();
+  if (id === 'studio-stock')   return loadStudioStock();
+  if (id === 'studio-request') return loadStudioRequests();
+  if (id === 'studio-todo')    return loadTodos('todo-list-studio');
+  if (id === 'traffic')        return initChart('ch-traffic', 'line') || initChart('ch-src','doughnut');
+  if (id === 'overview' || id === 'stripe') initOverviewCharts();
+}
+
+// ── ADMIN OVERVIEW ─────────────────────────────────────────────────────
+async function loadAdminOverview() {
+  try {
+    const [ud, rd] = await Promise.all([
+      apiGet('/api/hub-data?resource=users'),
+      apiGet('/api/hub-data?resource=stock-requests'),
+    ]);
+    const studios = ud.users.filter(u => u.role === 'studio');
+    const team    = ud.users.filter(u => u.role === 'team');
+    document.getElementById('sa-revenue').textContent  = '£4,821';
+    document.getElementById('sa-studios').textContent  = studios.length;
+    document.getElementById('sa-team').textContent     = team.length;
+    document.getElementById('sa-requests').textContent = rd.requests.length;
+  } catch(e) {}
+  initOverviewCharts();
+}
+
+function initOverviewCharts() {
+  const ac = '#c8ff00', bl = '#4488ff';
+  const days = Array.from({length:30},(_,i)=>{ const d=new Date(); d.setDate(d.getDate()-29+i); return d.getDate()===1||i===0?d.toLocaleDateString('en-GB',{day:'numeric',month:'short'}):String(d.getDate()); });
+  function rnd(mn,mx,n=30){let v=(mn+mx)/2;return Array.from({length:n},()=>{v=Math.max(mn,Math.min(mx,v+(Math.random()-.47)*(mx-mn)*.2));return Math.round(v);})}
+  mkChart('ch-rev',{type:'line',data:{labels:days,datasets:[{data:rnd(80,320),borderColor:ac,backgroundColor:'rgba(200,255,0,.07)',fill:true,tension:.4,pointRadius:0}]},options:chartOpts({y:{ticks:{callback:v=>'£'+v}}})});
+  mkChart('ch-vis',{type:'bar',data:{labels:days,datasets:[{data:rnd(60,200),backgroundColor:'rgba(68,136,255,.45)',borderColor:bl,borderWidth:1,borderRadius:2}]},options:chartOpts()});
+}
+
+// ── STUDIOS PAGE ──────────────────────────────────────────────────────
+async function loadStudiosPage() {
+  const tb = document.getElementById('studios-tbl');
+  try {
+    const d = await apiGet('/api/hub-data?resource=users');
+    const studios = d.users.filter(u => u.role === 'studio');
+    if (!studios.length) { tb.innerHTML = `<tr><td colspan="5" class="empty">No studios registered yet</td></tr>`; return; }
+    tb.innerHTML = studios.map(u => `<tr>
+      <td class="td-n">${esc(u.displayName)}</td>
+      <td>${esc(u.email)}</td>
+      <td>${new Date(u.createdAt).toLocaleDateString('en-GB',{day:'numeric',month:'short',year:'numeric'})}</td>
+      <td>${Object.keys(u.stock||{}).length}</td>
+      <td><span class="pill pill-ok">Active</span></td>
+    </tr>`).join('');
+  } catch(e) { tb.innerHTML = `<tr><td colspan="5" class="empty">Error loading studios</td></tr>`; }
+}
+
+// ── STOCK PAGE ────────────────────────────────────────────────────────
+async function loadStockPage() {
+  const st = document.getElementById('allstock-tbl');
+  const rq = document.getElementById('reqs-tbl');
+  try {
+    const [sd, rd] = await Promise.all([
+      apiGet('/api/hub-data?resource=all-stock'),
+      apiGet('/api/hub-data?resource=stock-requests'),
+    ]);
+    const rows = [];
+    (sd.studios || []).forEach(s => {
+      Object.entries(s.stock || {}).forEach(([prod, info]) => {
+        const u = info.units, pct = Math.min(100, Math.round((u / Math.max(u + info.sold, 1)) * 100));
+        const barCls = pct < 20 ? 'cr' : pct < 40 ? 'lo' : '';
+        const stt = u === 0 ? '<span class="pill pill-out">Out</span>' : pct < 20 ? '<span class="pill pill-lo">Low</span>' : '<span class="pill pill-ok">Good</span>';
+        rows.push(`<tr><td class="td-n">${esc(s.name)}</td><td>${esc(prod)}</td><td>${u}</td><td>${info.sold||0}</td>
+          <td><div class="pw" style="width:80px"><div class="pb ${barCls}" style="width:${pct}%"></div></div></td><td>${stt}</td></tr>`);
+      });
+    });
+    st.innerHTML = rows.length ? rows.join('') : `<tr><td colspan="6" class="empty">No stock data yet</td></tr>`;
+
+    if (rd.requests.length) {
+      rq.innerHTML = rd.requests.map(r => `<tr>
+        <td class="td-n">${esc(r.studioName)}</td><td>${esc(r.product)}</td><td>${r.qty}</td>
+        <td>${timeAgo(r.createdAt)}</td>
+        <td><button class="btn btn-p btn-sm" onclick="approveReq('${r.studioId}','${r.id}',true,this)">Approve</button>
+            <button class="btn btn-g btn-sm" style="margin-left:5px" onclick="approveReq('${r.studioId}','${r.id}',false,this)">Decline</button></td>
+      </tr>`).join('');
+    } else {
+      rq.innerHTML = `<tr><td colspan="5" class="empty">No pending requests</td></tr>`;
+    }
+  } catch(e) { st.innerHTML = `<tr><td colspan="6" class="empty">Error loading stock</td></tr>`; }
+}
+
+async function approveReq(studioId, reqId, approved, btn) {
+  btn.disabled = true; btn.textContent = '…';
+  try {
+    await api('/api/hub-data', { resource: 'stock-approve', studioId, requestId: reqId, approved });
+    showToast(approved ? 'Request approved & stock updated.' : 'Request declined.');
+    loadStockPage();
+  } catch(e) { showToast(e.message); btn.disabled = false; btn.textContent = approved ? 'Approve' : 'Decline'; }
+}
+
+// ── TEAM PAGE (admin) ─────────────────────────────────────────────────
+async function loadTeamPage() {
+  try {
+    const d = await apiGet('/api/hub-data?resource=commission');
+    const list = document.getElementById('team-commission-list');
+    if (!d.team || !d.team.length) { list.innerHTML = '<div class="empty">No team members yet</div>'; return; }
+    list.innerHTML = d.team.map(m => `
+      <div class="amb-row">
+        <div class="amb-av">${(m.name||'?')[0].toUpperCase()}</div>
+        <div class="amb-inf">
+          <div class="amb-nm">${esc(m.name)}</div>
+          <div class="amb-cd">Code: ${m.teamCode||'None'} · ${m.commission?.stripeUses||0} Stripe uses · ${m.commission?.newStudios||0} new studios</div>
+        </div>
+        <div class="amb-sl">
+          <div class="amb-slv">£${((m.commission?.totalEarned||0)/100).toFixed(2)}</div>
+          <div class="amb-sll">Total earned</div>
+        </div>
+      </div>`).join('');
+  } catch(e) {}
+}
+
+async function createTeamMember() {
+  const name = document.getElementById('tm-name').value.trim();
+  const email = document.getElementById('tm-email').value.trim();
+  const pass = document.getElementById('tm-pass').value;
+  const code = document.getElementById('tm-code').value.trim();
+  if (!name || !email || !pass) return showToast('Please fill in name, email and password.');
+  try {
+    await api('/api/hub-data', { resource: 'team-create', displayName: name, email, password: pass, teamCode: code || null });
+    showToast('Team member added successfully.');
+    document.getElementById('tm-name').value = '';
+    document.getElementById('tm-email').value = '';
+    document.getElementById('tm-pass').value = '';
+    document.getElementById('tm-code').value = '';
+    loadTeamPage();
+  } catch(e) { showToast(e.message); }
+}
+
+// ── TEAM OVERVIEW ─────────────────────────────────────────────────────
+async function loadTeamOverview() {
+  try {
+    const [ud, cd] = await Promise.all([
+      apiGet('/api/hub-data?resource=users'),
+      apiGet('/api/hub-data?resource=commission'),
+    ]);
+    const c = cd.commission || {};
+    document.getElementById('t-commission').textContent = '£' + ((c.totalEarned||0)/100).toFixed(2);
+    document.getElementById('t-newstudios').textContent = c.newStudios || 0;
+    document.getElementById('t-codeuses').textContent   = c.stripeUses || 0;
+    document.getElementById('t-assigned').textContent   = (ME.assignedStudios||[]).length;
+    document.getElementById('t-mycode').textContent     = cd.teamCode || 'No code assigned';
+
+    const studios = ud.users.filter(u => u.role === 'studio');
+    const mine = studios.filter(u => (ME.assignedStudios||[]).includes(u.id));
+    const tb = document.getElementById('t-studios-tbl');
+    if (!mine.length) { tb.innerHTML = `<tr><td colspan="4" class="empty">No studios assigned yet</td></tr>`; return; }
+    tb.innerHTML = mine.map(u => `<tr>
+      <td class="td-n">${esc(u.displayName)}</td><td>${esc(u.email)}</td>
+      <td>${Object.keys(u.stock||{}).length}</td>
+      <td>${new Date(u.createdAt).toLocaleDateString('en-GB',{day:'numeric',month:'short'})}</td>
+    </tr>`).join('');
+  } catch(e) {}
+}
+
+// ── TEAM COMMISSION PAGE ──────────────────────────────────────────────
+async function loadMyCommission() {
+  try {
+    const d = await apiGet('/api/hub-data?resource=commission');
+    const c = d.commission || {};
+    document.getElementById('tc-total').textContent  = '£' + ((c.totalEarned||0)/100).toFixed(2);
+    document.getElementById('tc-studios').textContent = c.newStudios || 0;
+    document.getElementById('tc-uses').textContent    = c.stripeUses || 0;
+  } catch(e) {}
+}
+
+// ── STUDIO OVERVIEW ───────────────────────────────────────────────────
+async function loadStudioOverview() {
+  try {
+    const d = await apiGet('/api/hub-data?resource=my-stock');
+    const stock = d.stock || {};
+    const prods = Object.entries(stock);
+    document.getElementById('st-prods').textContent = prods.length;
+    document.getElementById('st-orders').textContent = (d.orders||[]).length;
+    document.getElementById('st-rev').textContent = '—';
+    document.getElementById('st-pend').textContent = '—';
+    const levels = document.getElementById('st-levels');
+    if (!prods.length) { levels.innerHTML = '<div class="empty">No stock yet. Request some from KONG above.</div>'; return; }
+    levels.innerHTML = prods.map(([prod, info]) => {
+      const total = (info.units||0) + (info.sold||0);
+      const pct = total ? Math.round((info.units / total) * 100) : 0;
+      const barCls = pct < 20 ? 'cr' : pct < 40 ? 'lo' : '';
+      const warn = pct < 20 ? ` <span style="color:var(--amber)">⚠</span>` : '';
+      return `<div>
+        <div style="display:flex;justify-content:space-between;margin-bottom:5px">
+          <span style="color:var(--fg);font-weight:500;font-size:13px">${esc(prod)}</span>
+          <span style="color:var(--body);font-size:13px;font-variant-numeric:tabular-nums">${info.units||0} units${warn}</span>
+        </div>
+        <div class="pw"><div class="pb ${barCls}" style="width:${pct}%"></div></div>
+      </div>`;
+    }).join('');
+  } catch(e) { document.getElementById('st-levels').innerHTML = '<div class="empty">Error loading stock</div>'; }
+}
+
+// ── STUDIO STOCK ──────────────────────────────────────────────────────
+async function loadStudioStock() {
+  const tb = document.getElementById('st-stock-tbl');
+  try {
+    const d = await apiGet('/api/hub-data?resource=my-stock');
+    const stock = d.stock || {};
+    const rows = Object.entries(stock);
+    if (!rows.length) { tb.innerHTML = `<tr><td colspan="5" class="empty">No stock yet. Request some from KONG.</td></tr>`; return; }
+    tb.innerHTML = rows.map(([prod, info]) => {
+      const total = (info.units||0) + (info.sold||0);
+      const pct = total ? Math.round((info.units / total) * 100) : 0;
+      const barCls = pct < 20 ? 'cr' : pct < 40 ? 'lo' : '';
+      const stt = !info.units ? '<span class="pill pill-out">Out</span>' : pct < 20 ? '<span class="pill pill-lo">Low — reorder</span>' : '<span class="pill pill-ok">Good</span>';
+      return `<tr><td class="td-n">${esc(prod)}</td><td>${info.units||0}</td><td>${info.sold||0}</td>
+        <td><div class="pw" style="width:90px"><div class="pb ${barCls}" style="width:${pct||2}%"></div></div></td><td>${stt}</td></tr>`;
+    }).join('');
+  } catch(e) { tb.innerHTML = `<tr><td colspan="5" class="empty">Error</td></tr>`; }
+}
+
+// ── STUDIO REQUESTS ───────────────────────────────────────────────────
+async function loadStudioRequests() {
+  const tb = document.getElementById('st-reqs-tbl');
+  try {
+    const d = await apiGet('/api/hub-data?resource=my-stock');
+    const reqs = (d.stockRequests || ME.stockRequests || []);
+    if (!reqs.length) { tb.innerHTML = `<tr><td colspan="4" class="empty">No requests yet</td></tr>`; return; }
+    tb.innerHTML = [...reqs].reverse().map(r => `<tr>
+      <td class="td-n">${esc(r.product)}</td><td>${r.qty}</td>
+      <td>${timeAgo(r.createdAt)}</td>
+      <td>${r.status === 'approved' ? '<span class="pill pill-ok">Approved</span>' : r.status === 'declined' ? '<span class="pill pill-out">Declined</span>' : '<span class="pill pill-pend">Pending</span>'}</td>
+    </tr>`).join('');
+  } catch(e) {}
+}
+
+async function submitStockRequest() {
+  const product = document.getElementById('req-prod').value;
+  const qty     = document.getElementById('req-qty').value;
+  const notes   = document.getElementById('req-notes').value;
+  try {
+    await api('/api/hub-data', { resource: 'stock-request', product, qty, notes });
+    showToast(`Request for ${qty}× ${product} sent to KONG.`);
+    loadStudioRequests();
+  } catch(e) { showToast(e.message); }
+}
+
+// ── TO-DO LIST ─────────────────────────────────────────────────────────
+async function loadTodos(listId) {
+  try {
+    const d = await apiGet('/api/hub-data?resource=todos');
+    renderTodos(d.todos || [], listId);
+  } catch(e) {}
+}
+
+function renderTodos(todos, listId) {
+  const el = document.getElementById(listId);
+  if (!todos.length) { el.innerHTML = '<div class="empty">No tasks yet — add one above</div>'; return; }
+  el.innerHTML = todos.map(t => `
+    <div class="todo-item" id="todo-${t.id}">
+      <div class="todo-cb ${t.done ? 'done' : ''}" onclick="toggleTodo('${t.id}','${listId}')">${t.done ? '✓' : ''}</div>
+      <div class="todo-txt ${t.done ? 'done' : ''}">${esc(t.text)}</div>
+      <button class="todo-del" onclick="deleteTodo('${t.id}','${listId}')">×</button>
+    </div>`).join('');
+}
+
+async function addTodo() {
+  const input = document.getElementById('todo-input') || document.getElementById('studio-todo-input');
+  const listId = document.getElementById('todo-list') ? 'todo-list' : 'todo-list-studio';
+  const text = input.value.trim();
+  if (!text) return;
+  input.value = '';
+  try {
+    const d = await api('/api/hub-data', { resource: 'todo', action: 'add', text });
+    renderTodos(d.todos, listId);
+  } catch(e) { showToast(e.message); }
+}
+
+async function toggleTodo(id, listId) {
+  try {
+    const d = await api('/api/hub-data', { resource: 'todo', action: 'toggle', todoId: id });
+    renderTodos(d.todos, listId);
+  } catch(e) {}
+}
+
+async function deleteTodo(id, listId) {
+  try {
+    const d = await api('/api/hub-data', { resource: 'todo', action: 'delete', todoId: id });
+    renderTodos(d.todos, listId);
+  } catch(e) {}
+}
+
+// ── CHARTS ────────────────────────────────────────────────────────────
+const CHART_DEFAULTS = { responsive:true, maintainAspectRatio:false, plugins:{legend:{display:false}}, scales:{x:{grid:{color:'rgba(255,255,255,.05)'},ticks:{color:'#555',font:{size:10}}},y:{grid:{color:'rgba(255,255,255,.05)'},ticks:{color:'#555',font:{size:10}}}} };
+function chartOpts(extra={}) {
+  const o = JSON.parse(JSON.stringify(CHART_DEFAULTS));
+  if (extra.y) o.scales.y = {...o.scales.y, ...extra.y};
+  return o;
+}
+function rnd(mn,mx,n=30){let v=(mn+mx)/2;return Array.from({length:n},()=>{v=Math.max(mn,Math.min(mx,v+(Math.random()-.47)*(mx-mn)*.2));return Math.round(v);})}
+function days30(){const l=[];for(let i=29;i>=0;i--){const d=new Date();d.setDate(d.getDate()-i);l.push(d.getDate()===1||i===29?d.toLocaleDateString('en-GB',{day:'numeric',month:'short'}):String(d.getDate()));}return l;}
+function mkChart(id,cfg){const el=document.getElementById(id);if(!el||charts[id])return;try{charts[id]=new Chart(el.getContext('2d'),cfg);}catch(e){}}
+
+// ── UTILITIES ─────────────────────────────────────────────────────────
+function esc(str) { return String(str||'').replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;').replace(/"/g,'&quot;'); }
+function showToast(msg) { const t=document.getElementById('toast');t.textContent=msg;t.style.display='block';setTimeout(()=>t.style.display='none',3200); }
+function timeAgo(iso) {
+  const diff = Date.now() - new Date(iso).getTime();
+  const m = Math.floor(diff/60000), h = Math.floor(m/60), d = Math.floor(h/24);
+  if (d > 0) return d + 'd ago';
+  if (h > 0) return h + 'h ago';
+  if (m > 0) return m + 'm ago';
+  return 'just now';
+}
+
+// ── INIT ──────────────────────────────────────────────────────────────
+(async () => {
+  try {
+    const d = await apiGet('/api/hub-auth');
+    ME = d.user;
+    document.getElementById('screen-login').style.display = 'none';
+    launchApp();
+  } catch(e) {
+    document.getElementById('screen-login').style.display = 'flex';
+  }
+})();
+</script>
+</body>
+</html>

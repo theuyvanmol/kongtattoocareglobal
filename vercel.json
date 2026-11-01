@@ -7,6 +7,7 @@
   "outputDirectory": ".",
   "rewrites": [
     {"source": "/shop", "destination": "/shop-all"},
-    {"source": "/product", "destination": "/product"}
+    {"source": "/product", "destination": "/product"},
+    {"source": "/hub", "destination": "/hub.html"}
   ]
 }
