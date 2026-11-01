@@ -302,6 +302,67 @@ SUPABASE_SERVICE_ROLE_KEY=eyJhbGci...</code>
         </div>
       </div>
 
+      <!-- STRIPE REVENUE PAGE (superadmin) -->
+      <div class="page" id="pg-stripe-revenue">
+        <div id="stripe-loading" style="color:var(--subtle);padding:16px 0;font-size:13px">Loading Stripe data…</div>
+        <div id="stripe-err" style="display:none" class="setup-box"><h3>⚠ Stripe Not Available</h3><p id="stripe-err-msg"></p><p>Make sure <code>STRIPE_SECRET_KEY</code> is set as a Vercel environment variable (production).</p></div>
+        <div id="stripe-dash" style="display:none">
+          <div class="stat-grid">
+            <div class="stat hi"><div class="stat-lbl">Balance Available</div><div class="stat-val ac" id="sr-avail">—</div></div>
+            <div class="stat"><div class="stat-lbl">Balance Pending</div><div class="stat-val" id="sr-pend">—</div></div>
+            <div class="stat"><div class="stat-lbl">Revenue (Last 30d)</div><div class="stat-val" id="sr-rev30">—</div><div class="stat-sub" id="sr-growth"></div></div>
+            <div class="stat"><div class="stat-lbl">Orders (Last 30d)</div><div class="stat-val" id="sr-orders">—</div><div class="stat-sub" id="sr-avg"></div></div>
+          </div>
+          <div class="card">
+            <div class="sec-hd"><div class="sec-ttl">Daily Revenue — Last 14 Days</div><button class="btn btn-g btn-sm" onclick="loadStripeRevenue()">↻ Refresh</button></div>
+            <div class="chart-w"><canvas id="ch-stripe-rev"></canvas></div>
+          </div>
+          <div class="two-col">
+            <div class="card">
+              <div class="sec-hd"><div class="sec-ttl">Recent Payments</div></div>
+              <div class="tw"><table><thead><tr><th>Description</th><th>Customer</th><th>Amount</th><th>Date</th></tr></thead>
+              <tbody id="sr-charges-tbl"><tr><td colspan="4" class="empty">Loading…</td></tr></tbody></table></div>
+            </div>
+            <div class="card">
+              <div class="sec-hd"><div class="sec-ttl">Recent Payouts</div></div>
+              <div class="tw"><table><thead><tr><th>Amount</th><th>Status</th><th>Arrival</th></tr></thead>
+              <tbody id="sr-payouts-tbl"><tr><td colspan="3" class="empty">Loading…</td></tr></tbody></table></div>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <!-- WEBSITE PERFORMANCE PAGE (superadmin) -->
+      <div class="page" id="pg-performance">
+        <div id="perf-loading" style="color:var(--subtle);padding:16px 0;font-size:13px">Loading analytics…</div>
+        <div id="perf-dash" style="display:none">
+          <div class="stat-grid">
+            <div class="stat hi"><div class="stat-lbl">Page Views (30d)</div><div class="stat-val ac" id="pf-views">—</div></div>
+            <div class="stat"><div class="stat-lbl">Deployments</div><div class="stat-val" id="pf-deploys">—</div></div>
+            <div class="stat"><div class="stat-lbl">Last Deploy Status</div><div class="stat-val" id="pf-last-state" style="font-size:14px">—</div></div>
+            <div class="stat"><div class="stat-lbl">Data Source</div><div class="stat-val" id="pf-source" style="font-size:12px;color:var(--subtle)">—</div></div>
+          </div>
+          <div class="card">
+            <div class="sec-hd"><div class="sec-ttl">Page Views — Last 14 Days</div><button class="btn btn-g btn-sm" onclick="loadPerformance()">↻ Refresh</button></div>
+            <div class="chart-w"><canvas id="ch-pageviews"></canvas></div>
+          </div>
+          <div class="card">
+            <div class="sec-hd"><div class="sec-ttl">Recent Deployments</div></div>
+            <div class="tw"><table><thead><tr><th>URL</th><th>Target</th><th>Status</th><th>Deployed</th></tr></thead>
+            <tbody id="pf-deploys-tbl"><tr><td colspan="4" class="empty">Loading…</td></tr></tbody></table></div>
+          </div>
+          <div class="card" style="margin-bottom:0">
+            <div class="sec-hd"><div class="sec-ttl">Core Web Vitals</div><span style="font-size:11px;color:var(--subtle)">Measured via PerformanceObserver on page load</span></div>
+            <div class="stat-grid" style="margin-bottom:0" id="cwv-grid">
+              <div class="stat"><div class="stat-lbl">LCP</div><div class="stat-val" id="cwv-lcp">—</div><div class="stat-sub">Largest Contentful Paint</div></div>
+              <div class="stat"><div class="stat-lbl">FID / INP</div><div class="stat-val" id="cwv-inp">—</div><div class="stat-sub">Interaction to Next Paint</div></div>
+              <div class="stat"><div class="stat-lbl">CLS</div><div class="stat-val" id="cwv-cls">—</div><div class="stat-sub">Cumulative Layout Shift</div></div>
+              <div class="stat"><div class="stat-lbl">TTFB</div><div class="stat-val" id="cwv-ttfb">—</div><div class="stat-sub">Time to First Byte</div></div>
+            </div>
+          </div>
+        </div>
+      </div>
+
       <!-- TEAM PAGES -->
       <div class="page" id="pg-team-overview">
         <div class="stat-grid">
@@ -722,6 +783,8 @@ const NAV = {
     {id:'pg-team',label:'Team Members',icon:'team'},
     {id:'pg-assign',label:'Assign Studios',icon:'link'},
     {id:'pg-stripe',label:'Commission',icon:'credit'},
+    {id:'pg-stripe-revenue',label:'Stripe Revenue',icon:'stripe'},
+    {id:'pg-performance',label:'Performance',icon:'chart'},
   ],
   team:[
     {id:'pg-team-overview',label:'My Overview',icon:'grid'},
@@ -743,8 +806,10 @@ const IC = {
   credit:'<svg viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="1.5"><rect x="1" y="3.5" width="14" height="9" rx="1.5"/><path d="M1 6.5h14"/><path d="M4 10h3"/></svg>',
   check:'<svg viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="1.5"><path d="M2 8l4 4 8-8"/></svg>',
   plus:'<svg viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="1.5"><path d="M8 2v12M2 8h12"/></svg>',
+  stripe:'<svg viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="1.5"><rect x="1" y="3.5" width="14" height="9" rx="1.5"/><path d="M1 6.5h14"/><path d="M4 9.5h2.5m2.5 0h2"/></svg>',
+  chart:'<svg viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="1.5"><polyline points="1,11 5,7 8,9 12,4 15,6"/><line x1="1" y1="14" x2="15" y2="14"/></svg>',
 };
-const TITLES = {'pg-overview':'Overview','pg-studios':'All Studios','pg-stock':'Stock Control','pg-team':'Team Members','pg-assign':'Assign Studios','pg-stripe':'Commission','pg-team-overview':'My Overview','pg-team-todo':'To-Do List','pg-studio-overview':'Dashboard','pg-studio-stock':'My Stock','pg-studio-request':'Request Stock','pg-studio-todo':'To-Do List','pg-setup':'Setup Required'};
+const TITLES = {'pg-overview':'Overview','pg-studios':'All Studios','pg-stock':'Stock Control','pg-team':'Team Members','pg-assign':'Assign Studios','pg-stripe':'Commission','pg-stripe-revenue':'Stripe Revenue','pg-performance':'Website Performance','pg-team-overview':'My Overview','pg-team-todo':'To-Do List','pg-studio-overview':'Dashboard','pg-studio-stock':'My Stock','pg-studio-request':'Request Stock','pg-studio-todo':'To-Do List','pg-setup':'Setup Required'};
 
 function buildNav(role) {
   const nav = document.getElementById('sb-nav');
@@ -781,6 +846,8 @@ async function loadPage(id) {
     if(id==='pg-team')            return loadTeam();
     if(id==='pg-assign')          return loadAssign();
     if(id==='pg-stripe')          return loadCommission();
+    if(id==='pg-stripe-revenue')  return loadStripeRevenue();
+    if(id==='pg-performance')     return loadPerformance();
     if(id==='pg-team-overview')   return loadTeamOverview();
     if(id==='pg-team-todo')       return loadTodos('todo-list');
     if(id==='pg-studio-overview') return loadStudioOverview();
@@ -997,6 +1064,168 @@ async function submitRequest() {
   showToast(`✓ Request for ${qty}× ${product} sent to KONG.`);
   document.getElementById('req-notes').value='';
   loadStudioRequests();
+}
+
+// ── STRIPE REVENUE ─────────────────────────────────────────────────────────────
+async function loadStripeRevenue() {
+  const loading = document.getElementById('stripe-loading');
+  const err = document.getElementById('stripe-err');
+  const dash = document.getElementById('stripe-dash');
+  if(loading) loading.style.display='block';
+  if(err) err.style.display='none';
+  if(dash) dash.style.display='none';
+  try {
+    const data = await fetch('/api/hub-stripe').then(r => r.json());
+    if(data.error) throw new Error(data.error);
+    if(loading) loading.style.display='none';
+    if(dash) dash.style.display='block';
+
+    const cur = (data.balance?.currency||'gbp').toUpperCase();
+    const fmt2 = (amt) => (cur==='GBP'?'£':'$')+(amt/100).toFixed(2).replace(/\B(?=(\d{3})+(?!\d))/g,',');
+
+    document.getElementById('sr-avail').textContent = fmt2(data.balance?.available||0);
+    document.getElementById('sr-pend').textContent = fmt2(data.balance?.pending||0);
+    document.getElementById('sr-rev30').textContent = fmt2(data.revenue?.last30Days||0);
+    document.getElementById('sr-orders').textContent = data.revenue?.txCount||0;
+    document.getElementById('sr-avg').textContent = 'Avg: '+fmt2(data.revenue?.avgOrder||0);
+
+    const growth = data.revenue?.growth;
+    const gEl = document.getElementById('sr-growth');
+    if(growth!==null && growth!==undefined) {
+      gEl.textContent = (growth>=0?'▲ +':'▼ ')+growth+'% vs prev 30d';
+      gEl.style.color = growth>=0?'var(--green)':'var(--red)';
+    } else {
+      gEl.textContent = '';
+    }
+
+    // Chart
+    if(data.chart?.labels?.length) {
+      mkChart('ch-stripe-rev','bar',data.chart.labels,data.chart.values.map(Number));
+    }
+
+    // Charges table
+    const ct = document.getElementById('sr-charges-tbl');
+    ct.innerHTML = (data.recentCharges||[]).length ? data.recentCharges.map(c=>`
+      <tr>
+        <td class="td-n">${esc(c.description||'Payment')}</td>
+        <td style="font-size:11px;color:var(--subtle)">${esc(c.customer_email||'—')}</td>
+        <td style="color:var(--accent);font-weight:600">${fmt2(c.amount)}</td>
+        <td style="font-size:11px">${timeAgo(new Date(c.created*1000).toISOString())}</td>
+      </tr>`).join('') : `<tr><td colspan="4" class="empty">No payments in last 30 days</td></tr>`;
+
+    // Payouts table
+    const pt = document.getElementById('sr-payouts-tbl');
+    pt.innerHTML = (data.payouts||[]).length ? data.payouts.map(p=>`
+      <tr>
+        <td class="td-n">${fmt2(p.amount)}</td>
+        <td><span class="pill ${p.status==='paid'?'pill-ok':p.status==='pending'?'pill-pend':'pill-lo'}">${esc(p.status)}</span></td>
+        <td style="font-size:11px">${p.arrival_date?new Date(p.arrival_date*1000).toLocaleDateString('en-GB',{day:'numeric',month:'short'}):'—'}</td>
+      </tr>`).join('') : `<tr><td colspan="3" class="empty">No recent payouts</td></tr>`;
+
+  } catch(e) {
+    if(loading) loading.style.display='none';
+    if(err) { err.style.display='block'; document.getElementById('stripe-err-msg').textContent=e.message; }
+  }
+}
+
+// ── PERFORMANCE / ANALYTICS ─────────────────────────────────────────────────────
+async function loadPerformance() {
+  const loading = document.getElementById('perf-loading');
+  const dash = document.getElementById('perf-dash');
+  if(loading) loading.style.display='block';
+  if(dash) dash.style.display='none';
+  try {
+    const data = await fetch('/api/hub-analytics').then(r => r.json());
+    if(loading) loading.style.display='none';
+    if(dash) dash.style.display='block';
+
+    document.getElementById('pf-views').textContent = (data.pageviews?.total||0).toLocaleString();
+    document.getElementById('pf-deploys').textContent = (data.deployments||[]).length;
+    document.getElementById('pf-source').textContent = data.source==='vercel'?'Vercel Analytics':'Sample data — add VERCEL_ACCESS_TOKEN';
+
+    const lastDeploy = (data.deployments||[])[0];
+    const stateEl = document.getElementById('pf-last-state');
+    if(lastDeploy) {
+      const stMap = {READY:'✓ Ready',ERROR:'✗ Error',BUILDING:'⟳ Building',QUEUED:'◎ Queued',CANCELED:'— Canceled'};
+      stateEl.textContent = stMap[lastDeploy.state]||lastDeploy.state;
+      stateEl.style.color = lastDeploy.state==='READY'?'var(--green)':lastDeploy.state==='ERROR'?'var(--red)':'var(--amber)';
+    } else {
+      stateEl.textContent = '—';
+    }
+
+    // Chart
+    const daily = data.pageviews?.daily||[];
+    if(daily.length) {
+      const labels = daily.map(d=>d.date);
+      const values = daily.map(d=>d.views);
+      mkChart('ch-pageviews','line',labels,values);
+    }
+
+    // Deployments table
+    const dt = document.getElementById('pf-deploys-tbl');
+    dt.innerHTML = (data.deployments||[]).length ? data.deployments.map(d=>`
+      <tr>
+        <td class="td-n" style="font-size:11px;font-family:monospace">${esc(d.url||'—')}</td>
+        <td><span class="pill ${d.target==='production'?'pill-ok':'pill-pend'}">${esc(d.target||'preview')}</span></td>
+        <td><span class="pill ${d.state==='READY'?'pill-ok':d.state==='ERROR'?'pill-out':'pill-lo'}">${esc(d.state||'—')}</span></td>
+        <td style="font-size:11px">${d.created?timeAgo(new Date(d.created).toISOString()):'—'}</td>
+      </tr>`).join('') : `<tr><td colspan="4" class="empty">No deployment data. Add VERCEL_ACCESS_TOKEN to env vars.</td></tr>`;
+
+  } catch(e) {
+    if(loading) loading.style.display='none';
+    if(dash) dash.style.display='block';
+    document.getElementById('pf-deploys-tbl').innerHTML=`<tr><td colspan="4" class="empty">${esc(e.message)}</td></tr>`;
+  }
+
+  // ── Core Web Vitals (measured locally via PerformanceObserver) ──────────────
+  measureCWV();
+}
+
+function measureCWV() {
+  // Measure TTFB from navigation timing (always available)
+  const nav = performance.getEntriesByType('navigation')[0];
+  if(nav) {
+    const ttfb = Math.round(nav.responseStart - nav.requestStart);
+    setCWV('cwv-ttfb', ttfb+'ms', ttfb<200?'ok':ttfb<500?'lo':'cr');
+  }
+
+  // LCP via PerformanceObserver
+  try {
+    new PerformanceObserver(list => {
+      const entries = list.getEntries();
+      const lcp = entries[entries.length-1];
+      if(lcp) {
+        const ms = Math.round(lcp.startTime);
+        setCWV('cwv-lcp', ms+'ms', ms<2500?'ok':ms<4000?'lo':'cr');
+      }
+    }).observe({type:'largest-contentful-paint',buffered:true});
+  } catch(e){}
+
+  // CLS
+  let clsVal = 0;
+  try {
+    new PerformanceObserver(list => {
+      list.getEntries().forEach(e => { if(!e.hadRecentInput) clsVal+=e.value; });
+      setCWV('cwv-cls', clsVal.toFixed(3), clsVal<0.1?'ok':clsVal<0.25?'lo':'cr');
+    }).observe({type:'layout-shift',buffered:true});
+  } catch(e){}
+
+  // INP / FID
+  try {
+    new PerformanceObserver(list => {
+      list.getEntries().forEach(e => {
+        const ms = Math.round(e.processingStart - e.startTime);
+        setCWV('cwv-inp', ms+'ms', ms<200?'ok':ms<500?'lo':'cr');
+      });
+    }).observe({type:'first-input',buffered:true});
+  } catch(e){}
+}
+
+function setCWV(id, val, cls) {
+  const el = document.getElementById(id);
+  if(!el) return;
+  el.textContent = val;
+  el.style.color = cls==='ok'?'var(--green)':cls==='lo'?'var(--amber)':'var(--red)';
 }
 
 // ── CHARTS ────────────────────────────────────────────────────────────────────
