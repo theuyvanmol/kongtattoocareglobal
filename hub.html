@@ -130,7 +130,7 @@ select.inp{cursor:pointer}
 .setup-box h3{font-family:'Syne',sans-serif;font-size:15px;color:var(--accent);margin-bottom:10px}
 .setup-box p{font-size:13px;color:var(--body);line-height:1.6;margin-bottom:10px}
 .setup-box code{display:block;background:var(--surface2);border:1px solid var(--border);border-radius:var(--r-sm);padding:10px 12px;font-size:11px;color:var(--fg);font-family:monospace;margin:8px 0;white-space:pre-wrap;word-break:break-all}
-@media(max-width:720px){:root{--sw:0px}.sb{transform:translateX(-220px);transition:transform .2s}.sb.open{transform:translateX(0)}.main{margin-left:0}.content{padding:14px}.two-col{grid-template-columns:1fr}.stat-grid{grid-template-columns:1fr 1fr}.topbar{padding:11px 14px}.hbg{display:flex!important}}
+@media(max-width:720px){:root{--sw:0px}.sb{transform:translateX(-220px);transition:transform .2s;width:220px;min-width:220px}.sb.open{transform:translateX(0)}.sb-overlay{display:none;position:fixed;inset:0;background:rgba(0,0,0,.55);z-index:99}.sb-overlay.open{display:block}.main{margin-left:0}.content{padding:14px}.two-col{grid-template-columns:1fr}.stat-grid{grid-template-columns:1fr 1fr}.topbar{padding:11px 14px}.hbg{display:flex!important}}
 </style>
 </head>
 <body>
@@ -181,6 +181,7 @@ select.inp{cursor:pointer}
 
 <!-- APP SHELL -->
 <div id="screen-app">
+  <div class="sb-overlay" id="sb-overlay" onclick="closeSidebar()"></div>
   <nav class="sb" id="sidebar">
     <div class="sb-head">
       <div class="sb-logo">KONG<span>.</span></div>
@@ -201,7 +202,7 @@ select.inp{cursor:pointer}
   <div class="main">
     <div class="topbar">
       <div style="display:flex;align-items:center;gap:11px">
-        <div class="hbg" onclick="document.getElementById('sidebar').classList.toggle('open')"><span></span><span></span><span></span></div>
+        <div class="hbg" onclick="toggleSidebar()"><span></span><span></span><span></span></div>
         <div class="pg-title" id="pg-title">Overview</div>
       </div>
       <div style="display:flex;align-items:center;gap:10px">
@@ -923,6 +924,17 @@ function buildNav(role) {
   });
 }
 
+function toggleSidebar() {
+  const sb = document.getElementById('sidebar');
+  const ov = document.getElementById('sb-overlay');
+  const open = sb.classList.toggle('open');
+  if(ov) ov.classList.toggle('open', open);
+}
+function closeSidebar() {
+  document.getElementById('sidebar').classList.remove('open');
+  const ov = document.getElementById('sb-overlay');
+  if(ov) ov.classList.remove('open');
+}
 function showPage(id) {
   document.querySelectorAll('.page').forEach(p => p.classList.remove('active'));
   document.querySelectorAll('.nav-item').forEach(n => n.classList.remove('active'));
@@ -931,7 +943,7 @@ function showPage(id) {
   const nv = document.getElementById('nav-'+id);
   if(nv) nv.classList.add('active');
   document.getElementById('pg-title').textContent = TITLES[id]||'';
-  document.getElementById('sidebar').classList.remove('open');
+  closeSidebar();
   setTimeout(() => loadPage(id), 30);
 }
 
@@ -960,21 +972,21 @@ async function loadPage(id) {
 
 async function loadAdminOverview() {
   const [r1,r2,r3,r4] = await Promise.all([
-    sb.from('profiles').select('*',{count:'exact',head:true}).eq('role','studio'),
-    sb.from('profiles').select('*',{count:'exact',head:true}).eq('role','team'),
+    sb.from('profiles').select('id,role').eq('role','studio'),
+    sb.from('profiles').select('id,role').eq('role','team'),
     sb.from('stock_requests').select('*',{count:'exact',head:true}).eq('status','pending'),
     sb.from('stock_items').select('*',{count:'exact',head:true}),
   ]);
   // Count pending trade orders too
   const { count: tradeCount } = await sb.from('trade_orders').select('*',{count:'exact',head:true}).eq('status','pending');
-  document.getElementById('sa-studios').textContent = r1.count??'—';
-  document.getElementById('sa-team').textContent = r2.count??'—';
+  document.getElementById('sa-studios').textContent = (r1.data?.length)??'—';
+  document.getElementById('sa-team').textContent = (r2.data?.length)??'—';
   document.getElementById('sa-requests').textContent = ((r3.count||0)+(tradeCount||0))||'0';
   document.getElementById('sa-items').textContent = r4.count??'—';
   // Activity feed: merge stock_requests + trade_orders
   const [{ data: recentReqs }, { data: recentTrades }] = await Promise.all([
-    sb.from('stock_requests').select('*,studio:studio_id(display_name)').order('created_at',{ascending:false}).limit(5),
-    sb.from('trade_orders').select('*,studio:studio_id(display_name)').order('created_at',{ascending:false}).limit(5),
+    sb.from('stock_requests').select('*,profiles!studio_id(display_name)').order('created_at',{ascending:false}).limit(5),
+    sb.from('trade_orders').select('*,profiles!studio_id(display_name)').order('created_at',{ascending:false}).limit(5),
   ]);
   const allActivity = [
     ...(recentReqs||[]).map(r=>({...r, _type:'request', _time: new Date(r.created_at).getTime()})),
@@ -987,13 +999,13 @@ async function loadAdminOverview() {
       const summary=items2.slice(0,2).map(i=>`${i.product} ×${i.qty}`).join(', ')+(items2.length>2?` +${items2.length-2} more`:'');
       return `<div style="display:flex;gap:10px;align-items:flex-start;padding:9px 0;border-bottom:1px solid rgba(255,255,255,.04)">
         <div style="width:7px;height:7px;border-radius:50%;background:${r.status==='pending'?'var(--accent)':'var(--green)'};flex-shrink:0;margin-top:5px"></div>
-        <div style="flex:1;font-size:13px;color:var(--body)"><strong style="color:var(--fg)">${esc(r.studio?.display_name||'Studio')}</strong> placed trade order — ${esc(summary)} — £${(r.total_gbp||0).toFixed(2)}</div>
+        <div style="flex:1;font-size:13px;color:var(--body)"><strong style="color:var(--fg)">${esc(r.profiles?.display_name||r.studio?.display_name||'Studio')}</strong> placed trade order — ${esc(summary)} — £${(r.total_gbp||0).toFixed(2)}</div>
         <div style="font-size:10px;color:var(--subtle);flex-shrink:0">${timeAgo(r.created_at)}</div>
       </div>`;
     }
     return `<div style="display:flex;gap:10px;align-items:flex-start;padding:9px 0;border-bottom:1px solid rgba(255,255,255,.04)">
       <div style="width:7px;height:7px;border-radius:50%;background:${r.status==='approved'?'var(--green)':r.status==='pending'?'var(--amber)':'var(--red)'};flex-shrink:0;margin-top:5px"></div>
-      <div style="flex:1;font-size:13px;color:var(--body)"><strong style="color:var(--fg)">${esc(r.studio?.display_name||'Studio')}</strong> requested ${r.qty}× ${esc(r.product)}</div>
+      <div style="flex:1;font-size:13px;color:var(--body)"><strong style="color:var(--fg)">${esc(r.profiles?.display_name||r.studio?.display_name||'Studio')}</strong> requested ${r.qty}× ${esc(r.product)}</div>
       <div style="font-size:10px;color:var(--subtle);flex-shrink:0">${timeAgo(r.created_at)}</div>
     </div>`;
   }).join('') : '<div style="color:var(--subtle);padding:12px 0;font-size:13px">No activity yet</div>';
@@ -1062,23 +1074,23 @@ async function addStudio() {
 
 async function loadAllStock() {
   const [{ data: items },{ data: requests },{ data: tradeOrders }] = await Promise.all([
-    sb.from('stock_items').select('*,studio:studio_id(display_name)').order('created_at'),
-    sb.from('stock_requests').select('*,studio:studio_id(display_name)').eq('status','pending').order('created_at',{ascending:false}),
-    sb.from('trade_orders').select('*,studio:studio_id(display_name)').order('created_at',{ascending:false}).limit(50),
+    sb.from('stock_items').select('*,profiles!studio_id(display_name)').order('created_at'),
+    sb.from('stock_requests').select('*,profiles!studio_id(display_name)').eq('status','pending').order('created_at',{ascending:false}),
+    sb.from('trade_orders').select('*,profiles!studio_id(display_name)').order('created_at',{ascending:false}).limit(50),
   ]);
   const st = document.getElementById('allstock-tbl');
   st.innerHTML = items?.length ? items.map(item=>{
     const total=(item.units||0)+(item.sold||0), pct=total?Math.round((item.units/total)*100):0, cls=pct<20?'cr':pct<40?'lo':'';
-    return `<tr><td class="td-n">${esc(item.studio?.display_name||'—')}</td><td>${esc(item.product)}</td><td>${item.units||0}</td><td>${item.sold||0}</td><td><div class="pw" style="width:80px"><div class="pb ${cls}" style="width:${pct||2}%"></div></div></td></tr>`;
+    return `<tr><td class="td-n">${esc(item.profiles?.display_name||item.studio?.display_name||'—')}</td><td>${esc(item.product)}</td><td>${item.units||0}</td><td>${item.sold||0}</td><td><div class="pw" style="width:80px"><div class="pb ${cls}" style="width:${pct||2}%"></div></div></td></tr>`;
   }).join('') : `<tr><td colspan="5" class="empty">No stock data yet</td></tr>`;
   const rq = document.getElementById('reqs-tbl');
-  rq.innerHTML = requests?.length ? requests.map(r=>`<tr><td class="td-n">${esc(r.studio?.display_name||'—')}</td><td>${esc(r.product)}</td><td>${r.qty}</td><td>${timeAgo(r.created_at)}</td><td><button class="btn btn-p btn-sm" onclick="approveReq('${r.id}','${r.studio_id}',true,this)">Approve</button> <button class="btn btn-r btn-sm" onclick="approveReq('${r.id}','${r.studio_id}',false,this)">Decline</button></td></tr>`).join('') : `<tr><td colspan="5" class="empty">No pending requests</td></tr>`;
+  rq.innerHTML = requests?.length ? requests.map(r=>`<tr><td class="td-n">${esc(r.profiles?.display_name||r.studio?.display_name||'—')}</td><td>${esc(r.product)}</td><td>${r.qty}</td><td>${timeAgo(r.created_at)}</td><td><button class="btn btn-p btn-sm" onclick="approveReq('${r.id}','${r.studio_id}',true,this)">Approve</button> <button class="btn btn-r btn-sm" onclick="approveReq('${r.id}','${r.studio_id}',false,this)">Decline</button></td></tr>`).join('') : `<tr><td colspan="5" class="empty">No pending requests</td></tr>`;
   const to = document.getElementById('trade-orders-admin-tbl');
   if(to) to.innerHTML = tradeOrders?.length ? tradeOrders.map(o=>{
     const items2=(o.items||[]);
     const summary=items2.slice(0,2).map(i=>`${i.product} ×${i.qty}`).join(', ')+(items2.length>2?` +${items2.length-2} more`:'');
     const statusPill = o.status==='pending'?'<span class="pill pill-pend">Pending</span>':o.status==='shipped'?'<span class="pill pill-ok">Shipped</span>':o.status==='delivered'?'<span class="pill pill-ok">Delivered</span>':o.status==='processing'?'<span class="pill" style="background:rgba(100,120,255,.15);color:#889">Processing</span>':'<span class="pill pill-out">'+esc(o.status)+'</span>';
-    return `<tr><td class="td-n">${esc(o.studio?.display_name||'—')}</td><td>${esc(summary||'—')}</td><td>£${(o.total_gbp||0).toFixed(2)}</td><td>${timeAgo(o.created_at)}</td><td>${statusPill}</td><td><select class="input" style="padding:3px 6px;font-size:11px;height:auto" onchange="updateTradeOrderStatus('${o.id}',this.value)"><option value="">Update…</option><option value="processing">Processing</option><option value="shipped">Shipped</option><option value="delivered">Delivered</option><option value="cancelled">Cancelled</option></select></td></tr>`;
+    return `<tr><td class="td-n">${esc(o.profiles?.display_name||o.studio?.display_name||'—')}</td><td>${esc(summary||'—')}</td><td>£${(o.total_gbp||0).toFixed(2)}</td><td>${timeAgo(o.created_at)}</td><td>${statusPill}</td><td><select class="input" style="padding:3px 6px;font-size:11px;height:auto" onchange="updateTradeOrderStatus('${o.id}',this.value)"><option value="">Update…</option><option value="processing">Processing</option><option value="shipped">Shipped</option><option value="delivered">Delivered</option><option value="cancelled">Cancelled</option></select></td></tr>`;
   }).join('') : `<tr><td colspan="6" class="empty">No trade orders yet</td></tr>`;
 }
 
@@ -1290,14 +1302,14 @@ async function loadStockDispatch() {
   const snap = document.getElementById('dsp-snapshot');
   if (snap) {
     const { data: stocks } = await sb.from('stock_items')
-      .select('studio_id,product_name,quantity,studio:studio_id(display_name)')
+      .select('studio_id,product_name,quantity,profiles!studio_id(display_name)')
       .order('studio_id').order('product_name');
     if (!stocks||!stocks.length) { snap.innerHTML='<div class="empty">No stock records yet</div>'; }
     else {
       // Group by studio
       const byStudio = {};
       stocks.forEach(s => {
-        const sName = s.studio?.display_name || s.studio_id;
+        const sName = s.profiles?.display_name || s.studio?.display_name || s.studio_id;
         if (!byStudio[sName]) byStudio[sName] = [];
         byStudio[sName].push(s);
       });
