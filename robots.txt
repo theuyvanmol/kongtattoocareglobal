@@ -1,4 +1,20 @@
 User-agent: *
 Allow: /
 
+# Block API endpoints from crawling
+Disallow: /api/
+Disallow: /hub.html
+Disallow: /hub
+Disallow: /success
+Disallow: /checkout
+
+# Block common attack/scan paths
+Disallow: /wp-admin
+Disallow: /wp-login.php
+Disallow: /admin
+Disallow: /.env
+Disallow: /config
+Disallow: /phpinfo.php
+Disallow: /xmlrpc.php
+
 Sitemap: https://www.kongtattoocareglobal.com/sitemap.xml

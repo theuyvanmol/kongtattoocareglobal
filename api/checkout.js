@@ -1,11 +1,15 @@
 const Stripe = require('stripe');
+const { rateLimit } = require('./_ratelimit');
 
 module.exports = async (req, res) => {
   // Handle CORS preflight
-  res.setHeader('Access-Control-Allow-Origin', '*');
+  res.setHeader('Access-Control-Allow-Origin', 'https://www.kongtattoocareglobal.com');
   res.setHeader('Access-Control-Allow-Methods', 'POST, OPTIONS');
   res.setHeader('Access-Control-Allow-Headers', 'Content-Type, Authorization');
   if (req.method === 'OPTIONS') return res.status(200).end();
+
+  // Rate limit: 10 checkout attempts per minute per IP
+  if (rateLimit(req, res, { limit: 10, windowMs: 60_000, endpoint: 'checkout' })) return;
 
   // Only allow POST
   if (req.method !== 'POST') {

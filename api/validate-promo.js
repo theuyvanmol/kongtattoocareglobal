@@ -3,6 +3,7 @@
 // Called by checkout.html before payment so the customer sees the discount applied.
 
 const Stripe = require('stripe');
+const { rateLimit } = require('./_ratelimit');
 
 module.exports = async (req, res) => {
   res.setHeader('Access-Control-Allow-Origin', 'https://www.kongtattoocareglobal.com');
@@ -10,6 +11,8 @@ module.exports = async (req, res) => {
   res.setHeader('Access-Control-Allow-Headers', 'Content-Type');
 
   if (req.method === 'OPTIONS') return res.status(200).end();
+  // Strict limit on promo code validation to stop brute-force guessing
+  if (rateLimit(req, res, { limit: 5, windowMs: 60_000, endpoint: 'validate-promo' })) return;
   if (req.method !== 'POST') return res.status(405).json({ error: 'Method not allowed' });
 
   try {
