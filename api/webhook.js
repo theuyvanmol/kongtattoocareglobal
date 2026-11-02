@@ -49,23 +49,97 @@ module.exports = async function handler(req, res) {
       console.log('   Customer email:', session.customer_details?.email);
       console.log('   Amount total:  ', session.amount_total / 100, session.currency.toUpperCase());
 
-      // TODO: Fulfil the order here.
-      // Examples:
-      //   - Send a confirmation email
-      //   - Update your order database
-      //   - Trigger shipping workflow
+      // ── Trade shop order ──────────────────────────────────────────────
+      if (session.metadata?.type === 'trade') {
+        const { studio_id, studio_name, items_json } = session.metadata;
+        const totalGbp = (session.amount_total || 0) / 100;
+
+        let items = [];
+        try { items = JSON.parse(items_json || '[]'); } catch (_) {}
+
+        const supabaseUrl = process.env.SUPABASE_URL;
+        const serviceKey  = process.env.SUPABASE_SERVICE_ROLE_KEY;
+
+        if (supabaseUrl && serviceKey && studio_id) {
+          // 1. Record the paid trade order in Supabase
+          const orderRes = await fetch(`${supabaseUrl}/rest/v1/trade_orders`, {
+            method: 'POST',
+            headers: {
+              apikey: serviceKey,
+              Authorization: `Bearer ${serviceKey}`,
+              'Content-Type': 'application/json',
+              Prefer: 'return=representation',
+            },
+            body: JSON.stringify({
+              studio_id,
+              items,
+              total_gbp: totalGbp,
+              status: 'paid',
+              stripe_session_id: session.id,
+            }),
+          });
+          if (!orderRes.ok) {
+            const t = await orderRes.text();
+            console.error('Failed to record trade order:', t);
+          } else {
+            console.log(`✅ Trade order recorded for studio ${studio_name || studio_id}`);
+          }
+
+          // 2. Notify superadmin(s) by email via Supabase Auth Admin API
+          //    Fetch all superadmin emails, then send each a notification email
+          try {
+            const adminsRes = await fetch(
+              `${supabaseUrl}/rest/v1/profiles?role=eq.superadmin&select=id,display_name`,
+              { headers: { apikey: serviceKey, Authorization: `Bearer ${serviceKey}` } }
+            );
+            const admins = await adminsRes.json();
+
+            // Build a summary of items
+            const itemSummary = items.slice(0, 5)
+              .map(i => `• ${i.product || i.name} ×${i.qty}`)
+              .join('\n');
+            const moreItems = items.length > 5 ? `\n…and ${items.length - 5} more` : '';
+
+            for (const admin of (admins || [])) {
+              // Get admin's email from auth
+              const authRes = await fetch(`${supabaseUrl}/auth/v1/admin/users/${admin.id}`, {
+                headers: { apikey: serviceKey, Authorization: `Bearer ${serviceKey}` }
+              });
+              const authUser = await authRes.json();
+              const adminEmail = authUser?.email;
+              if (!adminEmail) continue;
+
+              // Send email via Supabase's built-in mailer (resend/smtp configured in project)
+              await fetch(`${supabaseUrl}/auth/v1/admin/users/${admin.id}/send-email`, {
+                method: 'POST',
+                headers: {
+                  apikey: serviceKey,
+                  Authorization: `Bearer ${serviceKey}`,
+                  'Content-Type': 'application/json',
+                },
+                body: JSON.stringify({
+                  email: adminEmail,
+                  subject: `🛍️ Trade order paid — ${studio_name || studio_id}`,
+                  body: `A studio has just paid for a trade order and needs restocking.\n\nStudio: ${studio_name || studio_id}\nTotal: £${totalGbp.toFixed(2)}\n\nItems ordered:\n${itemSummary}${moreItems}\n\nStripe session: ${session.id}\n\nLog into the KONG Hub to view the order.`,
+                }),
+              }).catch(e => console.error('Email send failed:', e.message));
+            }
+            console.log(`✅ Notified ${(admins||[]).length} superadmin(s) of trade order`);
+          } catch (notifyErr) {
+            console.error('Superadmin notification error:', notifyErr.message);
+          }
+        }
+      }
       break;
     }
 
     case 'checkout.session.expired': {
       const session = event.data.object;
       console.log('⚠️  Checkout expired:', session.id);
-      // TODO: Release any held stock / notify customer
       break;
     }
 
     default:
-      // Unexpected event type — log and ignore.
       console.log('Unhandled event type:', event.type);
   }
 

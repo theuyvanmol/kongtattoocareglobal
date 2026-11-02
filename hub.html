@@ -453,8 +453,8 @@ SUPABASE_SERVICE_ROLE_KEY=eyJhbGci...</code>
         </div>
         <div class="card" style="margin-top:4px">
           <div class="sec-hd"><div class="sec-ttl">My Previous Orders</div><button class="btn btn-g btn-sm" onclick="loadTradeOrders()">↻ Refresh</button></div>
-          <div class="tw"><table><thead><tr><th>Date</th><th>Items</th><th>Total</th><th>Status</th></tr></thead>
-          <tbody id="trade-orders-tbl"><tr><td colspan="4" class="empty">No orders yet</td></tr></tbody></table></div>
+          <div class="tw"><table><thead><tr><th>Date</th><th>Items</th><th>Total</th><th>Status</th><th></th></tr></thead>
+          <tbody id="trade-orders-tbl"><tr><td colspan="5" class="empty">No orders yet</td></tr></tbody></table></div>
         </div>
       </div>
 
@@ -532,8 +532,8 @@ SUPABASE_SERVICE_ROLE_KEY=eyJhbGci...</code>
         </div>
         <div class="card">
           <div class="sec-hd"><div class="sec-ttl">My Request History</div></div>
-          <div class="tw"><table><thead><tr><th>Product</th><th>Qty</th><th>Submitted</th><th>Status</th></tr></thead>
-          <tbody id="st-reqs-tbl"><tr><td colspan="4" class="empty">No requests yet</td></tr></tbody></table></div>
+          <div class="tw"><table><thead><tr><th>Product</th><th>Qty</th><th>Submitted</th><th>Status</th><th></th></tr></thead>
+          <tbody id="st-reqs-tbl"><tr><td colspan="5" class="empty">No requests yet</td></tr></tbody></table></div>
         </div>
       </div>
 
@@ -865,6 +865,22 @@ function launchApp() {
   document.getElementById('role-badge').textContent = role==='superadmin'?'Admin':role==='team'?'Team':'Studio';
   buildNav(role);
   showApp();
+
+  // Handle Stripe trade shop redirect params
+  const params = new URLSearchParams(window.location.search);
+  if (params.get('trade_success') === '1') {
+    history.replaceState({}, '', window.location.pathname);
+    showPage('pg-trade-shop');
+    setTimeout(() => showToast('✅ Payment received! Your trade order has been placed.'), 300);
+    return;
+  }
+  if (params.get('trade_cancel') === '1') {
+    history.replaceState({}, '', window.location.pathname);
+    showPage('pg-trade-shop');
+    setTimeout(() => showToast('Payment cancelled — your cart is still here.'), 300);
+    return;
+  }
+
   const first = {superadmin:'pg-overview',team:'pg-team-overview',studio:'pg-studio-overview'}[role]||'pg-studio-overview';
   showPage(first);
 }
@@ -1273,7 +1289,20 @@ async function loadStudioStock() {
 async function loadStudioRequests() {
   const { data } = await sb.from('stock_requests').select('*').eq('studio_id',ME.id).order('created_at',{ascending:false});
   const tb=document.getElementById('st-reqs-tbl');
-  tb.innerHTML = data?.length ? data.map(r=>`<tr><td class="td-n">${esc(r.product)}</td><td>${r.qty}</td><td>${timeAgo(r.created_at)}</td><td>${r.status==='approved'?'<span class="pill pill-ok">Approved</span>':r.status==='declined'?'<span class="pill pill-out">Declined</span>':'<span class="pill pill-pend">Pending</span>'}</td></tr>`).join('') : `<tr><td colspan="4" class="empty">No requests yet</td></tr>`;
+  tb.innerHTML = data?.length ? data.map(r=>{
+    const isPending = r.status==='pending';
+    const statusPill = r.status==='approved'?'<span class="pill pill-ok">Approved</span>':r.status==='declined'?'<span class="pill pill-out">Declined</span>':r.status==='cancelled'?'<span class="pill pill-out">Cancelled</span>':'<span class="pill pill-pend">Pending</span>';
+    const cancelBtn = isPending ? `<button class="btn btn-sm" style="background:#ff4f4f22;color:#ff4f4f;border:1px solid #ff4f4f44;padding:2px 10px;font-size:11px;border-radius:6px;cursor:pointer" onclick="cancelStockRequest('${r.id}')">Cancel</button>` : '';
+    return `<tr><td class="td-n">${esc(r.product)}</td><td>${r.qty}</td><td>${timeAgo(r.created_at)}</td><td>${statusPill}</td><td>${cancelBtn}</td></tr>`;
+  }).join('') : `<tr><td colspan="5" class="empty">No requests yet</td></tr>`;
+}
+
+async function cancelStockRequest(id) {
+  if (!confirm('Cancel this stock request?')) return;
+  const { error } = await sb.from('stock_requests').update({status:'cancelled'}).eq('id',id).eq('studio_id',ME.id);
+  if (error) { showToast('Error: '+error.message); return; }
+  showToast('Request cancelled.');
+  loadStudioRequests();
 }
 
 async function submitRequest() {
@@ -1437,21 +1466,28 @@ async function submitTradeOrder() {
     product: TRADE_PRODUCTS[i].name, qty, unit_price: TRADE_PRODUCTS[i].trade
   }));
   if (!items.length) { alert('Your cart is empty.'); return; }
-  const total = items.reduce((s,i)=>s+i.unit_price*i.qty,0);
-  const userId = ME?.id;
-  if (!userId) { showToast('Not logged in — please refresh and try again.'); return; }
-  const { error } = await sb.from('trade_orders').insert({
-    studio_id: userId,
-    items: items,
-    total_gbp: total,
-    status: 'pending'
-  });
-  if (error) { alert('Error placing order: '+error.message); return; }
-  alert('✓ Order placed! Our team will be in touch to confirm.');
-  _tradeCart = {};
-  TRADE_PRODUCTS.forEach((_,i)=>{ const el=document.getElementById('cart-qty-'+i); if(el)el.textContent='0'; });
-  updateCartDisplay();
-  loadTradeOrders();
+  if (!ME?.id) { showToast('Not logged in — please refresh and try again.'); return; }
+  showToast('Redirecting to payment…');
+  try {
+    const res = await fetch('/api/checkout', {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({
+        type: 'trade',
+        studio_id: ME.id,
+        studio_name: ME.display_name || ME.email || ME.id,
+        items,
+      }),
+    });
+    const data = await res.json();
+    if (data.url) {
+      window.location.href = data.url;
+    } else {
+      alert('Payment error: ' + (data.error || 'Unknown error'));
+    }
+  } catch (err) {
+    alert('Payment error: ' + err.message);
+  }
 }
 
 async function loadTradeOrders() {
@@ -1460,18 +1496,36 @@ async function loadTradeOrders() {
   const userId = ME?.id;
   const { data: orders } = await sb.from('trade_orders')
     .select('*').eq('studio_id',userId).order('created_at',{ascending:false}).limit(20);
-  if (!orders||!orders.length) { tbody.innerHTML='<tr><td colspan="4" class="empty">No orders yet</td></tr>'; return; }
+  if (!orders||!orders.length) { tbody.innerHTML='<tr><td colspan="5" class="empty">No orders yet</td></tr>'; return; }
   tbody.innerHTML = orders.map(o=>{
     const items = (o.items||[]);
-    const summary = items.slice(0,2).map(i=>`${i.product} ×${i.qty}`).join(', ')+(items.length>2?` +${items.length-2} more`:'');
-    const statusColor = o.status==='approved'?'var(--accent)':o.status==='declined'?'#ff4f4f':'var(--subtle)';
+    const summary = items.slice(0,2).map(i=>`${i.product||i.name} ×${i.qty}`).join(', ')+(items.length>2?` +${items.length-2} more`:'');
+    const isPaid = o.status==='paid'||o.status==='approved';
+    const isCancelled = o.status==='cancelled';
+    const statusPill = isPaid
+      ? `<span class="pill pill-ok">Paid</span>`
+      : isCancelled
+        ? `<span class="pill pill-out">Cancelled</span>`
+        : `<span class="pill pill-pend">Pending</span>`;
+    const cancelBtn = (!isPaid && !isCancelled)
+      ? `<button class="btn btn-sm" style="background:#ff4f4f22;color:#ff4f4f;border:1px solid #ff4f4f44;padding:2px 10px;font-size:11px;border-radius:6px;cursor:pointer" onclick="cancelTradeOrder('${o.id}')">Cancel</button>`
+      : '';
     return `<tr>
       <td>${new Date(o.created_at).toLocaleDateString('en-GB',{day:'numeric',month:'short',year:'numeric'})}</td>
       <td style="font-size:12px">${summary}</td>
-      <td>£${parseFloat(o.total_gbp).toFixed(2)}</td>
-      <td><span style="color:${statusColor};font-weight:600;text-transform:capitalize">${o.status}</span></td>
+      <td>£${parseFloat(o.total_gbp||0).toFixed(2)}</td>
+      <td>${statusPill}</td>
+      <td>${cancelBtn}</td>
     </tr>`;
   }).join('');
+}
+
+async function cancelTradeOrder(id) {
+  if (!confirm('Cancel this trade order?')) return;
+  const { error } = await sb.from('trade_orders').update({status:'cancelled'}).eq('id',id).eq('studio_id',ME.id);
+  if (error) { showToast('Error: '+error.message); return; }
+  showToast('Order cancelled.');
+  loadTradeOrders();
 }
 
 // ── STRIPE REVENUE ─────────────────────────────────────────────────────────────
