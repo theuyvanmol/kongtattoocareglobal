@@ -7,12 +7,29 @@
 <meta name="robots" content="noindex,nofollow">
 <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Syne:wght@400;600;700;800&family=Inter:wght@300;400;500;600&display=swap">
 <script src="https://cdnjs.cloudflare.com/ajax/libs/Chart.js/4.4.1/chart.umd.min.js"></script>
-<script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2.45.4/dist/umd/supabase.js"></script>
 <script>
-  // Fallback: if jsdelivr failed to load supabase (common on slow/restricted mobile networks), try unpkg
-  if (!window.supabase) {
-    document.write('<script src="https://unpkg.com/@supabase/supabase-js@2.45.4/dist/umd/supabase.js"><\/script>');
-  }
+  // Load Supabase with CDN fallback chain
+  (function() {
+    function loadScript(src, cb) {
+      var s = document.createElement('script');
+      s.src = src;
+      s.onload = cb;
+      s.onerror = cb; // cb called regardless, caller checks window.supabase
+      document.head.appendChild(s);
+    }
+    var cdns = [
+      'https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2.45.4/dist/umd/supabase.js',
+      'https://cdnjs.cloudflare.com/ajax/libs/supabase-js/2.45.4/supabase-js.min.js',
+      'https://unpkg.com/@supabase/supabase-js@2.45.4/dist/umd/supabase.js'
+    ];
+    var i = 0;
+    function tryNext() {
+      if (window.supabase) return; // loaded
+      if (i >= cdns.length) { window._supabaseLoadFailed = true; return; }
+      loadScript(cdns[i++], tryNext);
+    }
+    tryNext();
+  })();
 </script>
 <style>
 :root{--bg:#0a0a0a;--surface:#111;--surface2:#181818;--border:#232323;--muted:#3a3a3a;--subtle:#606060;--body:#aaa;--fg:#f0f0f0;--accent:#c8ff00;--accent-dim:#8fb300;--accent-bg:rgba(200,255,0,.07);--red:#ff4444;--amber:#ffaa00;--blue:#4488ff;--green:#00cc88;--r:10px;--r-sm:6px;--sw:220px;color-scheme:dark}
@@ -707,13 +724,28 @@ create policy "own_todos" on todos for all using (user_id = auth.uid());
 document.getElementById('setup-sql-display').textContent = SETUP_SQL;
 
 // ── INIT ─────────────────────────────────────────────────────────────────────
+
+// Wait for the Supabase library to finish loading (CDN fallback chain may take a moment)
+function waitForSupabaseLib(timeout) {
+  return new Promise((resolve, reject) => {
+    if (window.supabase) return resolve();
+    if (window._supabaseLoadFailed) return reject(new Error('All Supabase CDNs failed to load.'));
+    var deadline = Date.now() + (timeout || 10000);
+    var iv = setInterval(function() {
+      if (window.supabase) { clearInterval(iv); resolve(); }
+      else if (window._supabaseLoadFailed || Date.now() > deadline) {
+        clearInterval(iv);
+        reject(new Error('Supabase library could not be loaded. Please check your internet connection and refresh.'));
+      }
+    }, 100);
+  });
+}
+
 async function initSupabase() {
   if (sb) return sb; // already initialised
+  await waitForSupabaseLib(10000);
   const cfg = await fetch('/api/hub-auth').then(r => r.json());
   if (!cfg.url || !cfg.anon) return null; // not configured
-  if (!window.supabase || !window.supabase.createClient) {
-    throw new Error('Supabase library failed to load. Check your internet connection and refresh.');
-  }
   sb = window.supabase.createClient(cfg.url, cfg.anon);
   return sb;
 }
