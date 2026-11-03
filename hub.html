@@ -8,6 +8,12 @@
 <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Syne:wght@400;600;700;800&family=Inter:wght@300;400;500;600&display=swap">
 <script src="https://cdnjs.cloudflare.com/ajax/libs/Chart.js/4.4.1/chart.umd.min.js"></script>
 <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2.45.4/dist/umd/supabase.js"></script>
+<script>
+  // Fallback: if jsdelivr failed to load supabase (common on slow/restricted mobile networks), try unpkg
+  if (!window.supabase) {
+    document.write('<script src="https://unpkg.com/@supabase/supabase-js@2.45.4/dist/umd/supabase.js"><\/script>');
+  }
+</script>
 <style>
 :root{--bg:#0a0a0a;--surface:#111;--surface2:#181818;--border:#232323;--muted:#3a3a3a;--subtle:#606060;--body:#aaa;--fg:#f0f0f0;--accent:#c8ff00;--accent-dim:#8fb300;--accent-bg:rgba(200,255,0,.07);--red:#ff4444;--amber:#ffaa00;--blue:#4488ff;--green:#00cc88;--r:10px;--r-sm:6px;--sw:220px;color-scheme:dark}
 *{box-sizing:border-box;margin:0;padding:0}
@@ -705,6 +711,9 @@ async function initSupabase() {
   if (sb) return sb; // already initialised
   const cfg = await fetch('/api/hub-auth').then(r => r.json());
   if (!cfg.url || !cfg.anon) return null; // not configured
+  if (!window.supabase || !window.supabase.createClient) {
+    throw new Error('Supabase library failed to load. Check your internet connection and refresh.');
+  }
   sb = window.supabase.createClient(cfg.url, cfg.anon);
   return sb;
 }
