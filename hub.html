@@ -701,16 +701,23 @@ create policy "own_todos" on todos for all using (user_id = auth.uid());
 document.getElementById('setup-sql-display').textContent = SETUP_SQL;
 
 // ── INIT ─────────────────────────────────────────────────────────────────────
+async function initSupabase() {
+  if (sb) return sb; // already initialised
+  const cfg = await fetch('/api/hub-auth').then(r => r.json());
+  if (!cfg.url || !cfg.anon) return null; // not configured
+  sb = window.supabase.createClient(cfg.url, cfg.anon);
+  return sb;
+}
+
 (async () => {
   try {
-    const cfg = await fetch('/api/hub-auth').then(r => r.json());
-    if (!cfg.url || !cfg.anon) {
+    const client = await initSupabase();
+    if (!client) {
       hideEl('loading-screen');
       showPage('pg-setup');
       showApp();
       return;
     }
-    sb = window.supabase.createClient(cfg.url, cfg.anon);
     const { data: { session } } = await sb.auth.getSession();
     if (session) {
       await loadProfile(session.user);
@@ -718,6 +725,7 @@ document.getElementById('setup-sql-display').textContent = SETUP_SQL;
       showLogin();
     }
   } catch(e) {
+    console.error('[KONG] init error:', e);
     hideEl('loading-screen');
     showLogin();
   }
@@ -789,6 +797,15 @@ async function doLogin() {
   const btn = document.getElementById('login-btn');
   btn.disabled=true; btn.textContent='Signing in…';
   try {
+    // Re-init Supabase if it failed on page load (common on slow mobile connections)
+    if (!sb) {
+      const client = await initSupabase();
+      if (!client) {
+        setErr('login-err', 'Connection failed. Please refresh the page and try again.');
+        btn.disabled=false; btn.textContent='ENTER HUB';
+        return;
+      }
+    }
     // If it doesn't look like an email, try to look up email by username
     let email = loginId;
     if (!loginId.includes('@')) {
@@ -822,6 +839,14 @@ async function doRegister() {
   const btn = document.getElementById('reg-btn');
   btn.disabled=true; btn.textContent='Creating account…';
   try {
+    if (!sb) {
+      const client = await initSupabase();
+      if (!client) {
+        setErr('reg-err', 'Connection failed. Please refresh the page and try again.');
+        btn.disabled=false; btn.textContent='CREATE ACCOUNT';
+        return;
+      }
+    }
     const { data, error } = await sb.auth.signUp({ email, password: pass, options:{ data:{ display_name:name } } });
     if(error) throw error;
     if(data.session) {
@@ -840,6 +865,10 @@ async function doForgot() {
   setErr('forgot-err',''); setOk('forgot-ok','');
   const email = val('forgot-email');
   if(!email) return setErr('forgot-err','Enter your email address.');
+  if (!sb) {
+    const client = await initSupabase();
+    if (!client) return setErr('forgot-err','Connection failed. Please refresh and try again.');
+  }
   const { error } = await sb.auth.resetPasswordForEmail(email, { redirectTo: window.location.origin+'/hub' });
   if(error) return setErr('forgot-err',error.message);
   setOk('forgot-ok','Reset link sent! Check your email.');
@@ -987,6 +1016,8 @@ async function loadPage(id) {
 }
 
 async function getAuthHeader() {
+  if (!sb) await initSupabase();
+  if (!sb) return '';
   const { data: { session } } = await sb.auth.getSession();
   return session ? `Bearer ${session.access_token}` : '';
 }
