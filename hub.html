@@ -1348,7 +1348,16 @@ async function loadAdminOverview() {
 
   // ── Analytics visitors ─────────────────────────────────────────────
   if (analyticsData) {
-    document.getElementById('ov-visitors').textContent = (analyticsData.pageviews?.total||0).toLocaleString();
+    const visitorCount = analyticsData.overview?.activeUsers || analyticsData.pageviews?.total || 0;
+    const visEl = document.getElementById('ov-visitors');
+    if (visitorCount > 0) {
+      visEl.textContent = visitorCount.toLocaleString();
+    } else if (analyticsData.source === 'placeholder' || analyticsData.setupRequired) {
+      visEl.textContent = '—';
+      visEl.title = 'Add GA4 credentials in Vercel to see real data';
+    } else {
+      visEl.textContent = '0';
+    }
   }
 
   // ── Studio growth chart ────────────────────────────────────────────
@@ -1390,7 +1399,10 @@ async function loadAdminOverview() {
   }).join('') : '<div style="color:var(--subtle);padding:12px 0;font-size:13px">No activity yet</div>';
 
   // ── AI Brief (only for Dan's account) ─────────────────────────────
-  if (ME?.email === 'info@kongtattoocareglobal.com') {
+  // Get email from auth session as fallback (profile.email may be null)
+  const { data: { session: ovSession } } = await sb.auth.getSession().catch(()=>({data:{session:null}}));
+  const userEmail = ME?.email || ovSession?.user?.email || '';
+  if (userEmail === 'info@kongtattoocareglobal.com') {
     const brief = document.getElementById('ov-ai-brief');
     const briefBody = document.getElementById('ov-ai-brief-body');
     brief.style.display = 'block';
@@ -1400,7 +1412,8 @@ async function loadAdminOverview() {
     const txCount = stripeOrders?.stats?.totalOrders || 0;
     const avgOrder = stripeOrders?.stats?.avgOrder || 0;
     const topCode = activeCodes[0];
-    const visitors = analyticsData?.pageviews?.total || 0;
+    const visitors = analyticsData?.overview?.activeUsers || analyticsData?.pageviews?.total || 0;
+    const ga4Missing = analyticsData?.setupRequired || analyticsData?.source === 'placeholder';
     const pendingReqs = (r3.count||0)+(tradeCount||0);
     const studios = adminStats?.studioCount || 0;
 
@@ -1427,7 +1440,7 @@ async function loadAdminOverview() {
     const actionItems = [];
     if (pendingReqs > 0) actionItems.push(`<strong>${pendingReqs} stock request${pendingReqs>1?'s':''} need${pendingReqs===1?'s':''} your attention</strong>`);
     if (rev30 === 0) actionItems.push('Stripe secret key may not be set — add <code style="font-size:11px;background:rgba(255,255,255,.08);padding:1px 5px;border-radius:3px">STRIPE_SECRET_KEY</code> in Vercel');
-    if (visitors === 0) actionItems.push('Analytics not reporting — check Vercel Analytics is enabled for this project');
+    if (ga4Missing) actionItems.push('Website visitor data not connected — add <code style="font-size:11px;background:rgba(255,255,255,.08);padding:1px 5px;border-radius:3px">GA4_PROPERTY_ID</code>, <code style="font-size:11px;background:rgba(255,255,255,.08);padding:1px 5px;border-radius:3px">GA4_CLIENT_EMAIL</code> and <code style="font-size:11px;background:rgba(255,255,255,.08);padding:1px 5px;border-radius:3px">GA4_PRIVATE_KEY</code> to Vercel env vars');
 
     const now = new Date();
     document.getElementById('ov-brief-time').textContent = now.toLocaleString('en-GB',{weekday:'short',day:'numeric',month:'short',hour:'2-digit',minute:'2-digit'});
@@ -1436,7 +1449,7 @@ async function loadAdminOverview() {
       <p style="margin-bottom:10px">👋 <strong>Hi Dan</strong> — here's your KONG business snapshot for today.</p>
       <p style="margin-bottom:8px">📈 ${revTrend}. ${orderInsight}</p>
       <p style="margin-bottom:8px">🏷️ ${codeInsight}</p>
-      <p style="margin-bottom:${actionItems.length?'8px':'0'}">${studioInsight}${visitors > 0 ? ` Your site had <strong>${visitors.toLocaleString()} visitors</strong> in the last 30 days.` : ''}</p>
+      <p style="margin-bottom:${actionItems.length?'8px':'0'}">${studioInsight}${visitors > 0 ? ` Your site had <strong>${visitors.toLocaleString()} visitors</strong> in the last 30 days.` : ga4Missing ? ' <span style="color:var(--subtle);font-size:12px">(Website visitor data needs GA4 setup — see action items below)</span>' : ''}</p>
       ${actionItems.length ? `<div style="margin-top:12px;padding:12px 14px;background:rgba(255,170,0,.07);border:1px solid rgba(255,170,0,.2);border-radius:8px;font-size:12px"><strong style="color:var(--amber)">⚡ Action needed:</strong><ul style="margin:6px 0 0 16px;display:flex;flex-direction:column;gap:4px">${actionItems.map(i=>`<li style="color:var(--body)">${i}</li>`).join('')}</ul></div>` : ''}
     `;
   }
