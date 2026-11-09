@@ -291,24 +291,89 @@ SUPABASE_SERVICE_ROLE_KEY=eyJhbGci...</code>
 
       <!-- SUPERADMIN PAGES -->
       <div class="page" id="pg-overview">
-        <div class="stat-grid">
-          <div class="stat hi"><div class="stat-lbl">Active Studios</div><div class="stat-val ac" id="sa-studios">—</div></div>
-          <div class="stat"><div class="stat-lbl">Team Members</div><div class="stat-val" id="sa-team">—</div></div>
-          <div class="stat"><div class="stat-lbl">Open Stock Requests</div><div class="stat-val" id="sa-requests">—</div></div>
-          <div class="stat"><div class="stat-lbl">Products Tracked</div><div class="stat-val" id="sa-items">—</div></div>
+
+        <!-- AI Brief (shown only for info@kongtattoocareglobal.com) -->
+        <div id="ov-ai-brief" style="display:none;background:linear-gradient(135deg,rgba(200,255,0,.06),rgba(200,255,0,.02));border:1px solid rgba(200,255,0,.18);border-radius:12px;padding:20px 22px;margin-bottom:22px">
+          <div style="display:flex;align-items:center;gap:10px;margin-bottom:12px">
+            <div style="width:32px;height:32px;border-radius:50%;background:var(--accent);display:flex;align-items:center;justify-content:center;font-size:15px;flex-shrink:0">🤖</div>
+            <div>
+              <div style="font-family:'Syne',sans-serif;font-size:14px;font-weight:700;color:var(--accent)">KONG AI Brief</div>
+              <div style="font-size:11px;color:var(--subtle)" id="ov-brief-time">Updated just now</div>
+            </div>
+            <button onclick="document.getElementById('ov-ai-brief-body').style.display = document.getElementById('ov-ai-brief-body').style.display==='none'?'':'none'" style="margin-left:auto;background:none;border:1px solid var(--border);border-radius:6px;padding:4px 10px;font-size:11px;color:var(--subtle);cursor:pointer">Toggle</button>
+          </div>
+          <div id="ov-ai-brief-body" style="font-size:13px;color:var(--body);line-height:1.75"></div>
         </div>
-        <!-- Revenue + Visitors row -->
-        <div class="stat-grid" style="margin-bottom:18px">
+
+        <!-- Row 1: Business stats -->
+        <div style="display:grid;grid-template-columns:repeat(4,1fr);gap:12px;margin-bottom:14px">
           <div class="stat hi"><div class="stat-lbl">Revenue (30d)</div><div class="stat-val ac" id="ov-rev30">—</div><div class="stat-sub" id="ov-rev-growth"></div></div>
           <div class="stat"><div class="stat-lbl">Lifetime Revenue</div><div class="stat-val" id="ov-lifetime">—</div></div>
           <div class="stat"><div class="stat-lbl">Balance Available</div><div class="stat-val" id="ov-balance">—</div></div>
+          <div class="stat"><div class="stat-lbl">Avg Order Value</div><div class="stat-val" id="ov-avg-order">—</div></div>
+        </div>
+
+        <!-- Row 2: Operations stats -->
+        <div style="display:grid;grid-template-columns:repeat(4,1fr);gap:12px;margin-bottom:20px">
+          <div class="stat"><div class="stat-lbl">Orders (30d)</div><div class="stat-val" id="ov-order-count">—</div></div>
+          <div class="stat"><div class="stat-lbl">Active Studios</div><div class="stat-val" id="sa-studios">—</div></div>
+          <div class="stat"><div class="stat-lbl">Open Requests</div><div class="stat-val" id="sa-requests">—</div></div>
           <div class="stat"><div class="stat-lbl">Site Visitors (30d)</div><div class="stat-val" id="ov-visitors">—</div></div>
         </div>
-        <div class="two-col">
-          <div class="card"><div class="sec-hd"><div class="sec-ttl">Studio Growth</div></div><div class="chart-w"><canvas id="ch-studios"></canvas></div></div>
-          <div class="card"><div class="sec-hd"><div class="sec-ttl">Daily Revenue — Last 14 Days</div></div><div class="chart-w"><canvas id="ch-ov-revenue"></canvas></div></div>
+
+        <!-- Revenue chart + Orders breakdown -->
+        <div class="two-col" style="margin-bottom:18px">
+          <div class="card">
+            <div class="sec-hd"><div class="sec-ttl">Revenue — Last 14 Days</div><div id="ov-rev-total-chip" style="font-size:11px;color:var(--subtle)"></div></div>
+            <div class="chart-w"><canvas id="ch-ov-revenue"></canvas></div>
+          </div>
+          <div class="card">
+            <div class="sec-hd"><div class="sec-ttl">Studio Growth 2025</div></div>
+            <div class="chart-w"><canvas id="ch-studios"></canvas></div>
+          </div>
         </div>
-        <div class="card"><div class="sec-hd"><div class="sec-ttl">Recent Activity</div></div><div id="activity-feed"><div style="padding:10px 0;color:var(--subtle);font-size:13px">Loading…</div></div></div>
+
+        <!-- Recent Orders (full buyer details) -->
+        <div class="card" style="margin-bottom:18px">
+          <div class="sec-hd">
+            <div class="sec-ttl">Recent Orders</div>
+            <div id="ov-orders-status" style="font-size:11px;color:var(--subtle)">Loading…</div>
+          </div>
+          <div style="overflow-x:auto">
+            <table style="width:100%;border-collapse:collapse;min-width:680px" id="ov-orders-tbl">
+              <thead>
+                <tr style="border-bottom:1px solid var(--border)">
+                  <th style="padding:7px 10px;text-align:left;font-size:10px;letter-spacing:.08em;text-transform:uppercase;color:var(--subtle);font-weight:500">Buyer</th>
+                  <th style="padding:7px 10px;text-align:left;font-size:10px;letter-spacing:.08em;text-transform:uppercase;color:var(--subtle);font-weight:500">Address</th>
+                  <th style="padding:7px 10px;text-align:left;font-size:10px;letter-spacing:.08em;text-transform:uppercase;color:var(--subtle);font-weight:500">Items</th>
+                  <th style="padding:7px 10px;text-align:left;font-size:10px;letter-spacing:.08em;text-transform:uppercase;color:var(--subtle);font-weight:500">Total</th>
+                  <th style="padding:7px 10px;text-align:left;font-size:10px;letter-spacing:.08em;text-transform:uppercase;color:var(--subtle);font-weight:500">Code</th>
+                  <th style="padding:7px 10px;text-align:left;font-size:10px;letter-spacing:.08em;text-transform:uppercase;color:var(--subtle);font-weight:500">Date</th>
+                </tr>
+              </thead>
+              <tbody id="ov-orders-tbody">
+                <tr><td colspan="6" style="padding:14px 10px;color:var(--subtle);font-size:13px">Loading orders…</td></tr>
+              </tbody>
+            </table>
+          </div>
+        </div>
+
+        <!-- Bottom row: Discount codes + Activity -->
+        <div class="two-col" style="margin-bottom:0">
+          <div class="card">
+            <div class="sec-hd"><div class="sec-ttl">Discount Codes</div></div>
+            <div id="ov-codes-list" style="display:flex;flex-direction:column;gap:8px">
+              <div style="color:var(--subtle);font-size:13px">Loading…</div>
+            </div>
+          </div>
+          <div class="card">
+            <div class="sec-hd"><div class="sec-ttl">Recent Activity</div></div>
+            <div id="activity-feed"><div style="padding:10px 0;color:var(--subtle);font-size:13px">Loading…</div></div>
+          </div>
+        </div>
+
+        <!-- Hidden fields kept for compatibility -->
+        <div style="display:none"><span id="sa-team">0</span><span id="sa-items">0</span></div>
       </div>
 
       <div class="page" id="pg-studios">
@@ -1191,17 +1256,111 @@ async function getAuthHeader() {
 
 async function loadAdminOverview() {
   const authHeader = await getAuthHeader();
-  const [adminStats, r3, r4] = await Promise.all([
+
+  // Fire all data sources in parallel
+  const [adminStats, r3, r4, stripeRev, stripeOrders, analyticsData] = await Promise.all([
     fetch('/api/hub-admin-stats', { headers: { Authorization: authHeader } }).then(r=>r.json()).catch(()=>null),
     sb.from('stock_requests').select('id',{count:'exact',head:true}).eq('status','pending'),
     sb.from('stock_items').select('id',{count:'exact',head:true}),
+    fetch('/api/hub-stripe').then(r=>r.json()).catch(()=>null),
+    fetch('/api/hub-stripe?type=orders').then(r=>r.json()).catch(()=>null),
+    fetch('/api/hub-analytics').then(r=>r.json()).catch(()=>null),
   ]);
   const { count: tradeCount } = await sb.from('trade_orders').select('id',{count:'exact',head:true}).eq('status','pending');
+
+  // ── Ops stats ──────────────────────────────────────────────────────
   document.getElementById('sa-studios').textContent = adminStats?.studioCount ?? '—';
-  document.getElementById('sa-team').textContent = adminStats?.teamCount ?? '—';
   document.getElementById('sa-requests').textContent = ((r3.count||0)+(tradeCount||0))||'0';
-  document.getElementById('sa-items').textContent = r4.count??'—';
-  // Activity feed: merge stock_requests + trade_orders
+
+  // ── Stripe revenue ─────────────────────────────────────────────────
+  const fmtGBP = (pence) => '£' + (pence/100).toFixed(2).replace(/\B(?=(\d{3})+(?!\d))/g,',');
+  if (stripeRev && !stripeRev.error) {
+    document.getElementById('ov-rev30').textContent    = fmtGBP(stripeRev.revenue?.last30Days||0);
+    document.getElementById('ov-lifetime').textContent = fmtGBP(stripeRev.revenue?.lifetime||0);
+    document.getElementById('ov-balance').textContent  = fmtGBP(stripeRev.balance?.available||0);
+    document.getElementById('ov-avg-order').textContent = fmtGBP(stripeRev.revenue?.avgOrder||0);
+    const g = stripeRev.revenue?.growth;
+    const gEl = document.getElementById('ov-rev-growth');
+    if (g !== null && g !== undefined) {
+      gEl.textContent = (g>=0?'▲ +':'▼ ')+g+'% vs prev 30d';
+      gEl.style.color = g>=0 ? 'var(--green)' : 'var(--red)';
+    }
+    if (stripeRev.chart?.labels?.length) {
+      const total = stripeRev.chart.values.reduce((s,v)=>s+Number(v),0);
+      document.getElementById('ov-rev-total-chip').textContent = fmtGBP(total*100) + ' shown';
+      mkChart('ch-ov-revenue','bar',stripeRev.chart.labels,stripeRev.chart.values.map(Number));
+    }
+  }
+
+  // ── Stripe orders table (top 8) ────────────────────────────────────
+  const ordTbody = document.getElementById('ov-orders-tbody');
+  const ordStatus = document.getElementById('ov-orders-status');
+  if (stripeOrders && !stripeOrders.error && stripeOrders.orders?.length) {
+    const cnt = stripeOrders.orders.length;
+    ordStatus.textContent = cnt + ' total';
+    document.getElementById('ov-order-count').textContent = cnt;
+    ordTbody.innerHTML = stripeOrders.orders.slice(0,8).map(o => {
+      const date = new Date(o.created*1000).toLocaleDateString('en-GB',{day:'numeric',month:'short'});
+      const mainItem = o.items?.[0];
+      const itemStr = mainItem ? (mainItem.name + (o.items.length>1 ? ` +${o.items.length-1}` : '')) : '—';
+      const codeHtml = o.discount_code
+        ? `<span style="font-family:monospace;font-size:11px;background:rgba(200,255,0,.1);color:var(--accent);border:1px solid rgba(200,255,0,.2);border-radius:4px;padding:1px 6px">${o.discount_code}</span>`
+        : '<span style="color:var(--muted);font-size:12px">—</span>';
+      return `<tr style="border-bottom:1px solid var(--border)">
+        <td style="padding:10px 10px;vertical-align:middle">
+          <div style="font-weight:500;color:var(--fg);font-size:13px">${esc(o.name)}</div>
+          <div style="font-size:11px;color:var(--subtle)">${esc(o.email)}</div>
+        </td>
+        <td style="padding:10px 10px;font-size:12px;color:var(--body);max-width:160px;overflow:hidden;text-overflow:ellipsis;white-space:nowrap">${esc(o.address)}</td>
+        <td style="padding:10px 10px;font-size:12px;color:var(--body);max-width:140px;overflow:hidden;text-overflow:ellipsis;white-space:nowrap">${esc(itemStr)}</td>
+        <td style="padding:10px 10px;font-weight:600;font-size:13px;font-variant-numeric:tabular-nums">${fmtGBP(o.total)}</td>
+        <td style="padding:10px 10px">${codeHtml}</td>
+        <td style="padding:10px 10px;font-size:11px;color:var(--subtle);white-space:nowrap">${date}</td>
+      </tr>`;
+    }).join('');
+  } else {
+    ordStatus.textContent = stripeOrders?.error ? 'Stripe key needed' : '0 orders';
+    document.getElementById('ov-order-count').textContent = '0';
+    ordTbody.innerHTML = `<tr><td colspan="6" style="padding:14px 10px;color:var(--subtle);font-size:13px">${stripeOrders?.error || 'No orders yet'}</td></tr>`;
+  }
+
+  // ── Discount codes summary ─────────────────────────────────────────
+  const codesList = document.getElementById('ov-codes-list');
+  const activeCodes = (stripeOrders?.discountCodes||[]).filter(c=>c.active).slice(0,6);
+  if (activeCodes.length) {
+    codesList.innerHTML = activeCodes.map(c => `
+      <div style="display:flex;align-items:center;justify-content:space-between;padding:8px 0;border-bottom:1px solid rgba(255,255,255,.04);gap:8px">
+        <div style="display:flex;align-items:center;gap:8px;min-width:0">
+          <span style="font-family:monospace;font-size:12px;font-weight:700;color:var(--accent);flex-shrink:0">${esc(c.code)}</span>
+          <span style="font-size:11px;color:var(--subtle);overflow:hidden;text-overflow:ellipsis;white-space:nowrap">${esc(c.off)}</span>
+        </div>
+        <div style="display:flex;align-items:center;gap:10px;flex-shrink:0">
+          <div style="text-align:right">
+            <div style="font-size:13px;font-weight:700;font-variant-numeric:tabular-nums;color:var(--fg)">${c.times_redeemed}</div>
+            <div style="font-size:9px;color:var(--subtle);letter-spacing:.06em;text-transform:uppercase">uses</div>
+          </div>
+          ${c.max_redemptions ? `<div style="width:48px;height:4px;background:var(--surface2);border-radius:4px;overflow:hidden"><div style="height:100%;background:var(--accent);border-radius:4px;width:${Math.min(100,Math.round(c.times_redeemed/c.max_redemptions*100))}%"></div></div>` : ''}
+        </div>
+      </div>`).join('');
+  } else {
+    codesList.innerHTML = '<div style="color:var(--subtle);font-size:13px">No active codes</div>';
+  }
+
+  // ── Analytics visitors ─────────────────────────────────────────────
+  if (analyticsData) {
+    document.getElementById('ov-visitors').textContent = (analyticsData.pageviews?.total||0).toLocaleString();
+  }
+
+  // ── Studio growth chart ────────────────────────────────────────────
+  if (adminStats?.studioGrowth) {
+    const sg = adminStats.studioGrowth;
+    const curMonth = new Date().getMonth();
+    mkChart('ch-studios','bar',sg.labels.slice(0,curMonth+1),sg.values.slice(0,curMonth+1));
+  } else {
+    mkChart('ch-studios','bar',['Jan','Feb','Mar','Apr','May','Jun','Jul','Aug','Sep','Oct','Nov'],[0,0,0,0,0,0,0,0,0,0,0]);
+  }
+
+  // ── Activity feed ──────────────────────────────────────────────────
   const ovNames = adminStats?.studioNames || {};
   const ovStudioName = (id) => ovNames[id] || '—';
   const [{ data: recentReqs }, { data: recentTrades }] = await Promise.all([
@@ -1219,7 +1378,7 @@ async function loadAdminOverview() {
       const summary=items2.slice(0,2).map(i=>`${i.product} ×${i.qty}`).join(', ')+(items2.length>2?` +${items2.length-2} more`:'');
       return `<div style="display:flex;gap:10px;align-items:flex-start;padding:9px 0;border-bottom:1px solid rgba(255,255,255,.04)">
         <div style="width:7px;height:7px;border-radius:50%;background:${r.status==='pending'?'var(--accent)':'var(--green)'};flex-shrink:0;margin-top:5px"></div>
-        <div style="flex:1;font-size:13px;color:var(--body)"><strong style="color:var(--fg)">${esc(ovStudioName(r.studio_id))}</strong> placed trade order — ${esc(summary)} — £${(r.total_gbp||0).toFixed(2)}</div>
+        <div style="flex:1;font-size:13px;color:var(--body)"><strong style="color:var(--fg)">${esc(ovStudioName(r.studio_id))}</strong> trade order — ${esc(summary)} — £${(r.total_gbp||0).toFixed(2)}</div>
         <div style="font-size:10px;color:var(--subtle);flex-shrink:0">${timeAgo(r.created_at)}</div>
       </div>`;
     }
@@ -1229,37 +1388,58 @@ async function loadAdminOverview() {
       <div style="font-size:10px;color:var(--subtle);flex-shrink:0">${timeAgo(r.created_at)}</div>
     </div>`;
   }).join('') : '<div style="color:var(--subtle);padding:12px 0;font-size:13px">No activity yet</div>';
-  if(adminStats?.studioGrowth) {
-    const sg = adminStats.studioGrowth;
-    // Only show up to current month
-    const now = new Date();
-    const curMonth = now.getMonth();
-    mkChart('ch-studios','bar',sg.labels.slice(0,curMonth+1),sg.values.slice(0,curMonth+1));
-  } else {
-    mkChart('ch-studios','bar',['Jan','Feb','Mar','Apr','May','Jun','Jul','Aug','Sep','Oct','Nov'],[0,0,0,0,0,0,0,0,0,0,0]);
-  }
 
-  // Fetch Stripe + Analytics in parallel for overview cards
-  try {
-    const [stripeData, analyticsData] = await Promise.all([
-      fetch('/api/hub-stripe').then(r=>r.json()).catch(()=>null),
-      fetch('/api/hub-analytics').then(r=>r.json()).catch(()=>null),
-    ]);
-    if(stripeData && !stripeData.error) {
-      const cur = (stripeData.balance?.currency||'gbp').toUpperCase();
-      const fmt2 = (amt) => (cur==='GBP'?'£':'$')+(amt/100).toFixed(2).replace(/\B(?=(\d{3})+(?!\d))/g,',');
-      document.getElementById('ov-rev30').textContent = fmt2(stripeData.revenue?.last30Days||0);
-      document.getElementById('ov-lifetime').textContent = fmt2(stripeData.revenue?.lifetime||0);
-      document.getElementById('ov-balance').textContent = fmt2(stripeData.balance?.available||0);
-      const g = stripeData.revenue?.growth;
-      const gEl = document.getElementById('ov-rev-growth');
-      if(g!==null && g!==undefined) { gEl.textContent=(g>=0?'▲ +':'▼ ')+g+'% vs prev 30d'; gEl.style.color=g>=0?'var(--green)':'var(--red)'; }
-      if(stripeData.chart?.labels?.length) mkChart('ch-ov-revenue','bar',stripeData.chart.labels,stripeData.chart.values.map(Number));
-    }
-    if(analyticsData) {
-      document.getElementById('ov-visitors').textContent = (analyticsData.pageviews?.total||0).toLocaleString();
-    }
-  } catch(e) { /* overview revenue cards remain as — */ }
+  // ── AI Brief (only for Dan's account) ─────────────────────────────
+  if (ME?.email === 'info@kongtattoocareglobal.com') {
+    const brief = document.getElementById('ov-ai-brief');
+    const briefBody = document.getElementById('ov-ai-brief-body');
+    brief.style.display = 'block';
+    // Build contextual brief from real data
+    const rev30 = stripeRev?.revenue?.last30Days || 0;
+    const revGrowth = stripeRev?.revenue?.growth;
+    const txCount = stripeOrders?.stats?.totalOrders || 0;
+    const avgOrder = stripeOrders?.stats?.avgOrder || 0;
+    const topCode = activeCodes[0];
+    const visitors = analyticsData?.pageviews?.total || 0;
+    const pendingReqs = (r3.count||0)+(tradeCount||0);
+    const studios = adminStats?.studioCount || 0;
+
+    const revTrend = revGrowth === null || revGrowth === undefined
+      ? 'Revenue data is loading'
+      : revGrowth > 0
+        ? `Revenue is <strong style="color:var(--green)">up ${revGrowth}%</strong> compared to the previous 30 days`
+        : revGrowth === 0
+          ? 'Revenue is <strong>flat</strong> compared to the previous 30 days'
+          : `Revenue is <strong style="color:var(--red)">down ${Math.abs(revGrowth)}%</strong> vs last month — worth reviewing your promo activity`;
+
+    const codeInsight = topCode
+      ? `Your best-performing discount code is <strong style="color:var(--accent)">${topCode.code}</strong> with ${topCode.times_redeemed} redemptions${topCode.max_redemptions ? ` out of ${topCode.max_redemptions} allowed` : ''} — it's driving real volume.`
+      : 'No discount codes have been redeemed yet.';
+
+    const orderInsight = txCount > 0
+      ? `You have <strong>${txCount} orders</strong> on record with an average order value of <strong>${fmtGBP(avgOrder)}</strong>.`
+      : 'No orders have been recorded yet — check your Stripe key is set.';
+
+    const studioInsight = studios > 0
+      ? `<strong>${studios} studio${studios>1?'s':''}</strong> ${studios>1?'are':'is'} active on the Hub.`
+      : 'No studio accounts yet — start adding partner studios.';
+
+    const actionItems = [];
+    if (pendingReqs > 0) actionItems.push(`<strong>${pendingReqs} stock request${pendingReqs>1?'s':''} need${pendingReqs===1?'s':''} your attention</strong>`);
+    if (rev30 === 0) actionItems.push('Stripe secret key may not be set — add <code style="font-size:11px;background:rgba(255,255,255,.08);padding:1px 5px;border-radius:3px">STRIPE_SECRET_KEY</code> in Vercel');
+    if (visitors === 0) actionItems.push('Analytics not reporting — check Vercel Analytics is enabled for this project');
+
+    const now = new Date();
+    document.getElementById('ov-brief-time').textContent = now.toLocaleString('en-GB',{weekday:'short',day:'numeric',month:'short',hour:'2-digit',minute:'2-digit'});
+
+    briefBody.innerHTML = `
+      <p style="margin-bottom:10px">👋 <strong>Hi Dan</strong> — here's your KONG business snapshot for today.</p>
+      <p style="margin-bottom:8px">📈 ${revTrend}. ${orderInsight}</p>
+      <p style="margin-bottom:8px">🏷️ ${codeInsight}</p>
+      <p style="margin-bottom:${actionItems.length?'8px':'0'}">${studioInsight}${visitors > 0 ? ` Your site had <strong>${visitors.toLocaleString()} visitors</strong> in the last 30 days.` : ''}</p>
+      ${actionItems.length ? `<div style="margin-top:12px;padding:12px 14px;background:rgba(255,170,0,.07);border:1px solid rgba(255,170,0,.2);border-radius:8px;font-size:12px"><strong style="color:var(--amber)">⚡ Action needed:</strong><ul style="margin:6px 0 0 16px;display:flex;flex-direction:column;gap:4px">${actionItems.map(i=>`<li style="color:var(--body)">${i}</li>`).join('')}</ul></div>` : ''}
+    `;
+  }
 }
 
 async function loadStudios() {
