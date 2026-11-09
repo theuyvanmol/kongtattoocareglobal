@@ -1806,7 +1806,7 @@ async function loadOrders() {
   errBox.style.display = 'none';
 
   try {
-    const res = await fetch('/api/hub-orders');
+    const res = await fetch('/api/hub-stripe?type=orders');
     const data = await res.json();
     if (!res.ok || data.error) throw new Error(data.error || 'Failed to load');
 
