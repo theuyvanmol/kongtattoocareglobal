@@ -396,29 +396,51 @@ SUPABASE_SERVICE_ROLE_KEY=eyJhbGci...</code>
       <div class="page" id="pg-performance">
         <div id="perf-loading" style="color:var(--subtle);padding:16px 0;font-size:13px">Loading analytics…</div>
         <div id="perf-dash" style="display:none">
+          <!-- Top stats row -->
           <div class="stat-grid">
+            <div class="stat hi"><div class="stat-lbl">🟢 Live Visitors</div><div class="stat-val ac" id="pf-realtime">—</div></div>
             <div class="stat hi"><div class="stat-lbl">Page Views (30d)</div><div class="stat-val ac" id="pf-views">—</div></div>
-            <div class="stat"><div class="stat-lbl">Deployments</div><div class="stat-val" id="pf-deploys">—</div></div>
-            <div class="stat"><div class="stat-lbl">Last Deploy Status</div><div class="stat-val" id="pf-last-state" style="font-size:14px">—</div></div>
-            <div class="stat"><div class="stat-lbl">Data Source</div><div class="stat-val" id="pf-source" style="font-size:12px;color:var(--subtle)">—</div></div>
+            <div class="stat"><div class="stat-lbl">Active Users (30d)</div><div class="stat-val" id="pf-users">—</div></div>
+            <div class="stat"><div class="stat-lbl">Sessions (30d)</div><div class="stat-val" id="pf-sessions">—</div></div>
+            <div class="stat"><div class="stat-lbl">New Users (30d)</div><div class="stat-val" id="pf-new-users">—</div></div>
+            <div class="stat"><div class="stat-lbl">Avg Session</div><div class="stat-val" id="pf-duration">—</div></div>
+            <div class="stat"><div class="stat-lbl">Bounce Rate</div><div class="stat-val" id="pf-bounce">—</div></div>
+            <div class="stat"><div class="stat-lbl">Data Source</div><div class="stat-val" id="pf-source" style="font-size:11px;color:var(--subtle)">—</div></div>
           </div>
+          <!-- Chart -->
           <div class="card">
-            <div class="sec-hd"><div class="sec-ttl">Page Views — Last 14 Days</div><button class="btn btn-g btn-sm" onclick="loadPerformance()">↻ Refresh</button></div>
+            <div class="sec-hd"><div class="sec-ttl">Page Views — Last 30 Days</div><button class="btn btn-g btn-sm" onclick="loadPerformance()">↻ Refresh</button></div>
             <div class="chart-w"><canvas id="ch-pageviews"></canvas></div>
           </div>
-          <div class="card">
-            <div class="sec-hd"><div class="sec-ttl">Recent Deployments</div></div>
-            <div class="tw"><table><thead><tr><th>URL</th><th>Target</th><th>Status</th><th>Deployed</th></tr></thead>
-            <tbody id="pf-deploys-tbl"><tr><td colspan="4" class="empty">Loading…</td></tr></tbody></table></div>
-          </div>
-          <div class="card" style="margin-bottom:0">
-            <div class="sec-hd"><div class="sec-ttl">Core Web Vitals</div><span style="font-size:11px;color:var(--subtle)">Measured via PerformanceObserver on page load</span></div>
-            <div class="stat-grid" style="margin-bottom:0" id="cwv-grid">
-              <div class="stat"><div class="stat-lbl">LCP</div><div class="stat-val" id="cwv-lcp">—</div><div class="stat-sub">Largest Contentful Paint</div></div>
-              <div class="stat"><div class="stat-lbl">FID / INP</div><div class="stat-val" id="cwv-inp">—</div><div class="stat-sub">Interaction to Next Paint</div></div>
-              <div class="stat"><div class="stat-lbl">CLS</div><div class="stat-val" id="cwv-cls">—</div><div class="stat-sub">Cumulative Layout Shift</div></div>
-              <div class="stat"><div class="stat-lbl">TTFB</div><div class="stat-val" id="cwv-ttfb">—</div><div class="stat-sub">Time to First Byte</div></div>
+          <!-- Countries + Sources side by side -->
+          <div style="display:grid;grid-template-columns:1fr 1fr;gap:16px">
+            <div class="card" style="margin-bottom:0">
+              <div class="sec-hd"><div class="sec-ttl">Top Countries</div></div>
+              <div class="tw"><table><thead><tr><th>Country</th><th>Users</th></tr></thead>
+              <tbody id="pf-countries-tbl"><tr><td colspan="2" class="empty">Loading…</td></tr></tbody></table></div>
             </div>
+            <div class="card" style="margin-bottom:0">
+              <div class="sec-hd"><div class="sec-ttl">Traffic Sources</div></div>
+              <div class="tw"><table><thead><tr><th>Channel</th><th>Sessions</th></tr></thead>
+              <tbody id="pf-sources-tbl"><tr><td colspan="2" class="empty">Loading…</td></tr></tbody></table></div>
+            </div>
+          </div>
+          <!-- Top pages -->
+          <div class="card">
+            <div class="sec-hd"><div class="sec-ttl">Top Pages (30d)</div></div>
+            <div class="tw"><table><thead><tr><th>Page</th><th>Views</th></tr></thead>
+            <tbody id="pf-pages-tbl"><tr><td colspan="2" class="empty">Loading…</td></tr></tbody></table></div>
+          </div>
+          <!-- Setup notice (shown only when creds missing) -->
+          <div id="pf-setup-notice" style="display:none" class="card">
+            <div class="sec-ttl" style="margin-bottom:10px">⚙️ Connect Real GA4 Data</div>
+            <p style="font-size:13px;color:var(--body);line-height:1.6;margin-bottom:12px">To show real Google Analytics data, add these 3 environment variables in Vercel:</p>
+            <div style="font-family:monospace;font-size:12px;background:var(--surface2);padding:12px;border-radius:8px;line-height:2">
+              <div><span style="color:var(--accent)">GA4_PROPERTY_ID</span> = 560748934</div>
+              <div><span style="color:var(--accent)">GA4_CLIENT_EMAIL</span> = your-service-account@project.iam.gserviceaccount.com</div>
+              <div><span style="color:var(--accent)">GA4_PRIVATE_KEY</span> = -----BEGIN PRIVATE KEY-----…</div>
+            </div>
+            <p style="font-size:12px;color:var(--subtle);margin-top:10px">Go to console.cloud.google.com → Enable "Google Analytics Data API" → Create a Service Account → Download JSON key → Add the email and private_key fields above.</p>
           </div>
         </div>
       </div>
@@ -1672,6 +1694,8 @@ async function loadStripeRevenue() {
 }
 
 // ── PERFORMANCE / ANALYTICS ─────────────────────────────────────────────────────
+let perfRefreshInterval = null;
+
 async function loadPerformance() {
   const loading = document.getElementById('perf-loading');
   const dash = document.getElementById('perf-dash');
@@ -1682,21 +1706,37 @@ async function loadPerformance() {
     if(loading) loading.style.display='none';
     if(dash) dash.style.display='block';
 
-    document.getElementById('pf-views').textContent = (data.pageviews?.total||0).toLocaleString();
-    document.getElementById('pf-deploys').textContent = (data.deployments||[]).length;
-    document.getElementById('pf-source').textContent = data.source==='vercel'?'Vercel Analytics':'Sample data — add VERCEL_ACCESS_TOKEN';
+    const ov = data.overview || {};
+    const fmtDur = s => s < 60 ? `${Math.round(s)}s` : `${Math.floor(s/60)}m ${Math.round(s%60)}s`;
 
-    const lastDeploy = (data.deployments||[])[0];
-    const stateEl = document.getElementById('pf-last-state');
-    if(lastDeploy) {
-      const stMap = {READY:'✓ Ready',ERROR:'✗ Error',BUILDING:'⟳ Building',QUEUED:'◎ Queued',CANCELED:'— Canceled'};
-      stateEl.textContent = stMap[lastDeploy.state]||lastDeploy.state;
-      stateEl.style.color = lastDeploy.state==='READY'?'var(--green)':lastDeploy.state==='ERROR'?'var(--red)':'var(--amber)';
-    } else {
-      stateEl.textContent = '—';
+    // Stats
+    document.getElementById('pf-realtime').textContent = (data.realtimeUsers||0).toLocaleString();
+    document.getElementById('pf-views').textContent = (data.pageviews?.total||0).toLocaleString();
+    document.getElementById('pf-users').textContent = (ov.activeUsers||0).toLocaleString();
+    document.getElementById('pf-sessions').textContent = (ov.sessions||0).toLocaleString();
+    document.getElementById('pf-new-users').textContent = (ov.newUsers||0).toLocaleString();
+    document.getElementById('pf-duration').textContent = ov.avgSessionDuration ? fmtDur(ov.avgSessionDuration) : '—';
+    document.getElementById('pf-bounce').textContent = ov.bounceRate ? (ov.bounceRate*100).toFixed(1)+'%' : '—';
+
+    const sourceLabel = data.source==='ga4' ? '✅ Google Analytics 4' : data.source==='error' ? '⚠ GA4 error — check env vars' : '⚠ Sample data — setup required';
+    document.getElementById('pf-source').textContent = sourceLabel;
+
+    // Show setup notice if no real data
+    const notice = document.getElementById('pf-setup-notice');
+    if(notice) notice.style.display = (data.source==='ga4') ? 'none' : 'block';
+
+    // Auto-refresh realtime every 30s
+    if(perfRefreshInterval) clearInterval(perfRefreshInterval);
+    if(data.source==='ga4') {
+      perfRefreshInterval = setInterval(async () => {
+        try {
+          const r = await fetch('/api/hub-analytics').then(x=>x.json());
+          document.getElementById('pf-realtime').textContent = (r.realtimeUsers||0).toLocaleString();
+        } catch(e){}
+      }, 30000);
     }
 
-    // Chart
+    // Chart — 30 days
     const daily = data.pageviews?.daily||[];
     if(daily.length) {
       const labels = daily.map(d=>d.date);
@@ -1704,24 +1744,29 @@ async function loadPerformance() {
       mkChart('ch-pageviews','line',labels,values);
     }
 
-    // Deployments table
-    const dt = document.getElementById('pf-deploys-tbl');
-    dt.innerHTML = (data.deployments||[]).length ? data.deployments.map(d=>`
-      <tr>
-        <td class="td-n" style="font-size:11px;font-family:monospace">${esc(d.url||'—')}</td>
-        <td><span class="pill ${d.target==='production'?'pill-ok':'pill-pend'}">${esc(d.target||'preview')}</span></td>
-        <td><span class="pill ${d.state==='READY'?'pill-ok':d.state==='ERROR'?'pill-out':'pill-lo'}">${esc(d.state||'—')}</span></td>
-        <td style="font-size:11px">${d.created?timeAgo(new Date(d.created).toISOString()):'—'}</td>
-      </tr>`).join('') : `<tr><td colspan="4" class="empty">No deployment data. Add VERCEL_ACCESS_TOKEN to env vars.</td></tr>`;
+    // Countries table
+    const ct = document.getElementById('pf-countries-tbl');
+    if(ct) ct.innerHTML = (data.countries||[]).length
+      ? data.countries.map(c=>`<tr><td>${esc(c.country)}</td><td>${c.users.toLocaleString()}</td></tr>`).join('')
+      : `<tr><td colspan="2" class="empty">No data yet</td></tr>`;
+
+    // Sources table
+    const st = document.getElementById('pf-sources-tbl');
+    if(st) st.innerHTML = (data.sources||[]).length
+      ? data.sources.map(s=>`<tr><td>${esc(s.channel)}</td><td>${s.sessions.toLocaleString()}</td></tr>`).join('')
+      : `<tr><td colspan="2" class="empty">No data yet</td></tr>`;
+
+    // Top pages table
+    const pt = document.getElementById('pf-pages-tbl');
+    if(pt) pt.innerHTML = (data.pages||[]).length
+      ? data.pages.map(p=>`<tr><td style="font-family:monospace;font-size:12px">${esc(p.path)}</td><td>${p.views.toLocaleString()}</td></tr>`).join('')
+      : `<tr><td colspan="2" class="empty">No data yet</td></tr>`;
 
   } catch(e) {
     if(loading) loading.style.display='none';
     if(dash) dash.style.display='block';
-    document.getElementById('pf-deploys-tbl').innerHTML=`<tr><td colspan="4" class="empty">${esc(e.message)}</td></tr>`;
+    console.error('[KONG] loadPerformance error:', e);
   }
-
-  // ── Core Web Vitals (measured locally via PerformanceObserver) ──────────────
-  measureCWV();
 }
 
 function measureCWV() {
