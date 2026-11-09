@@ -1402,7 +1402,8 @@ async function loadAdminOverview() {
   // Get email from auth session as fallback (profile.email may be null)
   const { data: { session: ovSession } } = await sb.auth.getSession().catch(()=>({data:{session:null}}));
   const userEmail = ME?.email || ovSession?.user?.email || '';
-  if (userEmail === 'info@kongtattoocareglobal.com') {
+  const isSuperAdmin = ME?.role === 'superadmin' || userEmail === 'info@kongtattoocareglobal.com';
+  if (isSuperAdmin) {
     const brief = document.getElementById('ov-ai-brief');
     const briefBody = document.getElementById('ov-ai-brief-body');
     brief.style.display = 'block';
@@ -1446,7 +1447,7 @@ async function loadAdminOverview() {
     document.getElementById('ov-brief-time').textContent = now.toLocaleString('en-GB',{weekday:'short',day:'numeric',month:'short',hour:'2-digit',minute:'2-digit'});
 
     briefBody.innerHTML = `
-      <p style="margin-bottom:10px">👋 <strong>Hi Dan</strong> — here's your KONG business snapshot for today.</p>
+      <p style="margin-bottom:10px">👋 <strong>Hi Dan</strong> — here's your KONG business snapshot for ${new Date().toLocaleDateString('en-GB',{weekday:'long',day:'numeric',month:'long'})}.</p>
       <p style="margin-bottom:8px">📈 ${revTrend}. ${orderInsight}</p>
       <p style="margin-bottom:8px">🏷️ ${codeInsight}</p>
       <p style="margin-bottom:${actionItems.length?'8px':'0'}">${studioInsight}${visitors > 0 ? ` Your site had <strong>${visitors.toLocaleString()} visitors</strong> in the last 30 days.` : ga4Missing ? ' <span style="color:var(--subtle);font-size:12px">(Website visitor data needs GA4 setup — see action items below)</span>' : ''}</p>
