@@ -157,6 +157,85 @@ footer{background:var(--bg3);border-top:1px solid var(--rule);padding-block:80px
 .foot-soc a{font-family:'Barlow Condensed',sans-serif;font-size:11px;letter-spacing:.15em;text-transform:uppercase;color:var(--fg-40);transition:color .15s}
 .foot-soc a:hover{color:var(--lime)}
 
+/* WHY SECTION */
+.why-sec{padding-block:80px;background:var(--bg2);border-top:1px solid var(--rule);border-bottom:1px solid var(--rule)}
+.why-grid{display:flex;flex-direction:column;gap:0}
+.why-row{display:grid;grid-template-columns:1fr 1fr;align-items:stretch;border-radius:20px;overflow:hidden;border:1px solid var(--rule);margin-bottom:16px;min-height:300px}
+.why-row.flip .why-img{order:2}.why-row.flip .why-txt{order:1}
+.why-img{overflow:hidden;background:var(--bg3)}
+.why-img img{width:100%;height:100%;object-fit:cover;display:block;transition:transform .6s}
+.why-row:hover .why-img img{transform:scale(1.04)}
+.why-txt{padding:48px;display:flex;flex-direction:column;justify-content:center;gap:0;background:var(--bg3)}
+.why-eyebrow{font-family:'Barlow Condensed',sans-serif;font-weight:700;font-size:10px;letter-spacing:.26em;text-transform:uppercase;color:var(--red);margin-bottom:12px}
+.why-title{font-family:'Barlow Condensed',sans-serif;font-weight:900;font-style:italic;font-size:clamp(28px,3.5vw,44px);text-transform:uppercase;line-height:.95;margin-bottom:16px}
+.why-body{font-size:15px;line-height:1.72;color:var(--fg-70);max-width:420px;margin-bottom:24px}
+.why-feats{display:flex;flex-direction:column;gap:11px}
+.why-feat{display:flex;align-items:flex-start;gap:12px}
+.why-feat-ic{width:32px;height:32px;border-radius:8px;border:1px solid var(--rule);display:grid;place-items:center;flex-shrink:0;margin-top:1px}
+.why-feat-ic svg{width:14px;height:14px;stroke:var(--lime);fill:none;stroke-width:2;stroke-linecap:round;stroke-linejoin:round}
+.why-feat-ttl{font-family:'Barlow Condensed',sans-serif;font-weight:700;font-size:13px;letter-spacing:.06em;text-transform:uppercase;margin-bottom:2px}
+.why-feat-sub{font-size:13px;color:var(--fg-40);line-height:1.5}
+
+/* VIDEO HIGHLIGHTS */
+.vid-hl-sec{padding-block:72px;border-top:1px solid var(--rule)}
+.vid-scroll-wrap{overflow-x:auto;-webkit-overflow-scrolling:touch;scrollbar-width:none;padding-block:4px}
+.vid-scroll-wrap::-webkit-scrollbar{display:none}
+.vid-scroll-row{display:flex;gap:12px;padding-left:max(40px,env(safe-area-inset-left,0px));padding-right:max(40px,env(safe-area-inset-right,0px));width:max-content}
+.vid-hl-card{flex-shrink:0;width:200px;cursor:pointer}
+.vid-hl-thumb{position:relative;border-radius:16px;overflow:hidden;aspect-ratio:9/16;background:var(--bg2);border:1px solid var(--rule);transition:border-color .2s,transform .2s}
+.vid-hl-card:hover .vid-hl-thumb{border-color:rgba(200,255,0,.4);transform:scale(1.02)}
+.vid-hl-thumb img{width:100%;height:100%;object-fit:cover;opacity:.75;transition:opacity .2s}
+.vid-hl-card:hover .vid-hl-thumb img{opacity:.9}
+.vid-hl-play{position:absolute;inset:0;display:flex;align-items:center;justify-content:center}
+.vhp-ic{width:48px;height:48px;border-radius:50%;border:2px solid rgba(255,255,255,.75);background:rgba(10,10,10,.45);display:grid;place-items:center;transition:background .2s,border-color .2s}
+.vid-hl-card:hover .vhp-ic{background:var(--red);border-color:var(--red)}
+.vhp-ic::after{content:'';border-style:solid;border-width:9px 0 9px 15px;border-color:transparent transparent transparent #fff;margin-left:3px}
+.vid-hl-label{position:absolute;bottom:12px;left:12px;right:12px;font-family:'Barlow Condensed',sans-serif;font-weight:700;font-size:12px;letter-spacing:.08em;text-transform:uppercase;color:#fff;text-shadow:0 1px 6px rgba(0,0,0,.7)}
+
+/* UGC */
+.ugc-sec{padding-block:72px;border-top:1px solid var(--rule)}
+.ugc-grid{display:grid;grid-template-columns:repeat(5,1fr);gap:10px}
+.ugc-card{position:relative;border-radius:14px;overflow:hidden;aspect-ratio:4/5;cursor:pointer;border:1px solid var(--rule);transition:transform .2s,border-color .2s}
+.ugc-card:hover{transform:scale(1.02);border-color:rgba(200,255,0,.4)}
+.ugc-card img{width:100%;height:100%;object-fit:cover;transition:transform .4s}
+.ugc-card:hover img{transform:scale(1.06)}
+.ugc-handle{position:absolute;bottom:0;left:0;right:0;background:linear-gradient(to top,rgba(0,0,0,.8),transparent);padding:28px 12px 10px;font-family:'Barlow Condensed',sans-serif;font-weight:700;font-size:12px;letter-spacing:.06em;color:#fff}
+
+/* REVIEWS */
+.reviews-sec{padding-block:80px;border-top:1px solid var(--rule)}
+.review-summary{display:grid;grid-template-columns:auto 1fr;gap:48px;align-items:center;max-width:640px;margin:0 auto 48px;padding:32px;background:var(--bg2);border:1px solid var(--rule);border-radius:16px}
+.review-score{text-align:center}
+.review-big-stars{font-size:20px;color:#FFB700;letter-spacing:2px;margin-bottom:4px}
+.review-avg{font-family:'Barlow Condensed',sans-serif;font-weight:900;font-size:52px;line-height:1;color:var(--fg)}
+.review-bars{display:flex;flex-direction:column;gap:7px}
+.rbar-row{display:flex;align-items:center;gap:10px}
+.rbar-lbl{font-size:12px;color:var(--fg-40);width:28px;flex-shrink:0;text-align:right}
+.rbar-track{flex:1;height:6px;background:var(--fg-15);border-radius:3px;overflow:hidden}
+.rbar-fill{height:100%;background:var(--lime);border-radius:3px;transition:width .6s ease}
+.rbar-pct{font-size:12px;color:var(--fg-40);width:32px;flex-shrink:0}
+.review-grid{display:grid;grid-template-columns:repeat(3,1fr);gap:20px}
+.review-card{background:var(--bg2);border:1px solid var(--rule);border-radius:14px;overflow:hidden}
+.rev-img-wrap{aspect-ratio:16/9;overflow:hidden;background:var(--bg3)}
+.rev-img-wrap img{width:100%;height:100%;object-fit:cover;transition:transform .4s}
+.review-card:hover .rev-img-wrap img{transform:scale(1.04)}
+.rev-stars{color:#FFB700;font-size:13px;letter-spacing:1px;margin:16px 16px 4px}
+.rev-verified{font-family:'Barlow Condensed',sans-serif;font-weight:700;font-size:10px;letter-spacing:.18em;text-transform:uppercase;color:var(--lime);margin:0 16px 10px}
+.rev-body{font-size:13px;line-height:1.72;color:var(--fg-70);margin:0 16px 12px;font-style:italic}
+.rev-name{font-family:'Barlow Condensed',sans-serif;font-weight:700;font-size:11px;letter-spacing:.1em;text-transform:uppercase;color:var(--fg-40);margin:0 16px 16px}
+
+/* FAQ */
+.faq-sec{padding-block:80px;border-top:1px solid var(--rule)}
+.faq-list{max-width:760px;margin-inline:auto;display:flex;flex-direction:column;gap:0}
+.faq-item{border-bottom:1px solid var(--rule)}
+.faq-q{display:flex;align-items:center;justify-content:space-between;padding-block:18px;cursor:pointer;gap:16px;background:none;border:none;width:100%;text-align:left;font-size:16px;font-weight:400;color:var(--fg);transition:color .15s}
+.faq-q:hover{color:var(--lime)}
+.faq-ic{width:24px;height:24px;border:1.5px solid var(--rule);border-radius:50%;display:grid;place-items:center;flex-shrink:0;transition:border-color .15s,transform .25s}
+.faq-ic::after{content:'+';font-size:14px;font-weight:300;line-height:1;color:var(--fg-40);transition:transform .25s}
+.faq-item.open .faq-ic{border-color:var(--lime);transform:rotate(45deg)}
+.faq-item.open .faq-ic::after{color:var(--lime)}
+.faq-a{display:none;padding-bottom:18px;font-size:14px;line-height:1.75;color:var(--fg-70);max-width:640px}
+.faq-item.open .faq-a{display:block}
+
 /* KEYFRAMES */
 @keyframes ticker{from{transform:translateX(0)}to{transform:translateX(-50%)}}
 @keyframes inkSpread{from{transform:scale(0)}80%{transform:scale(5);opacity:1}to{transform:scale(5);opacity:0}}
@@ -177,6 +256,12 @@ footer{background:var(--bg3);border-top:1px solid var(--rule);padding-block:80px
   .gallery{position:static}
   .related-grid{grid-template-columns:repeat(2,1fr)}
   .foot-g{grid-template-columns:1fr 1fr;gap:32px}
+  .why-row{grid-template-columns:1fr}
+  .why-row .why-img{aspect-ratio:16/9}
+  .why-row.flip .why-img{order:0}.why-row.flip .why-txt{order:1}
+  .ugc-grid{grid-template-columns:repeat(3,1fr)}
+  .review-grid{grid-template-columns:1fr 1fr}
+  .review-summary{grid-template-columns:1fr;gap:24px;text-align:center}
 }
 @media(max-width:768px){
   .nav-links,.nav-cta,.theme-btn{display:none}.ham{display:flex}
@@ -187,6 +272,10 @@ footer{background:var(--bg3);border-top:1px solid var(--rule);padding-block:80px
   .trust-strip{grid-template-columns:1fr;gap:14px}
   .related-grid{grid-template-columns:repeat(2,1fr);gap:10px}
   .foot-g{grid-template-columns:1fr;gap:28px}
+  .why-txt{padding:28px}
+  .ugc-grid{grid-template-columns:repeat(2,1fr)}
+  .review-grid{grid-template-columns:1fr}
+  .vid-scroll-row{padding-left:max(16px,env(safe-area-inset-left,0px));padding-right:max(16px,env(safe-area-inset-right,0px))}
 }
 @media(prefers-reduced-motion:reduce){*{transition:none!important;animation:none!important}}
 </style>
@@ -340,6 +429,107 @@ footer{background:var(--bg3);border-top:1px solid var(--rule);padding-block:80px
   </div>
 </div>
 
+<!-- WHY KONG SECTION -->
+<section class="why-sec" aria-labelledby="why-h">
+  <div class="wrap cap">
+    <div class="lbl" style="text-align:center;margin-bottom:12px">Why KONG Tattoo Care</div>
+    <h2 class="hed" id="why-h" style="font-size:clamp(36px,5vw,72px);text-align:center;margin-bottom:64px">THE ARTIST'S CHOICE</h2>
+    <div class="why-grid" id="whyGrid"></div>
+  </div>
+</section>
+
+<!-- VIDEO HIGHLIGHTS -->
+<section class="vid-hl-sec">
+  <div class="wrap cap">
+    <div class="lbl" style="margin-bottom:10px">Real Results</div>
+    <h2 class="hed" style="font-size:clamp(32px,4vw,56px);margin-bottom:8px">LOVED BY UK ARTISTS</h2>
+    <p style="font-size:14px;color:var(--fg-40);margin-bottom:28px">See what tattoo artists and customers say about KONG</p>
+  </div>
+  <div class="vid-scroll-wrap">
+    <div class="vid-scroll-row">
+      <div class="vid-hl-card" onclick="openVid(this)" data-src="/assets/vid/vid-1.mp4">
+        <div class="vid-hl-thumb"><img src="/assets/img/real-tattoo-studio-1.jpg" alt="Artist review" loading="lazy"><div class="vid-hl-play"><div class="vhp-ic"></div></div><div class="vid-hl-label">Studio session</div></div>
+      </div>
+      <div class="vid-hl-card" onclick="openVid(this)" data-src="/assets/vid/vid-2.mp4">
+        <div class="vid-hl-thumb"><img src="/assets/img/real-tattoo-studio-2.jpg" alt="Healing results" loading="lazy"><div class="vid-hl-play"><div class="vhp-ic"></div></div><div class="vid-hl-label">Healing results</div></div>
+      </div>
+      <div class="vid-hl-card" onclick="openVid(this)" data-src="/assets/vid/vid-3.mp4">
+        <div class="vid-hl-thumb"><img src="/assets/img/real-products-studio.jpg" alt="Product range" loading="lazy"><div class="vid-hl-play"><div class="vhp-ic"></div></div><div class="vid-hl-label">Product range</div></div>
+      </div>
+      <div class="vid-hl-card" onclick="openVid(this)" data-src="/assets/vid/vid-4.mp4">
+        <div class="vid-hl-thumb"><img src="/assets/img/real-tattoo-studio-1.jpg" alt="Artist picks" loading="lazy"><div class="vid-hl-play"><div class="vhp-ic"></div></div><div class="vid-hl-label">Artist picks</div></div>
+      </div>
+      <div class="vid-hl-card" onclick="openVid(this)" data-src="/assets/vid/vid-5.mp4">
+        <div class="vid-hl-thumb"><img src="/assets/img/real-tattoo-studio-2.jpg" alt="Numb collection" loading="lazy"><div class="vid-hl-play"><div class="vhp-ic"></div></div><div class="vid-hl-label">Numb collection</div></div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- UGC COMMUNITY GRID -->
+<section class="ugc-sec wrap cap">
+  <div class="lbl" style="text-align:center;margin-bottom:12px">The Community</div>
+  <h2 class="hed" style="font-size:clamp(32px,4vw,56px);text-align:center;margin-bottom:36px">JOIN THE #KONGFAM</h2>
+  <div class="ugc-grid">
+    <div class="ugc-card"><img src="/assets/img/real-tattoo-studio-1.jpg" alt="@kongtattoocare_uk" loading="lazy"><div class="ugc-handle">@kongtattoocare_uk</div></div>
+    <div class="ugc-card"><img src="/assets/img/real-tattoo-studio-2.jpg" alt="KONG artist" loading="lazy"><div class="ugc-handle">@inkmaster_lee</div></div>
+    <div class="ugc-card"><img src="/assets/img/real-products-studio.jpg" alt="KONG products" loading="lazy"><div class="ugc-handle">@tattoosbysophie</div></div>
+    <div class="ugc-card"><img src="/assets/img/real-tattoo-studio-1.jpg" alt="Healed results" loading="lazy"><div class="ugc-handle">@freshinkuk</div></div>
+    <div class="ugc-card"><img src="/assets/img/real-tattoo-studio-2.jpg" alt="KONG fan" loading="lazy"><div class="ugc-handle">@artbyjordan_</div></div>
+  </div>
+  <p style="text-align:center;margin-top:24px;font-size:13px;color:var(--fg-40)">Tag <strong style="color:var(--lime)">#KONGFAM</strong> for a chance to be featured</p>
+</section>
+
+<!-- REVIEWS -->
+<section class="reviews-sec wrap cap" id="reviews" aria-labelledby="reviews-h">
+  <div class="lbl" style="text-align:center;margin-bottom:12px">Loved by 5,000+ customers</div>
+  <h2 class="hed" id="reviews-h" style="font-size:clamp(32px,4vw,56px);text-align:center;margin-bottom:40px">WHAT OUR CUSTOMERS SAY</h2>
+  <div class="review-summary">
+    <div class="review-score">
+      <div class="review-big-stars">&#9733;&#9733;&#9733;&#9733;&#9733;</div>
+      <div class="review-avg">4.9</div>
+      <div style="font-size:12px;color:var(--fg-40);margin-top:4px">Verified reviews</div>
+    </div>
+    <div class="review-bars">
+      <div class="rbar-row"><span class="rbar-lbl">5&#9733;</span><div class="rbar-track"><div class="rbar-fill" style="width:88%"></div></div><span class="rbar-pct">88%</span></div>
+      <div class="rbar-row"><span class="rbar-lbl">4&#9733;</span><div class="rbar-track"><div class="rbar-fill" style="width:8%"></div></div><span class="rbar-pct">8%</span></div>
+      <div class="rbar-row"><span class="rbar-lbl">3&#9733;</span><div class="rbar-track"><div class="rbar-fill" style="width:3%"></div></div><span class="rbar-pct">3%</span></div>
+      <div class="rbar-row"><span class="rbar-lbl">2&#9733;</span><div class="rbar-track"><div class="rbar-fill" style="width:1%"></div></div><span class="rbar-pct">1%</span></div>
+      <div class="rbar-row"><span class="rbar-lbl">1&#9733;</span><div class="rbar-track"><div class="rbar-fill" style="width:0%"></div></div><span class="rbar-pct">0%</span></div>
+    </div>
+  </div>
+  <div class="review-grid">
+    <div class="review-card">
+      <div class="rev-img-wrap"><img src="/assets/img/real-tattoo-studio-2.jpg" alt="Customer tattoo" loading="lazy"></div>
+      <div class="rev-stars">&#9733;&#9733;&#9733;&#9733;&#9733;</div>
+      <div class="rev-verified">Verified buyer</div>
+      <p class="rev-body">"Absolutely obsessed with KONG. My tattoos heal so much faster and cleaner now. The foam cleanser + butter combo is unreal — my artist recommended it and I'm never switching."</p>
+      <div class="rev-name">Jade M. · Manchester</div>
+    </div>
+    <div class="review-card">
+      <div class="rev-img-wrap"><img src="/assets/img/real-tattoo-studio-1.jpg" alt="Healed tattoo" loading="lazy"></div>
+      <div class="rev-stars">&#9733;&#9733;&#9733;&#9733;&#9733;</div>
+      <div class="rev-verified">Verified buyer</div>
+      <p class="rev-body">"Used this on a full sleeve. The sealant spray in the first 48 hours made such a difference — no peeling, no patchiness. Colours stayed vivid. 10/10 recommend to anyone serious about their ink."</p>
+      <div class="rev-name">Tyler B. · London</div>
+    </div>
+    <div class="review-card">
+      <div class="rev-img-wrap"><img src="/assets/img/real-products-studio.jpg" alt="KONG products" loading="lazy"></div>
+      <div class="rev-stars">&#9733;&#9733;&#9733;&#9733;&#9733;</div>
+      <div class="rev-verified">Verified buyer</div>
+      <p class="rev-body">"As a tattoo artist I now stock KONG in my studio and recommend it to every single client. The packaging looks premium, the formula is clean, and clients come back saying their heals were the best they've ever had."</p>
+      <div class="rev-name">Sophie A. · Birmingham</div>
+    </div>
+  </div>
+</section>
+
+<!-- FAQ -->
+<section class="faq-sec wrap cap" aria-labelledby="faq-h">
+  <div class="lbl" style="text-align:center;margin-bottom:12px">Got questions?</div>
+  <h2 class="hed" id="faq-h" style="font-size:clamp(32px,4vw,56px);text-align:center;margin-bottom:40px">YOUR QUESTIONS, ANSWERED</h2>
+  <div class="faq-list" id="faqList"></div>
+</section>
+
 <!-- RELATED PRODUCTS -->
 <section class="related-sec wrap cap" aria-labelledby="related-h">
   <div class="lbl">Pairs Well With</div>
@@ -406,6 +596,35 @@ footer{background:var(--bg3);border-top:1px solid var(--rule);padding-block:80px
 
 /* ── PRODUCT DATA ── */
 var PRODUCTS = {
+/* ── WHY KONG DATA (shared across all products) ── */
+var WHY_ROWS = [
+  {
+    eyebrow:'The Formula',
+    title:'Artist-developed,\nDermatologist tested.',
+    body:'Every KONG product starts in a UK tattoo studio, not a lab. Our formulas are built around what artists actually see healing — then validated by dermatologists for safety on fresh skin.',
+    img:'/assets/img/real-tattoo-studio-1.jpg',
+    feats:[
+      {icon:'check','ttl':'No parabens, no SLS','sub':'Clean ingredients that won\'t disrupt healing skin'},
+      {icon:'leaf','ttl':'Vegan & cruelty-free','sub':'Zero animal-derived ingredients, never tested on animals'},
+      {icon:'uk','ttl':'Made in the UK','sub':'Manufactured and quality-checked in British facilities'}
+    ]
+  },
+  {
+    eyebrow:'The Science',
+    title:'Formulated for\nhealing skin.',
+    body:'Fresh tattoo skin is an open wound. Generic moisturisers were never designed for it. KONG products are pH-balanced, fragrance-free, and built to support — not disrupt — your skin\'s natural repair process.',
+    img:'/assets/img/real-tattoo-studio-2.jpg',
+    flip:true,
+    feats:[
+      {icon:'ph','ttl':'pH 5.5 balanced','sub':'Matches your skin\'s natural acid mantle'},
+      {icon:'drop','ttl':'Fragrance-free','sub':'No perfumes that sensitise healing tissue'},
+      {icon:'shield','ttl':'Barrier-protecting','sub':'Locks in moisture without clogging pores'}
+    ]
+  }
+];
+
+/* ── PRODUCT DATA ── */
+var PRODUCTS = {
   'tattoo-sealant-spray': {
     name:'Tattoo Sealant Spray',collection:'Renew Collection',collTag:'renew',
     price:9.99,badge:'Bestseller',
@@ -415,7 +634,14 @@ var PRODUCTS = {
     details:'<p>The Tattoo Sealant Spray creates an invisible barrier over fresh ink to protect against bacteria, friction, and moisture loss in the critical healing window. Formulated without alcohol or harsh preservatives, it supports the skin\'s natural repair process.</p><p>Use in the first 2 days after your tattoo. Apply lightly from 10–15cm away. Do not rub — let it settle.</p>',
     ingredients:'<p>Aqua, Panthenol (Pro-Vitamin B5), Allantoin, Aloe Barbadensis Leaf Juice, Glycerin, Calendula Officinalis Extract, Phenoxyethanol, Ethylhexylglycerin.</p>',
     howTo:'<ul><li>Cleanse the area gently with clean hands or a soft cloth</li><li>Hold can 10–15cm from the tattooed area</li><li>Apply a light, even mist — do not saturate</li><li>Allow to dry naturally — do not rub or fan</li><li>Repeat 2–3 times daily for the first 48 hours</li></ul>',
-    related:['tattoo-butter-150g','foam-cleanser','numb-instant-spray','repair-serum']
+    related:['tattoo-butter-150g','foam-cleanser','numb-instant-spray','repair-serum'],
+    faq:[
+      {q:'When should I start using the Tattoo Sealant Spray?',a:'Apply within the first few hours after your session ends, once any initial bleeding has stopped. Use it for the first 48 hours, 2–3 times daily, before switching to your regular aftercare routine.'},
+      {q:'Can I use it over cling film?',a:'No — the spray is designed for open skin once the cling film phase is over. Apply after removing your wrap and cleansing the area gently.'},
+      {q:'Is it safe on sensitive skin?',a:'Yes. The formula is fragrance-free, alcohol-free, and dermatologist-tested. It\'s been specifically formulated to be safe on the compromised skin barrier of a fresh tattoo.'},
+      {q:'How long does one bottle last?',a:'One 100ml bottle typically lasts through the first week of healing for a medium-sized tattoo, applying 2–3 times daily.'},
+      {q:'Can I use this on piercings too?',a:'We recommend our dedicated Piercing Aftercare Spray for piercings — it\'s a sterile saline formula better suited to that healing environment.'}
+    ]
   },
   'repair-serum': {
     name:'Repair Serum',collection:'Renew Collection',collTag:'renew',
@@ -673,6 +899,44 @@ window.relATC=function(e,relId){
 };
 
 updateCartUI();
+
+/* ── WHY SECTION ── */
+var whyGrid=document.getElementById('whyGrid');
+WHY_ROWS.forEach(function(row){
+  var iconSvgs={
+    check:'<path d="M20 6L9 17l-5-5"/>',
+    leaf:'<path d="M2 22c0 0 4-10 15-10"/><path d="M22 2C22 2 10 2 7 15"/>',
+    uk:'<circle cx="12" cy="12" r="10"/><path d="M2 12h20M12 2a15 15 0 0 1 0 20"/>',
+    ph:'<path d="M12 2a10 10 0 1 0 0 20 10 10 0 0 0 0-20z"/><path d="M8 12h8M12 8v8"/>',
+    drop:'<path d="M12 2.69l5.66 5.66a8 8 0 1 1-11.31 0z"/>',
+    shield:'<path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10z"/>'
+  };
+  var featsHtml=row.feats.map(function(f){return '<div class="why-feat"><div class="why-feat-ic"><svg viewBox="0 0 24 24" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" fill="none" stroke="currentColor" style="color:var(--lime);width:14px;height:14px">'+iconSvgs[f.icon]+'</svg></div><div><div class="why-feat-ttl">'+f.ttl+'</div><div class="why-feat-sub">'+f.sub+'</div></div></div>'}).join('');
+  var el=document.createElement('div');el.className='why-row'+(row.flip?' flip':'');
+  el.innerHTML='<div class="why-img"><img src="'+row.img+'" alt="'+row.title.replace(/\n/,' ')+'" loading="lazy"></div><div class="why-txt"><div class="why-eyebrow">'+row.eyebrow+'</div><div class="why-title">'+row.title.replace(/\n/,'<br>')+'</div><p class="why-body">'+row.body+'</p><div class="why-feats">'+featsHtml+'</div></div>';
+  whyGrid.appendChild(el);
+});
+
+/* ── FAQ ── */
+var DEFAULT_FAQ=[
+  {q:'Is KONG Tattoo Care suitable for all skin types?',a:'Yes. All KONG formulas are dermatologist-tested and free from common sensitisers including fragrance, parabens, and SLS. They\'re suitable for sensitive skin and all skin types.'},
+  {q:'How long does delivery take?',a:'Standard UK delivery takes 2–3 working days via Royal Mail Tracked 48. Orders are dispatched within 1 business day. Next-day delivery is available at checkout for £5.99.'},
+  {q:'Can I return a product?',a:'We accept returns on unopened items within 30 days of delivery. Contact us at support@kongtattoocare.co.uk to arrange a return.'},
+  {q:'Are KONG products vegan and cruelty-free?',a:'Yes — all KONG products are 100% vegan and cruelty-free. We never use animal-derived ingredients and never test on animals.'},
+  {q:'Can I use multiple KONG products together?',a:'Absolutely. KONG products are designed to work as a complete routine. The recommended stack is: Foam Cleanser → Sealant Spray (days 1–2) → Repair Serum (days 2–28) → Tattoo Butter (ongoing).'}
+];
+var faqs=(prod.faq||[]).concat(DEFAULT_FAQ);
+var faqList=document.getElementById('faqList');
+faqs.forEach(function(item,i){
+  var div=document.createElement('div');div.className='faq-item';
+  div.innerHTML='<button class="faq-q" aria-expanded="false" id="faq-q-'+i+'"><span>'+item.q+'</span><span class="faq-ic" aria-hidden="true"></span></button><div class="faq-a" role="region" id="faq-a-'+i+'">'+item.a+'</div>';
+  div.querySelector('.faq-q').addEventListener('click',function(){
+    var open=div.classList.contains('open');
+    document.querySelectorAll('.faq-item.open').forEach(function(x){x.classList.remove('open');x.querySelector('.faq-q').setAttribute('aria-expanded','false')});
+    if(!open){div.classList.add('open');this.setAttribute('aria-expanded','true')}
+  });
+  faqList.appendChild(div);
+});
 
 /* ── THEME ── */
 var root=document.documentElement;var SK='kong-theme';
