@@ -357,7 +357,11 @@ var _cartSubtotal = 0;
 var _appliedPromo = null; // { code, percentOff, amountOff, discountPence }
 
 (function(){
-  var cart=[];try{cart=JSON.parse(localStorage.getItem('kong-cart-v2')||'[]')}catch(e){}
+  var raw=[];try{raw=JSON.parse(localStorage.getItem('kong-cart-v2')||'[]')}catch(e){}
+  // Strip any stale/corrupt entries that have no valid name or price
+  var cart=raw.filter(function(x){return x&&x.name&&x.name!=='undefined'&&x.name!=='null'&&parseFloat(x.price)>0;});
+  // Re-save cleaned cart so stale entries don't persist
+  try{localStorage.setItem('kong-cart-v2',JSON.stringify(cart));}catch(e){}
   var emptyEl=document.getElementById('empty-state');
   var contentEl=document.getElementById('checkout-content');
   if(!cart.length){emptyEl.style.display='block';contentEl.style.display='none';return;}
