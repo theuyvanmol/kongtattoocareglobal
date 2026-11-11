@@ -666,7 +666,7 @@ footer{background:var(--bg3);border-top:1px solid var(--rule);padding-block:80px
             <span id="qty" aria-live="polite" aria-label="Quantity">1</span>
             <button onclick="changeQty(1)" aria-label="Increase quantity">+</button>
           </div>
-          <button class="btn btn-red atc-main" onclick="addToCart(this)">Add to Bag — £19.99</button>
+          <button class="btn btn-red atc-main" onclick="addToCart(this)" data-name="Tattoo Butter 150g" data-price="19.99">Add to Bag — £19.99</button>
         </div>
         <button class="btn btn-lime" style="width:100%;margin-bottom:16px" onclick="buyNow()">Buy Now · Fast UK Delivery</button>
         <!-- Guarantees -->
@@ -1375,23 +1375,50 @@ function selectSize(btn){
 }
 window.selectSize=selectSize;
 
-/* ── PRODUCT: Cart ── */
-function addToCart(btn){
+/* ── CART: shared with shop-all.html and checkout.html ── */
+function getCart(){try{return JSON.parse(localStorage.getItem('kong-cart-v2')||'[]')}catch(e){return[]}}
+function saveCart(c){try{localStorage.setItem('kong-cart-v2',JSON.stringify(c))}catch(e){}}
+function updateCartUI(){
+  const c=getCart();
+  const n=c.reduce((s,x)=>s+(x.qty||0),0);
+  document.querySelectorAll('.cart-count').forEach(el=>el.textContent=n||'0');
+}
+function atcFlash(btn,color){
   const orig=btn.textContent;
   btn.textContent='Added ✓';
-  btn.style.background='var(--lime)';
+  btn.style.background=color||'var(--lime)';
   btn.style.color='#0a0a0a';
-  const count=document.querySelector('.cart-count');
-  if(count){const n=parseInt(count.textContent)||0;count.textContent=n+qty}
   setTimeout(()=>{btn.textContent=orig;btn.style.background='';btn.style.color=''},1800);
+}
+function addToCart(btn){
+  const name=btn.dataset.name||'Tattoo Butter 150g';
+  const price=parseFloat(btn.dataset.price||19.99);
+  const cart=getCart();
+  const ex=cart.find(x=>x.name===name);
+  if(ex){ex.qty=(ex.qty||1)+1}else{cart.push({name,price,qty:1})}
+  saveCart(cart);updateCartUI();atcFlash(btn,'var(--lime)');
 }
 window.addToCart=addToCart;
 
-function buyNow(){
-  // Scroll to checkout / product section in demo
-  document.getElementById('upsell').scrollIntoView({behavior:'smooth'});
-}
+// Wire upsell "+ Add" buttons
+document.querySelectorAll('.upsell-add').forEach(btn=>{
+  btn.addEventListener('click',function(){
+    const body=btn.closest('.upsell-body');
+    const name=body?.querySelector('.upsell-name')?.textContent||'Product';
+    const priceStr=body?.querySelector('.upsell-price')?.textContent||'0';
+    const price=parseFloat(priceStr.replace(/[^0-9.]/g,''))||0;
+    const cart=getCart();
+    const ex=cart.find(x=>x.name===name);
+    if(ex){ex.qty=(ex.qty||1)+1}else{cart.push({name,price,qty:1})}
+    saveCart(cart);updateCartUI();
+    const orig=btn.textContent;btn.textContent='Added ✓';
+    setTimeout(()=>btn.textContent=orig,1800);
+  });
+});
+
+function buyNow(){window.location.href='checkout.html';}
 window.buyNow=buyNow;
+updateCartUI();
 
 })();
 </script>
