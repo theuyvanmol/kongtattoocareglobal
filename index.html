@@ -527,7 +527,8 @@ footer{background:var(--bg3);border-top:1px solid var(--rule);padding-block:80px
   <a href="about.html" onclick="closeMob()">About</a>
   <a href="blog.html" onclick="closeMob()">Journal</a>
   <a href="kong-kingdom.html" onclick="closeMob()">Kingdom</a>
-  <a href="shop-all.html" onclick="closeMob()" style="color:var(--lime);font-weight:900;margin-top:16px;font-size:18px">Shop Now →</a>
+  <a href="login.html" onclick="closeMob()" style="color:var(--fg-70);margin-top:8px;font-size:18px">Login →</a>
+  <a href="checkout.html" onclick="closeMob()" style="color:var(--lime);font-weight:900;margin-top:8px;font-size:18px">Checkout →</a>
 </nav>
 
 <!-- ANN BAR -->
@@ -549,11 +550,12 @@ footer{background:var(--bg3);border-top:1px solid var(--rule);padding-block:80px
         <span id="themeIcon">☀️</span>
         <span id="themeLbl">Light</span>
       </button>
-      <a href="#product-hero" class="nav-cta">Shop Now</a>
-      <button class="cart-ic" aria-label="Open cart, 0 items">
+      <a href="login.html" class="nav-cta" style="background:transparent;border:1.5px solid var(--rule);color:var(--fg-70);padding:8px 16px">Login</a>
+      <a href="shop-all.html" class="nav-cta">Shop Now</a>
+      <a href="checkout.html" class="cart-ic" aria-label="Go to checkout">
         <svg viewBox="0 0 24 24"><path d="M6 2 3 6v14a2 2 0 0 0 2 2h14a2 2 0 0 0 2-2V6l-3-4z"/><line x1="3" y1="6" x2="21" y2="6"/><path d="M16 10a4 4 0 0 1-8 0"/></svg>
         <span class="cart-count">0</span>
-      </button>
+      </a>
       <button class="ham" id="hamBtn" aria-label="Open mobile menu" aria-expanded="false">
         <span></span><span></span><span></span>
       </button>
