@@ -440,14 +440,74 @@ footer{background:var(--bg3);border-top:1px solid var(--rule);padding-block:80px
 @media(max-width:768px){
   .nav-links,.nav-cta,.cart-ic,.theme-btn{display:none}
   .ham{display:flex}
-  .wrap{padding-left:max(20px,env(safe-area-inset-left,0px));padding-right:max(20px,env(safe-area-inset-right,0px))}
-  .rev-grid{grid-template-columns:1fr}
-  .ba-grid{grid-template-columns:1fr}
+  .wrap{padding-left:max(16px,env(safe-area-inset-left,0px));padding-right:max(16px,env(safe-area-inset-right,0px))}
+  /* Hero */
+  .hero-content{padding:120px 0 60px}
+  .hero-h{font-size:clamp(52px,15vw,88px);line-height:.92}
+  .hero-sub{font-size:14px;max-width:100%}
+  .hero-btns{flex-direction:column;gap:12px}
+  .hero-btns .btn{width:100%;text-align:center;padding:16px 24px;font-size:16px}
+  .trust-ticker{padding:10px 0;font-size:12px;gap:28px}
+  /* Product hero */
+  .prod-hero-grid{grid-template-columns:1fr;gap:28px}
+  .prod-main-img{aspect-ratio:1/1}
+  .prod-thumbs{gap:8px}
+  .thumb{width:60px;height:60px}
+  .prod-h2{font-size:clamp(44px,13vw,72px)}
+  .size-opts{flex-wrap:wrap;gap:8px}
+  .size-opt{padding:10px 16px;font-size:14px}
+  .atc-row{flex-direction:column;gap:12px}
+  .atc-row .btn{width:100%}
+  .qty-btn{width:100%;justify-content:center}
+  .guarantees{grid-template-columns:1fr 1fr;gap:12px}
+  /* Upsells */
   .upsell-grid{grid-template-columns:1fr}
+  .upsell-card{display:grid;grid-template-columns:120px 1fr;gap:0;border-radius:var(--r);overflow:hidden}
+  .upsell-img{width:120px;height:120px}
+  .upsell-img img{width:100%;height:100%;object-fit:cover}
+  .upsell-body{padding:14px}
+  .upsell-name{font-size:16px}
+  .bundle-cta{flex-direction:column;gap:16px;text-align:center}
+  /* Collections grid */
+  .coll-grid{grid-template-columns:repeat(2,1fr);gap:12px}
+  .coll-card{height:200px}
+  .coll-tabs{gap:8px;overflow-x:auto;padding-bottom:8px;justify-content:flex-start;-webkit-overflow-scrolling:touch}
+  .ctab{white-space:nowrap;flex-shrink:0;padding:8px 16px;font-size:13px}
+  /* Video */
+  .vid-grid{grid-template-columns:1fr;gap:20px}
+  .vid-side{flex-direction:row;gap:12px;overflow-x:auto;-webkit-overflow-scrolling:touch}
+  .vid-mini{flex-shrink:0;width:200px}
+  /* Before/After */
+  .ba-grid{grid-template-columns:1fr}
+  /* Gallery mosaic */
+  .gal-mosaic{grid-template-columns:repeat(2,1fr);grid-template-rows:auto;gap:8px}
+  .g1,.g2,.g3,.g4,.g5,.g6{grid-column:span 1;grid-row:span 1}
+  /* Process steps */
+  .proc-steps{grid-template-columns:1fr;gap:28px}
+  .proc-steps::before{display:none}
+  /* Stats */
+  .stats-g{grid-template-columns:repeat(2,1fr);gap:20px}
+  .stat-n{font-size:clamp(44px,12vw,64px)}
+  /* Reviews */
+  .rev-grid{grid-template-columns:1fr}
+  .rev-summary{flex-direction:column;gap:24px}
+  .rev-bars{min-width:unset;width:100%}
+  /* Artist */
+  .artist-grid{grid-template-columns:1fr;gap:28px}
+  .artist-img{aspect-ratio:4/3}
+  /* Social grid */
+  .soc-grid{grid-template-columns:repeat(2,1fr);gap:4px}
+  /* CTA */
+  .cta-h{font-size:clamp(44px,13vw,80px)}
+  .cta-btns{flex-direction:column;gap:12px;align-items:stretch}
+  .cta-btns .btn{text-align:center}
+  /* Footer */
   .foot-g{grid-template-columns:1fr;gap:28px}
-  .rev-summary{flex-direction:column;gap:28px}
-  .soc-grid{grid-template-columns:repeat(2,1fr)}
-  .cta-h{font-size:clamp(48px,14vw,80px)}
+  .foot-links{flex-direction:column;gap:8px}
+  /* Section headings */
+  .hed{font-size:clamp(44px,12vw,80px)}
+  /* Ann bar */
+  .ann-inner{font-size:12px;gap:16px}
 }
 @media(prefers-reduced-motion:reduce){
   *{transition:none!important;animation:none!important}
@@ -461,11 +521,13 @@ footer{background:var(--bg3);border-top:1px solid var(--rule);padding-block:80px
 <!-- MOBILE NAV -->
 <nav id="mob" aria-label="Mobile navigation">
   <button id="mob-x" aria-label="Close navigation">✕</button>
-  <a href="#shop-nav" onclick="closeMob()">Shop</a>
+  <a href="/" onclick="closeMob()" class="mob-active">Home</a>
+  <a href="shop-all.html" onclick="closeMob()">Shop</a>
   <a href="#collections" onclick="closeMob()">Collections</a>
-  <a href="#video-sec" onclick="closeMob()">Stories</a>
-  <a href="#reviews" onclick="closeMob()">Reviews</a>
-  <a href="#product-hero" onclick="closeMob()" style="color:var(--red);margin-top:12px">Shop Now →</a>
+  <a href="about.html" onclick="closeMob()">About</a>
+  <a href="blog.html" onclick="closeMob()">Journal</a>
+  <a href="kong-kingdom.html" onclick="closeMob()">Kingdom</a>
+  <a href="shop-all.html" onclick="closeMob()" style="color:var(--lime);font-weight:900;margin-top:16px;font-size:18px">Shop Now →</a>
 </nav>
 
 <!-- ANN BAR -->
@@ -474,13 +536,13 @@ footer{background:var(--bg3);border-top:1px solid var(--rule);padding-block:80px
 <!-- NAV -->
 <nav id="nav" aria-label="Main navigation">
   <div class="nav-in wrap cap">
-    <a href="#" class="logo" aria-label="KONG Tattoo Care UK home">KONG <span class="logo-uk">UK</span></a>
+    <a href="/" class="logo" aria-label="KONG Tattoo Care UK home"><img src="/assets/img/img-home-1.webp" alt="KONG Tattoo Care" style="height:32px;width:auto;object-fit:contain;vertical-align:middle" onerror="this.replaceWith(document.createTextNode('KONG'))"></a>
     <ul class="nav-links" role="list">
-      <li><a href="#shop-nav">Shop</a></li>
-      <li><a href="#collections">Collections</a></li>
-      <li><a href="#video-sec">Stories</a></li>
-      <li><a href="#reviews">Reviews</a></li>
-      <li><a href="#artist">Artists</a></li>
+      <li><a href="shop-all.html">Shop</a></li>
+      <li><a href="#collections" class="active-link">Collections</a></li>
+      <li><a href="about.html">About</a></li>
+      <li><a href="blog.html">Journal</a></li>
+      <li><a href="kong-kingdom.html">Kingdom</a></li>
     </ul>
     <div class="nav-acts">
       <button class="theme-btn" aria-label="Toggle colour theme" id="themeBtn">
@@ -502,7 +564,7 @@ footer{background:var(--bg3);border-top:1px solid var(--rule);padding-block:80px
 <!-- HERO -->
 <section id="hero" aria-label="Hero — Made for your art">
   <div class="hero-bg" aria-hidden="true">
-    <img id="heroBg" src="/assets/img/img-home-22.webp" alt="" loading="eager" fetchpriority="high">
+    <img id="heroBg" src="/assets/img/real-hero-gym.png" alt="" loading="eager" fetchpriority="high" style="object-position:center center">
   </div>
   <div class="hero-veil" aria-hidden="true"></div>
   <div class="hero-body wrap cap">
@@ -571,14 +633,14 @@ footer{background:var(--bg3);border-top:1px solid var(--rule);padding-block:80px
           <button class="thumb active" onclick="switchImg(this,'/assets/img/img-product-6.webp')" aria-label="Product image 1">
             <img src="/assets/img/img-product-6.webp" alt="KONG Tattoo Butter view 1">
           </button>
-          <button class="thumb" onclick="switchImg(this,'/assets/img/img-product-1.webp')" aria-label="Product image 2">
-            <img src="/assets/img/img-product-1.webp" alt="KONG Tattoo Butter view 2">
+          <button class="thumb" onclick="switchImg(this,'/assets/img/img-product-5.webp')" aria-label="Product image 2">
+            <img src="/assets/img/img-product-5.webp" alt="KONG Tattoo Butter view 2">
           </button>
-          <button class="thumb" onclick="switchImg(this,'/assets/img/img-product-5.webp')" aria-label="Product image 3">
-            <img src="/assets/img/img-product-5.webp" alt="KONG Tattoo Butter view 3">
+          <button class="thumb" onclick="switchImg(this,'/assets/img/img-shop-13.webp')" aria-label="Product image 3">
+            <img src="/assets/img/img-shop-13.webp" alt="KONG Tattoo Butter view 3">
           </button>
-          <button class="thumb" onclick="switchImg(this,'/assets/img/img-product-3.webp')" aria-label="Product image 4">
-            <img src="/assets/img/img-product-3.webp" alt="KONG Tattoo Butter view 4">
+          <button class="thumb" onclick="switchImg(this,'/assets/img/real-products-studio.jpg')" aria-label="Product image 4">
+            <img src="/assets/img/real-products-studio.jpg" alt="KONG Tattoo Butter view 4">
           </button>
         </div>
       </div>
@@ -658,7 +720,7 @@ footer{background:var(--bg3);border-top:1px solid var(--rule);padding-block:80px
       <div class="upsell-card featured" data-reveal data-d="1">
         <div class="upsell-badge">Most Popular</div>
         <div class="upsell-img">
-          <img src="/assets/img/img-product-4.webp" alt="KONG Foam Cleanser — Renew Collection">
+          <img src="/assets/img/img-shop-8.webp" alt="KONG Foam Cleanser — Renew Collection">
         </div>
         <div class="upsell-body">
           <div class="upsell-coll">Renew Collection</div>
@@ -672,7 +734,7 @@ footer{background:var(--bg3);border-top:1px solid var(--rule);padding-block:80px
       </div>
       <div class="upsell-card" data-reveal data-d="2">
         <div class="upsell-img">
-          <img src="/assets/img/img-product-11.webp" alt="KONG Numb Cream — Numb Collection">
+          <img src="/assets/img/img-shop-9.webp" alt="KONG Numb Cream — Numb Collection">
         </div>
         <div class="upsell-body">
           <div class="upsell-coll">Numb Collection</div>
@@ -686,7 +748,7 @@ footer{background:var(--bg3);border-top:1px solid var(--rule);padding-block:80px
       </div>
       <div class="upsell-card" data-reveal data-d="3">
         <div class="upsell-img">
-          <img src="/assets/img/img-product-14.webp" alt="KONG Glow Serum — Glow Collection">
+          <img src="/assets/img/img-shop-7.webp" alt="KONG Glow Serum — Glow Collection">
         </div>
         <div class="upsell-body">
           <div class="upsell-coll">Glow Collection</div>
@@ -731,7 +793,7 @@ footer{background:var(--bg3);border-top:1px solid var(--rule);padding-block:80px
         <div class="coll-line" aria-hidden="true"></div>
       </div>
       <div class="coll-card" data-reveal data-d="2" tabindex="0" role="link" aria-label="Renew collection — healing and repair">
-        <img src="/assets/img/img-shop-11.webp" alt="Renew Collection — KONG Tattoo Care UK">
+        <img src="/assets/img/img-shop-10.webp" alt="Renew Collection — KONG Tattoo Care UK">
         <div class="coll-veil" aria-hidden="true"></div>
         <div class="coll-info">
           <div class="coll-name">Renew</div>
@@ -740,7 +802,7 @@ footer{background:var(--bg3);border-top:1px solid var(--rule);padding-block:80px
         <div class="coll-line" aria-hidden="true"></div>
       </div>
       <div class="coll-card" data-reveal data-d="3" tabindex="0" role="link" aria-label="Glow collection — vibrance and brightness">
-        <img src="/assets/img/img-shop-12.webp" alt="Glow Collection — KONG Tattoo Care UK">
+        <img src="/assets/img/img-shop-4.webp" alt="Glow Collection — KONG Tattoo Care UK">
         <div class="coll-veil" aria-hidden="true"></div>
         <div class="coll-info">
           <div class="coll-name">Glow</div>
@@ -749,7 +811,7 @@ footer{background:var(--bg3);border-top:1px solid var(--rule);padding-block:80px
         <div class="coll-line" aria-hidden="true"></div>
       </div>
       <div class="coll-card" data-reveal data-d="4" tabindex="0" role="link" aria-label="Defend collection — SPF and protection">
-        <img src="/assets/img/img-shop-13.webp" alt="Defend Collection — KONG Tattoo Care UK">
+        <img src="/assets/img/img-shop-6.webp" alt="Defend Collection — KONG Tattoo Care UK">
         <div class="coll-veil" aria-hidden="true"></div>
         <div class="coll-info">
           <div class="coll-name">Defend</div>
@@ -778,31 +840,29 @@ footer{background:var(--bg3);border-top:1px solid var(--rule);padding-block:80px
       <h2 class="hed" id="vid-h" style="font-size:clamp(44px,6vw,88px);margin-top:10px">SEE IT IN <em style="color:var(--red)">ACTION</em></h2>
     </div>
     <div class="vid-grid">
-      <div class="vid-main" data-reveal="left" aria-label="Watch: The Renew Routine" role="button" tabindex="0">
+      <div class="vid-main" data-reveal="left">
         <div class="vid-main-frame">
-          <img src="/assets/img/img-home-27.webp" alt="KONG Tattoo Care — Renew Routine video thumbnail">
-          <div class="play-btn" aria-hidden="true"><div class="play-ic"></div></div>
+          <video src="/assets/video/kong-video-1.mp4" controls playsinline preload="metadata" poster="/assets/img/real-tattoo-studio-1.jpg" style="width:100%;height:100%;object-fit:cover;border-radius:var(--r);display:block"></video>
         </div>
-        <div class="vid-label">The Renew Routine — 24hr Aftercare Guide</div>
+        <div class="vid-label">KONG Tattoo Care — Studio Session</div>
       </div>
       <div class="vid-side">
         <div class="vid-mini" data-reveal="right" data-d="1" role="button" tabindex="0" aria-label="Watch: Numb Collection explained">
           <div class="vid-mini-frame">
-            <img src="/assets/img/img-home-14.webp" alt="Numb collection video">
+            <img src="/assets/img/real-tattoo-studio-2.jpg" alt="KONG studio session">
           </div>
           <div class="vid-mini-play" aria-hidden="true"><div class="vid-mini-ic"></div></div>
           <div class="vid-mini-lbl">Numb — How It Works</div>
         </div>
-        <div class="vid-mini" data-reveal="right" data-d="2" role="button" tabindex="0" aria-label="Watch: Glow Serum results">
-          <div class="vid-mini-frame">
-            <img src="/assets/img/img-home-15.webp" alt="Glow collection video">
+        <div class="vid-mini" data-reveal="right" data-d="2">
+          <div class="vid-mini-frame" style="position:relative;overflow:hidden;border-radius:var(--r)">
+            <video src="/assets/video/kong-video-2.mp4" controls playsinline preload="metadata" poster="/assets/img/real-products-studio.jpg" style="width:100%;height:100%;object-fit:cover;display:block"></video>
           </div>
-          <div class="vid-mini-play" aria-hidden="true"><div class="vid-mini-ic"></div></div>
-          <div class="vid-mini-lbl">Glow — 6-Week Results</div>
+          <div class="vid-mini-lbl">Defend Your Ink — Studio Clip</div>
         </div>
         <div class="vid-mini" data-reveal="right" data-d="3" role="button" tabindex="0" aria-label="Watch: Expert collection studio session">
           <div class="vid-mini-frame">
-            <img src="/assets/img/img-home-16.webp" alt="Expert collection studio session video">
+            <img src="/assets/img/real-tattoo-studio-1.jpg" alt="KONG studio">
           </div>
           <div class="vid-mini-play" aria-hidden="true"><div class="vid-mini-ic"></div></div>
           <div class="vid-mini-lbl">Expert — Studio Session</div>
@@ -822,8 +882,8 @@ footer{background:var(--bg3);border-top:1px solid var(--rule);padding-block:80px
     <div class="ba-grid" style="margin-top:48px">
       <div class="ba-card" data-reveal data-d="1">
         <div class="ba-imgs">
-          <img src="/assets/img/img-home-23.webp" alt="Before using KONG Renew">
-          <img src="/assets/img/img-home-3.webp" alt="After using KONG Renew">
+          <img src="/assets/img/real-tattoo-studio-1.jpg" alt="Before using KONG Renew">
+          <img src="/assets/img/real-tattoo-studio-2.jpg" alt="After using KONG Renew">
         </div>
         <div class="ba-divider" aria-hidden="true"></div>
         <div class="ba-label-l" aria-hidden="true">Before</div>
@@ -835,8 +895,8 @@ footer{background:var(--bg3);border-top:1px solid var(--rule);padding-block:80px
       </div>
       <div class="ba-card" data-reveal data-d="2">
         <div class="ba-imgs">
-          <img src="/assets/img/img-home-24.webp" alt="Before using KONG Glow">
-          <img src="/assets/img/img-home-25.webp" alt="After using KONG Glow">
+          <img src="/assets/img/real-products-studio.jpg" alt="Before using KONG Glow">
+          <img src="/assets/img/img-shop-13.webp" alt="After using KONG Glow">
         </div>
         <div class="ba-divider" aria-hidden="true"></div>
         <div class="ba-label-l" aria-hidden="true">Before</div>
@@ -883,7 +943,7 @@ footer{background:var(--bg3);border-top:1px solid var(--rule);padding-block:80px
         <div class="gal-ov" aria-hidden="true"><span class="gal-ov-ic">View →</span></div>
       </div>
       <div class="gal-item g3" data-reveal data-d="2" role="listitem" tabindex="0" aria-label="Community tattoo photo 3">
-        <img src="/assets/img/img-home-10.webp" alt="KONG Tattoo Care community — coloured tattoo">
+        <img src="/assets/img/real-barbell-kong.png" alt="KONG Tattoo Care — Training">
         <div class="gal-ov" aria-hidden="true"><span class="gal-ov-ic">View →</span></div>
       </div>
       <div class="gal-item g4" data-reveal data-d="3" role="listitem" tabindex="0" aria-label="Community tattoo photo 4">
@@ -891,7 +951,7 @@ footer{background:var(--bg3);border-top:1px solid var(--rule);padding-block:80px
         <div class="gal-ov" aria-hidden="true"><span class="gal-ov-ic">View →</span></div>
       </div>
       <div class="gal-item g5" data-reveal data-d="4" role="listitem" tabindex="0" aria-label="Community tattoo photo 5">
-        <img src="/assets/img/img-home-9.webp" alt="KONG Tattoo Care community — healed geometric tattoo">
+        <img src="/assets/img/real-defend-your-ink.jpg" alt="KONG Defend Your Ink">
         <div class="gal-ov" aria-hidden="true"><span class="gal-ov-ic">View →</span></div>
       </div>
       <div class="gal-item g6" data-reveal data-d="5" role="listitem" tabindex="0" aria-label="Community tattoo photo 6">
@@ -1079,27 +1139,27 @@ footer{background:var(--bg3);border-top:1px solid var(--rule);padding-block:80px
     </div>
     <div class="soc-grid" role="list" aria-label="Instagram feed">
       <div class="soc-item" data-reveal data-d="1" role="listitem" tabindex="0" aria-label="Instagram post 1">
-        <img src="/assets/img/img-home-7.webp" alt="KONG Tattoo Care UK Instagram — KONG product">
+        <img src="/assets/img/real-boxing-kong.png" alt="KONG Tattoo Care UK — boxing">
         <div class="soc-ov" aria-hidden="true"><span class="soc-ic">♥</span></div>
       </div>
       <div class="soc-item" data-reveal data-d="2" role="listitem" tabindex="0" aria-label="Instagram post 2">
-        <img src="/assets/img/img-home-8.webp" alt="KONG Tattoo Care UK Instagram — colourful">
+        <img src="/assets/img/real-barbell-kong.png" alt="KONG Tattoo Care UK — strength">
         <div class="soc-ov" aria-hidden="true"><span class="soc-ic">♥</span></div>
       </div>
       <div class="soc-item" data-reveal data-d="3" role="listitem" tabindex="0" aria-label="Instagram post 3">
-        <img src="/assets/img/img-home-9.webp" alt="KONG Tattoo Care UK Instagram — product flat lay">
+        <img src="/assets/img/real-defend-your-ink.jpg" alt="KONG Tattoo Care UK — Defend Your Ink">
         <div class="soc-ov" aria-hidden="true"><span class="soc-ic">♥</span></div>
       </div>
       <div class="soc-item" data-reveal data-d="4" role="listitem" tabindex="0" aria-label="Instagram post 4">
-        <img src="/assets/img/img-home-10.webp" alt="KONG Tattoo Care UK Instagram — studio session">
+        <img src="/assets/img/real-tattoo-studio-1.jpg" alt="KONG Tattoo Care UK — studio session">
         <div class="soc-ov" aria-hidden="true"><span class="soc-ic">♥</span></div>
       </div>
       <div class="soc-item" data-reveal data-d="5" role="listitem" tabindex="0" aria-label="Instagram post 5">
-        <img src="/assets/img/img-home-11.webp" alt="KONG Tattoo Care UK Instagram — healed back piece">
+        <img src="/assets/img/real-tattoo-studio-2.jpg" alt="KONG Tattoo Care UK — studio">
         <div class="soc-ov" aria-hidden="true"><span class="soc-ic">♥</span></div>
       </div>
       <div class="soc-item" data-reveal data-d="6" role="listitem" tabindex="0" aria-label="Instagram post 6">
-        <img src="/assets/img/img-home-12.webp" alt="KONG Tattoo Care UK Instagram — KONG products">
+        <img src="/assets/img/real-products-studio.jpg" alt="KONG Tattoo Care UK — products in studio">
         <div class="soc-ov" aria-hidden="true"><span class="soc-ic">♥</span></div>
       </div>
     </div>
@@ -1108,7 +1168,7 @@ footer{background:var(--bg3);border-top:1px solid var(--rule);padding-block:80px
 
 <!-- FINAL CTA -->
 <section id="cta-fin" aria-labelledby="cta-h">
-  <div class="cta-bg" aria-hidden="true"><img src="/assets/img/img-home-17.webp" alt=""></div>
+  <div class="cta-bg" aria-hidden="true"><img src="/assets/img/real-hero-gym.png" alt=""></div>
   <div class="cta-veil" aria-hidden="true"></div>
   <div class="cta-body wrap cap">
     <div class="lbl" data-reveal>Start Your Routine</div>
