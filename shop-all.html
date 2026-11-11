@@ -194,7 +194,7 @@ footer{background:var(--bg3);border-top:1px solid var(--rule);padding-block:80px
   <a href="checkout.html" style="color:var(--lime);font-weight:900;margin-top:8px;font-size:18px">Checkout →</a>
 </nav>
 
-<div id="ann">🇬🇧 Free UK delivery over £35 &nbsp;·&nbsp; Use code <strong>KONG10</strong> for 10% off your first order &nbsp;·&nbsp; Artist-developed · Dermatologist-tested</div>
+<div id="ann">Free UK delivery over £35 &nbsp;·&nbsp; Use code <strong>KONG10</strong> for 10% off your first order &nbsp;·&nbsp; Artist-developed · Dermatologist-tested</div>
 
 <nav id="nav" aria-label="Main navigation">
   <div class="nav-in wrap cap">
@@ -209,7 +209,7 @@ footer{background:var(--bg3);border-top:1px solid var(--rule);padding-block:80px
       <li><a href="kong-kingdom.html">Kingdom</a></li>
     </ul>
     <div class="nav-acts">
-      <button class="theme-btn" aria-label="Toggle colour theme" id="themeBtn"><span id="themeIcon">☀️</span><span id="themeLbl">Light</span></button>
+      <button class="theme-btn" aria-label="Toggle colour theme" id="themeBtn"><span id="themeIcon"></span><span id="themeLbl">Light</span></button>
       <a href="login.html" class="nav-cta" style="background:transparent;border:1.5px solid var(--rule);color:var(--fg-70);padding:8px 16px">Login</a>
       <a href="shop-all.html" class="nav-cta">Shop Now</a>
       <a href="checkout.html" class="cart-ic" aria-label="Go to checkout">
@@ -288,7 +288,7 @@ footer{background:var(--bg3);border-top:1px solid var(--rule);padding-block:80px
     <div class="prod-grid" id="prodGrid" role="list">
 
       <!-- RENEW COLLECTION -->
-      <article class="prod-card" data-reveal data-d="1" data-coll="renew" data-price="9.99" role="listitem" data-name="Tattoo Sealant Spray" data-price="9.99">
+      <article class="prod-card" data-reveal data-d="1" data-coll="renew" data-price="9.99" role="listitem" data-name="Tattoo Sealant Spray" onclick="if(!event.target.closest('button'))location.href='product.html?id=tattoo-sealant-spray'" style="cursor:pointer" data-price="9.99">
         <div class="prod-card-img">
           <img src="/assets/img/img-shop-2.webp" alt="KONG Tattoo Sealant Spray — lightweight fresh tattoo protection" loading="lazy">
           <div class="prod-card-badge">Bestseller</div>
@@ -296,7 +296,7 @@ footer{background:var(--bg3);border-top:1px solid var(--rule);padding-block:80px
         <div class="prod-card-body">
           <div class="prod-card-coll">Renew · Step 01</div>
           <div class="prod-card-stars">★★★★★</div>
-          <div class="prod-card-name">Tattoo Sealant Spray</div>
+          <a href="product.html?id=tattoo-sealant-spray" class="prod-card-name" style="text-decoration:none;color:inherit;display:block">Tattoo Sealant Spray</a>
           <div class="prod-card-desc">Lightweight protection and comfort for fresh tattoos.</div>
           <div class="prod-card-foot">
             <div><div class="prod-card-price">£9.99</div></div>
@@ -305,7 +305,7 @@ footer{background:var(--bg3);border-top:1px solid var(--rule);padding-block:80px
         </div>
       </article>
 
-      <article class="prod-card" data-reveal data-d="2" data-coll="renew" data-price="12.99" role="listitem" data-name="Repair Serum" data-price="12.99">
+      <article class="prod-card" data-reveal data-d="2" data-coll="renew" data-price="12.99" role="listitem" data-name="Repair Serum" onclick="if(!event.target.closest('button'))location.href='product.html?id=repair-serum'" style="cursor:pointer" data-price="12.99">
         <div class="prod-card-img">
           <img src="/assets/img/img-shop-6.webp" alt="KONG Repair Serum — targeted hydration post-tattoo" loading="lazy">
           <div class="prod-card-badge">New arrival</div>
@@ -313,7 +313,7 @@ footer{background:var(--bg3);border-top:1px solid var(--rule);padding-block:80px
         <div class="prod-card-body">
           <div class="prod-card-coll">Renew · Step 02</div>
           <div class="prod-card-stars">★★★★★</div>
-          <div class="prod-card-name">Repair Serum</div>
+          <a href="product.html?id=repair-serum" class="prod-card-name" style="text-decoration:none;color:inherit;display:block">Repair Serum</a>
           <div class="prod-card-desc">Lightweight targeted hydration and post-tattoo support.</div>
           <div class="prod-card-foot">
             <div><div class="prod-card-price">£12.99</div></div>
@@ -322,14 +322,14 @@ footer{background:var(--bg3);border-top:1px solid var(--rule);padding-block:80px
         </div>
       </article>
 
-      <article class="prod-card" data-reveal data-d="3" data-coll="renew" data-price="19.99" role="listitem" data-name="Tattoo Butter 150g" data-price="19.99">
+      <article class="prod-card" data-reveal data-d="3" data-coll="renew" data-price="19.99" role="listitem" data-name="Tattoo Butter 150g" onclick="if(!event.target.closest('button'))location.href='product.html?id=tattoo-butter-150g'" style="cursor:pointer" data-price="19.99">
         <div class="prod-card-img">
           <img src="/assets/img/img-shop-13.webp" alt="KONG Tattoo Butter 150g — deep conditioning healing butter" loading="lazy">
         </div>
         <div class="prod-card-body">
           <div class="prod-card-coll">Renew · Step 03</div>
           <div class="prod-card-stars">★★★★★</div>
-          <div class="prod-card-name">Tattoo Butter 150g</div>
+          <a href="product.html?id=tattoo-butter-150g" class="prod-card-name" style="text-decoration:none;color:inherit;display:block">Tattoo Butter 150g</a>
           <div class="prod-card-desc">Deep-conditioning healing butter. Locks in moisture, keeps colour vivid.</div>
           <div class="prod-card-foot">
             <div><div class="prod-card-price">£19.99</div></div>
@@ -338,14 +338,14 @@ footer{background:var(--bg3);border-top:1px solid var(--rule);padding-block:80px
         </div>
       </article>
 
-      <article class="prod-card" data-reveal data-d="4" data-coll="renew" data-price="9.99" role="listitem" data-name="Relief Cream 30g" data-price="9.99">
+      <article class="prod-card" data-reveal data-d="4" data-coll="renew" data-price="9.99" role="listitem" data-name="Relief Cream 30g" onclick="if(!event.target.closest('button'))location.href='product.html?id=relief-cream-30g'" style="cursor:pointer" data-price="9.99">
         <div class="prod-card-img">
           <img src="/assets/img/img-shop-14.webp" alt="KONG Relief Cream 30g — soothing tattoo relief" loading="lazy">
         </div>
         <div class="prod-card-body">
           <div class="prod-card-coll">Renew · Step 02</div>
           <div class="prod-card-stars">★★★★★</div>
-          <div class="prod-card-name">Relief Cream 30g</div>
+          <a href="product.html?id=relief-cream-30g" class="prod-card-name" style="text-decoration:none;color:inherit;display:block">Relief Cream 30g</a>
           <div class="prod-card-desc">Calms redness and irritation. Advanced repair formula with panthenol and aloe.</div>
           <div class="prod-card-foot">
             <div><div class="prod-card-price">£9.99</div></div>
@@ -355,14 +355,14 @@ footer{background:var(--bg3);border-top:1px solid var(--rule);padding-block:80px
       </article>
 
       <!-- GLOW COLLECTION -->
-      <article class="prod-card" data-reveal data-d="1" data-coll="glow" data-price="9.99" role="listitem" data-name="Foam Cleanser" data-price="9.99">
+      <article class="prod-card" data-reveal data-d="1" data-coll="glow" data-price="9.99" role="listitem" data-name="Foam Cleanser" onclick="if(!event.target.closest('button'))location.href='product.html?id=foam-cleanser'" style="cursor:pointer" data-price="9.99">
         <div class="prod-card-img">
           <img src="/assets/img/img-shop-8.webp" alt="KONG Foam Cleanser — pH-balanced tattoo cleanser" loading="lazy">
         </div>
         <div class="prod-card-body">
           <div class="prod-card-coll">Glow · Step 01</div>
           <div class="prod-card-stars">★★★★★</div>
-          <div class="prod-card-name">Foam Cleanser</div>
+          <a href="product.html?id=foam-cleanser" class="prod-card-name" style="text-decoration:none;color:inherit;display:block">Foam Cleanser</a>
           <div class="prod-card-desc">pH-balanced formula. Removes bacteria, oils and plasma from fresh ink.</div>
           <div class="prod-card-foot">
             <div><div class="prod-card-price">£9.99</div></div>
@@ -371,14 +371,14 @@ footer{background:var(--bg3);border-top:1px solid var(--rule);padding-block:80px
         </div>
       </article>
 
-      <article class="prod-card" data-reveal data-d="2" data-coll="glow" data-price="12.99" role="listitem" data-name="Tattoo Care Stick" data-price="12.99">
+      <article class="prod-card" data-reveal data-d="2" data-coll="glow" data-price="12.99" role="listitem" data-name="Tattoo Care Stick" onclick="if(!event.target.closest('button'))location.href='product.html?id=tattoo-care-stick'" style="cursor:pointer" data-price="12.99">
         <div class="prod-card-img">
           <img src="/assets/img/img-shop-7.webp" alt="KONG Tattoo Care Stick — on-the-go moisturising stick" loading="lazy">
         </div>
         <div class="prod-card-body">
           <div class="prod-card-coll">Glow · Step 02</div>
           <div class="prod-card-stars">★★★★★</div>
-          <div class="prod-card-name">Tattoo Care Stick</div>
+          <a href="product.html?id=tattoo-care-stick" class="prod-card-name" style="text-decoration:none;color:inherit;display:block">Tattoo Care Stick</a>
           <div class="prod-card-desc">On-the-go moisturising stick. Easy application, mess-free healing support.</div>
           <div class="prod-card-foot">
             <div><div class="prod-card-price">£12.99</div></div>
@@ -387,14 +387,14 @@ footer{background:var(--bg3);border-top:1px solid var(--rule);padding-block:80px
         </div>
       </article>
 
-      <article class="prod-card" data-reveal data-d="3" data-coll="glow" data-price="9.99" role="listitem" data-name="Tattoo Balm 50g" data-price="9.99">
+      <article class="prod-card" data-reveal data-d="3" data-coll="glow" data-price="9.99" role="listitem" data-name="Tattoo Balm 50g" onclick="if(!event.target.closest('button'))location.href='product.html?id=tattoo-balm-50g'" style="cursor:pointer" data-price="9.99">
         <div class="prod-card-img">
           <img src="/assets/img/img-shop-12.webp" alt="KONG Tattoo Balm 50g — soothing aftercare balm" loading="lazy">
         </div>
         <div class="prod-card-body">
           <div class="prod-card-coll">Glow · Step 03</div>
           <div class="prod-card-stars">★★★★★</div>
-          <div class="prod-card-name">Tattoo Balm 50g</div>
+          <a href="product.html?id=tattoo-balm-50g" class="prod-card-name" style="text-decoration:none;color:inherit;display:block">Tattoo Balm 50g</a>
           <div class="prod-card-desc">Soothing aftercare balm. Calms irritation and locks in colour throughout healing.</div>
           <div class="prod-card-foot">
             <div><div class="prod-card-price">£9.99</div></div>
@@ -403,14 +403,14 @@ footer{background:var(--bg3);border-top:1px solid var(--rule);padding-block:80px
         </div>
       </article>
 
-      <article class="prod-card" data-reveal data-d="4" data-coll="glow" data-price="5.99" role="listitem" data-name="Tattoo Balm 10g" data-price="5.99">
+      <article class="prod-card" data-reveal data-d="4" data-coll="glow" data-price="5.99" role="listitem" data-name="Tattoo Balm 10g" onclick="if(!event.target.closest('button'))location.href='product.html?id=tattoo-balm-10g'" style="cursor:pointer" data-price="5.99">
         <div class="prod-card-img">
           <img src="/assets/img/img-shop-15.webp" alt="KONG Tattoo Balm 10g — travel-size tattoo balm" loading="lazy">
         </div>
         <div class="prod-card-body">
           <div class="prod-card-coll">Glow · Step 03</div>
           <div class="prod-card-stars">★★★★★</div>
-          <div class="prod-card-name">Tattoo Balm 10g</div>
+          <a href="product.html?id=tattoo-balm-10g" class="prod-card-name" style="text-decoration:none;color:inherit;display:block">Tattoo Balm 10g</a>
           <div class="prod-card-desc">Travel-size balm for top-ups on the go. Pocket-sized, big results.</div>
           <div class="prod-card-foot">
             <div><div class="prod-card-price">£5.99</div></div>
@@ -420,14 +420,14 @@ footer{background:var(--bg3);border-top:1px solid var(--rule);padding-block:80px
       </article>
 
       <!-- NUMB COLLECTION -->
-      <article class="prod-card" data-reveal data-d="1" data-coll="numb" data-price="15.00" role="listitem" data-name="Numb Instant Spray" data-price="15.0">
+      <article class="prod-card" data-reveal data-d="1" data-coll="numb" data-price="15.00" role="listitem" data-name="Numb Instant Spray" onclick="if(!event.target.closest('button'))location.href='product.html?id=numb-instant-spray'" style="cursor:pointer" data-price="15.0">
         <div class="prod-card-img">
           <img src="/assets/img/img-shop-9.webp" alt="KONG Numb Instant Spray — fast-acting pre-session spray" loading="lazy">
         </div>
         <div class="prod-card-body">
           <div class="prod-card-coll">Numb · Step 01</div>
           <div class="prod-card-stars">★★★★★</div>
-          <div class="prod-card-name">Numb Instant Spray</div>
+          <a href="product.html?id=numb-instant-spray" class="prod-card-name" style="text-decoration:none;color:inherit;display:block">Numb Instant Spray</a>
           <div class="prod-card-desc">Fast-acting topical spray. For use before and during your session.</div>
           <div class="prod-card-foot">
             <div><div class="prod-card-price">£15.00</div></div>
@@ -436,14 +436,14 @@ footer{background:var(--bg3);border-top:1px solid var(--rule);padding-block:80px
         </div>
       </article>
 
-      <article class="prod-card" data-reveal data-d="2" data-coll="numb" data-price="15.00" role="listitem" data-name="Rapid Cream 15g" data-price="15.0">
+      <article class="prod-card" data-reveal data-d="2" data-coll="numb" data-price="15.00" role="listitem" data-name="Rapid Cream 15g" onclick="if(!event.target.closest('button'))location.href='product.html?id=rapid-cream-15g'" style="cursor:pointer" data-price="15.0">
         <div class="prod-card-img">
           <img src="/assets/img/img-shop-10.webp" alt="KONG Rapid Cream 15g — pre-session topical anaesthetic" loading="lazy">
         </div>
         <div class="prod-card-body">
           <div class="prod-card-coll">Numb · Step 02</div>
           <div class="prod-card-stars">★★★★★</div>
-          <div class="prod-card-name">Rapid Cream 15g</div>
+          <a href="product.html?id=rapid-cream-15g" class="prod-card-name" style="text-decoration:none;color:inherit;display:block">Rapid Cream 15g</a>
           <div class="prod-card-desc">Topical anaesthetic cream. Apply 45 mins before your session for longer, more comfortable sittings.</div>
           <div class="prod-card-foot">
             <div><div class="prod-card-price">£15.00</div></div>
@@ -452,14 +452,14 @@ footer{background:var(--bg3);border-top:1px solid var(--rule);padding-block:80px
         </div>
       </article>
 
-      <article class="prod-card" data-reveal data-d="3" data-coll="numb" data-price="17.00" role="listitem" data-name="Rapid Cream 30g" data-price="17.0">
+      <article class="prod-card" data-reveal data-d="3" data-coll="numb" data-price="17.00" role="listitem" data-name="Rapid Cream 30g" onclick="if(!event.target.closest('button'))location.href='product.html?id=rapid-cream-30g'" style="cursor:pointer" data-price="17.0">
         <div class="prod-card-img">
           <img src="/assets/img/img-shop-11.webp" alt="KONG Rapid Cream 30g — large pre-session topical anaesthetic" loading="lazy">
         </div>
         <div class="prod-card-body">
           <div class="prod-card-coll">Numb · Step 02</div>
           <div class="prod-card-stars">★★★★★</div>
-          <div class="prod-card-name">Rapid Cream 30g</div>
+          <a href="product.html?id=rapid-cream-30g" class="prod-card-name" style="text-decoration:none;color:inherit;display:block">Rapid Cream 30g</a>
           <div class="prod-card-desc">Larger 30g pot. Greater coverage for bigger pieces and longer sessions.</div>
           <div class="prod-card-foot">
             <div><div class="prod-card-price">£17.00</div></div>
@@ -469,7 +469,7 @@ footer{background:var(--bg3);border-top:1px solid var(--rule);padding-block:80px
       </article>
 
       <!-- DEFEND COLLECTION -->
-      <article class="prod-card" data-reveal data-d="1" data-coll="defend" data-price="9.99" role="listitem" data-name="Piercing Aftercare Spray" data-price="9.99">
+      <article class="prod-card" data-reveal data-d="1" data-coll="defend" data-price="9.99" role="listitem" data-name="Piercing Aftercare Spray" onclick="if(!event.target.closest('button'))location.href='product.html?id=piercing-aftercare-spray'" style="cursor:pointer" data-price="9.99">
         <div class="prod-card-img">
           <img src="/assets/img/img-shop-4.webp" alt="KONG Piercing Aftercare Spray — daily piercing care" loading="lazy">
           <div class="prod-card-badge">Daily essential</div>
@@ -477,7 +477,7 @@ footer{background:var(--bg3);border-top:1px solid var(--rule);padding-block:80px
         <div class="prod-card-body">
           <div class="prod-card-coll">Defend · Daily Care</div>
           <div class="prod-card-stars">★★★★★</div>
-          <div class="prod-card-name">Piercing Aftercare Spray</div>
+          <a href="product.html?id=piercing-aftercare-spray" class="prod-card-name" style="text-decoration:none;color:inherit;display:block">Piercing Aftercare Spray</a>
           <div class="prod-card-desc">Clean, precise aftercare for an easy daily piercing routine.</div>
           <div class="prod-card-foot">
             <div><div class="prod-card-price">£9.99</div></div>
@@ -486,7 +486,7 @@ footer{background:var(--bg3);border-top:1px solid var(--rule);padding-block:80px
         </div>
       </article>
 
-      <article class="prod-card" data-reveal data-d="2" data-coll="defend" data-price="12.99" role="listitem" data-name="Hydrating Suncream SPF30" data-price="12.99">
+      <article class="prod-card" data-reveal data-d="2" data-coll="defend" data-price="12.99" role="listitem" data-name="Hydrating Suncream SPF30" onclick="if(!event.target.closest('button'))location.href='product.html?id=hydrating-suncream-spf30'" style="cursor:pointer" data-price="12.99">
         <div class="prod-card-img">
           <img src="/assets/img/img-shop-5.webp" alt="KONG Hydrating Suncream SPF30 — daily UV protection for tattoos" loading="lazy">
           <div class="prod-card-badge">Most popular</div>
@@ -494,7 +494,7 @@ footer{background:var(--bg3);border-top:1px solid var(--rule);padding-block:80px
         <div class="prod-card-body">
           <div class="prod-card-coll">Defend · Step 05</div>
           <div class="prod-card-stars">★★★★★</div>
-          <div class="prod-card-name">Hydrating Suncream SPF30</div>
+          <a href="product.html?id=hydrating-suncream-spf30" class="prod-card-name" style="text-decoration:none;color:inherit;display:block">Hydrating Suncream SPF30</a>
           <div class="prod-card-desc">Daily SPF30 protection for healed, vibrant tattoos.</div>
           <div class="prod-card-foot">
             <div><div class="prod-card-price">£12.99</div></div>
@@ -504,7 +504,7 @@ footer{background:var(--bg3);border-top:1px solid var(--rule);padding-block:80px
       </article>
 
       <!-- EXPERT COLLECTION -->
-      <article class="prod-card" data-reveal data-d="1" data-coll="expert" data-price="19.99" role="listitem" data-name="Expert Tattoo Glide" data-price="19.99">
+      <article class="prod-card" data-reveal data-d="1" data-coll="expert" data-price="19.99" role="listitem" data-name="Expert Tattoo Glide" onclick="if(!event.target.closest('button'))location.href='product.html?id=expert-tattoo-glide'" style="cursor:pointer" data-price="19.99">
         <div class="prod-card-img">
           <img src="/assets/img/img-shop-3.webp" alt="KONG Expert Tattoo Glide — professional studio glide" loading="lazy">
           <div class="prod-card-badge red">Artist favourite</div>
@@ -512,7 +512,7 @@ footer{background:var(--bg3);border-top:1px solid var(--rule);padding-block:80px
         <div class="prod-card-body">
           <div class="prod-card-coll">Expert · Artist Series</div>
           <div class="prod-card-stars">★★★★★</div>
-          <div class="prod-card-name">Expert Tattoo Glide</div>
+          <a href="product.html?id=expert-tattoo-glide" class="prod-card-name" style="text-decoration:none;color:inherit;display:block">Expert Tattoo Glide</a>
           <div class="prod-card-desc">Smooth professional glide created for control and comfort.</div>
           <div class="prod-card-foot">
             <div><div class="prod-card-price">£19.99</div></div>
@@ -593,9 +593,8 @@ footer{background:var(--bg3);border-top:1px solid var(--rule);padding-block:80px
         <span class="trust-logo-item">ICO Registered</span>
       </div>
       <div class="foot-soc">
-        <a href="#">Instagram</a>
-        <a href="#">TikTok</a>
-        <a href="#">Facebook</a>
+        <a href="https://www.instagram.com/kongtattoocare_uk/" target="_blank" rel="noopener">Instagram</a>
+        <a href="https://www.tiktok.com/@kongtattoocareuk" target="_blank" rel="noopener">TikTok</a>
       </div>
     </div>
   </div>
@@ -607,7 +606,7 @@ footer{background:var(--bg3);border-top:1px solid var(--rule);padding-block:80px
 const root=document.documentElement;
 const SK='kong-theme';
 function gt(){return root.getAttribute('data-theme')||(matchMedia('(prefers-color-scheme:light)').matches?'light':'dark')}
-function uiTheme(t){const icon=document.getElementById('themeIcon');const lbl=document.getElementById('themeLbl');if(icon)icon.textContent=t==='dark'?'☀️':'🌙';if(lbl)lbl.textContent=t==='dark'?'Light':'Dark'}
+function uiTheme(t){const icon=document.getElementById('themeIcon');const lbl=document.getElementById('themeLbl');if(icon)icon.textContent='';if(lbl)lbl.textContent=t==='dark'?'Light':'Dark'}
 function inkSplash(t){
   const wrap=document.getElementById('ink');const btn=document.getElementById('themeBtn');
   let x='50%',y='50%';if(btn){const r=btn.getBoundingClientRect();x=(r.left+r.width/2)+'px';y=(r.top+r.height/2)+'px'}

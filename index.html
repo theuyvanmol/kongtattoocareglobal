@@ -273,24 +273,24 @@ input,textarea,select{font-family:inherit}
 
 /* ═══ VIDEO SECTION ═══ */
 #video-sec{background:var(--bg3);padding-block:100px}
-.vid-grid{display:grid;grid-template-columns:1.5fr 1fr;gap:20px;margin-top:48px;align-items:start}
+.vid-grid{display:grid;grid-template-columns:1.6fr 1fr;gap:24px;margin-top:48px;align-items:stretch}
 .vid-main{position:relative;border-radius:16px;overflow:hidden;cursor:pointer;border:1px solid var(--rule)}
 .vid-main-frame{width:100%;aspect-ratio:16/9;background:#000;position:relative}
-.vid-main-frame img{width:100%;height:100%;object-fit:cover;opacity:.7}
-.play-btn{position:absolute;inset:0;display:flex;align-items:center;justify-content:center}
-.play-ic{width:72px;height:72px;border-radius:50%;border:2px solid rgba(255,255,255,.8);background:rgba(10,10,10,.5);display:grid;place-items:center;transition:all .25s}
-.play-ic::after{content:'';border-style:solid;border-width:12px 0 12px 20px;border-color:transparent transparent transparent #fff;margin-left:4px}
-.vid-main:hover .play-ic{background:var(--red);border-color:var(--red);transform:scale(1.1)}
-.vid-label{position:absolute;bottom:0;left:0;right:0;padding:20px;background:linear-gradient(0deg,rgba(10,10,10,.95),transparent);font-family:'Barlow Condensed',sans-serif;font-weight:900;font-style:italic;font-size:22px;text-transform:uppercase}
-.vid-side{display:flex;flex-direction:column;gap:12px}
-.vid-mini{position:relative;border-radius:12px;overflow:hidden;cursor:pointer;border:1px solid var(--rule);transition:border-color .25s}
+.vid-main-frame video{width:100%;height:100%;object-fit:cover;display:block}
+.vid-label{position:absolute;bottom:0;left:0;right:0;padding:20px;background:linear-gradient(0deg,rgba(10,10,10,.95),transparent);font-family:'Barlow Condensed',sans-serif;font-weight:900;font-style:italic;font-size:22px;text-transform:uppercase;pointer-events:none}
+.vid-side{display:flex;flex-direction:column;gap:14px}
+.vid-mini{position:relative;border-radius:12px;overflow:hidden;cursor:pointer;border:1px solid var(--rule);transition:border-color .25s;background:var(--bg2)}
 .vid-mini:hover{border-color:var(--lime)}
-.vid-mini-frame{width:100%;aspect-ratio:16/9;background:#000}
-.vid-mini-frame img{width:100%;height:100%;object-fit:cover;opacity:.6;animation:vidPulse 3s ease-in-out infinite}
-.vid-mini-play{position:absolute;inset:0;display:flex;align-items:center;justify-content:center}
-.vid-mini-ic{width:40px;height:40px;border-radius:50%;border:1.5px solid rgba(255,255,255,.7);background:rgba(10,10,10,.4);display:grid;place-items:center}
+.vid-mini-frame{width:100%;aspect-ratio:16/9;overflow:hidden;background:#000;position:relative}
+.vid-mini-frame img{width:100%;height:100%;object-fit:cover;opacity:.7;transition:opacity .2s,transform .4s}
+.vid-mini:hover .vid-mini-frame img{opacity:.85;transform:scale(1.04)}
+.vid-mini-play{position:absolute;inset:0;display:flex;align-items:center;justify-content:center;pointer-events:none}
+.vid-mini-ic{width:40px;height:40px;border-radius:50%;border:1.5px solid rgba(255,255,255,.7);background:rgba(10,10,10,.5);display:grid;place-items:center;transition:background .2s,border-color .2s}
+.vid-mini:hover .vid-mini-ic{background:var(--red);border-color:var(--red)}
 .vid-mini-ic::after{content:'';border-style:solid;border-width:7px 0 7px 12px;border-color:transparent transparent transparent #fff;margin-left:3px}
-.vid-mini-lbl{position:absolute;bottom:10px;left:12px;font-family:'Barlow Condensed',sans-serif;font-weight:700;font-size:13px;text-transform:uppercase;letter-spacing:.06em;text-shadow:0 1px 4px rgba(0,0,0,.8)}
+.vid-mini-lbl{padding:10px 14px;font-family:'Barlow Condensed',sans-serif;font-weight:700;font-size:13px;text-transform:uppercase;letter-spacing:.06em;color:var(--fg-70)}
+@media(max-width:900px){.vid-grid{grid-template-columns:1fr}}
+@media(max-width:768px){.vid-side{flex-direction:row;overflow-x:auto;gap:10px}.vid-mini{min-width:260px}}
 
 /* ═══ BEFORE / AFTER ═══ */
 #before-after{background:var(--bg2);padding-block:100px}
@@ -532,7 +532,7 @@ footer{background:var(--bg3);border-top:1px solid var(--rule);padding-block:80px
 </nav>
 
 <!-- ANN BAR -->
-<div id="ann">🇬🇧 Free UK delivery over £35 &nbsp;·&nbsp; Use code <strong>KONG10</strong> for 10% off your first order &nbsp;·&nbsp; Artist-developed · Dermatologist-tested</div>
+<div id="ann">Free UK delivery over £35 &nbsp;·&nbsp; Use code <strong>KONG10</strong> for 10% off your first order &nbsp;·&nbsp; Artist-developed · Dermatologist-tested</div>
 
 <!-- NAV -->
 <nav id="nav" aria-label="Main navigation">
@@ -547,7 +547,7 @@ footer{background:var(--bg3);border-top:1px solid var(--rule);padding-block:80px
     </ul>
     <div class="nav-acts">
       <button class="theme-btn" aria-label="Toggle colour theme" id="themeBtn">
-        <span id="themeIcon">☀️</span>
+        <span id="themeIcon"></span>
         <span id="themeLbl">Light</span>
       </button>
       <a href="login.html" class="nav-cta" style="background:transparent;border:1.5px solid var(--rule);color:var(--fg-70);padding:8px 16px">Login</a>
@@ -835,29 +835,30 @@ footer{background:var(--bg3);border-top:1px solid var(--rule);padding-block:80px
     <div class="vid-grid">
       <div class="vid-main" data-reveal="left">
         <div class="vid-main-frame">
-          <video src="/assets/video/kong-video-1.mp4" controls playsinline preload="metadata" poster="/assets/img/real-tattoo-studio-1.jpg" style="width:100%;height:100%;object-fit:cover;border-radius:var(--r);display:block"></video>
+          <video src="/assets/video/kong-video-1.mp4" controls playsinline preload="metadata" poster="/assets/img/real-tattoo-studio-1.jpg"></video>
         </div>
         <div class="vid-label">KONG Tattoo Care — Studio Session</div>
       </div>
       <div class="vid-side">
-        <div class="vid-mini" data-reveal="right" data-d="1" role="button" tabindex="0" aria-label="Watch: Numb Collection explained">
+        <div class="vid-mini" data-reveal="right" data-d="1" aria-label="Watch: Numb Collection explained">
           <div class="vid-mini-frame">
-            <img src="/assets/img/real-tattoo-studio-2.jpg" alt="KONG studio session">
+            <img src="/assets/img/real-tattoo-studio-2.jpg" alt="Numb collection studio session">
+            <div class="vid-mini-play" aria-hidden="true"><div class="vid-mini-ic"></div></div>
           </div>
-          <div class="vid-mini-play" aria-hidden="true"><div class="vid-mini-ic"></div></div>
           <div class="vid-mini-lbl">Numb — How It Works</div>
         </div>
         <div class="vid-mini" data-reveal="right" data-d="2">
-          <div class="vid-mini-frame" style="position:relative;overflow:hidden;border-radius:var(--r)">
-            <video src="/assets/video/kong-video-2.mp4" controls playsinline preload="metadata" poster="/assets/img/real-products-studio.jpg" style="width:100%;height:100%;object-fit:cover;display:block"></video>
+          <div class="vid-mini-frame">
+            <img src="/assets/img/real-products-studio.jpg" alt="Defend your ink studio clip">
+            <div class="vid-mini-play" aria-hidden="true"><div class="vid-mini-ic"></div></div>
           </div>
           <div class="vid-mini-lbl">Defend Your Ink — Studio Clip</div>
         </div>
-        <div class="vid-mini" data-reveal="right" data-d="3" role="button" tabindex="0" aria-label="Watch: Expert collection studio session">
+        <div class="vid-mini" data-reveal="right" data-d="3" aria-label="Watch: Expert collection studio session">
           <div class="vid-mini-frame">
-            <img src="/assets/img/real-tattoo-studio-1.jpg" alt="KONG studio">
+            <img src="/assets/img/real-tattoo-studio-1.jpg" alt="Expert collection studio session">
+            <div class="vid-mini-play" aria-hidden="true"><div class="vid-mini-ic"></div></div>
           </div>
-          <div class="vid-mini-play" aria-hidden="true"><div class="vid-mini-ic"></div></div>
           <div class="vid-mini-lbl">Expert — Studio Session</div>
         </div>
       </div>
@@ -1229,9 +1230,8 @@ footer{background:var(--bg3);border-top:1px solid var(--rule);padding-block:80px
         <span class="trust-logo-item">ICO Registered</span>
       </div>
       <div class="foot-soc" aria-label="Social media links">
-        <a href="#" aria-label="Instagram">Instagram</a>
-        <a href="#" aria-label="TikTok">TikTok</a>
-        <a href="#" aria-label="Facebook">Facebook</a>
+        <a href="https://www.instagram.com/kongtattoocare_uk/" target="_blank" rel="noopener" aria-label="Instagram">Instagram</a>
+        <a href="https://www.tiktok.com/@kongtattoocareuk" target="_blank" rel="noopener" aria-label="TikTok">TikTok</a>
       </div>
     </div>
   </div>
@@ -1254,7 +1254,7 @@ function setTheme(t,skip){
 function uiTheme(t){
   const icon=document.getElementById('themeIcon');
   const lbl=document.getElementById('themeLbl');
-  if(icon) icon.textContent=t==='dark'?'☀️':'🌙';
+  if(icon) icon.textContent=t==='dark'?'':'';
   if(lbl) lbl.textContent=t==='dark'?'Light':'Dark';
 }
 (function(){
