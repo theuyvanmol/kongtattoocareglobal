@@ -47,8 +47,8 @@ export default async function ProductPage({
   if (!product) notFound()
   const p = product!
 
-  const images = p.images.edges.map((e: { node: { url: string; altText?: string } }) => e.node)
-  const variants = p.variants.edges.map((e: { node: { id: string; title: string; price: { amount: string }; availableForSale: boolean } }) => e.node)
+  const images = p.images.edges.map((e) => e.node)
+  const variants = p.variants.edges.map((e) => e.node)
   const price = p.priceRange.minVariantPrice
   const comparePrice = p.compareAtPriceRange?.minVariantPrice
   const hasDiscount =
@@ -108,7 +108,7 @@ export default async function ProductPage({
               </div>
               {images.length > 1 && (
                 <div className="grid grid-cols-4 gap-2">
-                  {images.slice(1, 5).map((img: { url: string; altText?: string }, i: number) => (
+                  {images.slice(1, 5).map((img, i) => (
                     <div key={i} className="relative aspect-square rounded-lg overflow-hidden" style={{ background: 'var(--bg3)' }}>
                       <Image
                         src={img.url}
