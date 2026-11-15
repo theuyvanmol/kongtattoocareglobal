@@ -20,10 +20,10 @@ export default async function sitemap(): Promise<MetadataRoute.Sitemap> {
 
   let productPages: MetadataRoute.Sitemap = []
   try {
-    const data = await getProducts(100)
-    productPages = data.products.edges.map(({ node }: { node: { handle: string; updatedAt?: string } }) => ({
+    const products = await getProducts(100)
+    productPages = products.map((node) => ({
       url: `${BASE}/products/${node.handle}`,
-      lastModified: node.updatedAt ? new Date(node.updatedAt) : new Date(),
+      lastModified: new Date(),
       changeFrequency: 'weekly' as const,
       priority: 0.8,
     }))

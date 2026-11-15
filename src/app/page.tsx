@@ -23,7 +23,7 @@ export default async function HomePage() {
   let products = []
   try {
     const data = await getProducts(8)
-    products = data.products.edges.slice(0, 4).map((e: { node: unknown }) => e.node)
+    products = data.slice(0, 4)
   } catch {}
 
   return (

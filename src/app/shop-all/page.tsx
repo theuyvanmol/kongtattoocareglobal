@@ -35,8 +35,7 @@ export default async function ShopAllPage({
 
   let products: ShopifyProduct[] = []
   try {
-    const data = await getProducts(50)
-    products = data.products.edges.map((e: { node: ShopifyProduct }) => e.node)
+    products = await getProducts(50)
   } catch {}
 
   const filtered =
