@@ -49,13 +49,17 @@ export interface ShopifyCollection {
 
 // ── Cart ──────────────────────────────────────────────────────────────────
 export interface CartItem {
-  id: string
-  name: string
-  price: number
+  variantId: string
+  productId?: string
+  title: string
+  variantTitle?: string
+  price: string
   qty: number
   image?: string
   handle?: string
-  variantId?: string
+  // legacy aliases kept for backwards compat
+  id?: string
+  name?: string
 }
 
 // ── Blog ──────────────────────────────────────────────────────────────────
