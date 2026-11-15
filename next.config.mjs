@@ -30,7 +30,7 @@ const nextConfig = {
     return [
       { source: '/shop', destination: '/shop-all', permanent: true },
       { source: '/shop-all.html', destination: '/shop-all', permanent: true },
-      { source: '/product.html', destination: '/products/:handle*', permanent: false },
+      { source: '/product.html', destination: '/shop-all', permanent: false },
       { source: '/about.html', destination: '/about', permanent: true },
       { source: '/blog.html', destination: '/blog', permanent: true },
       { source: '/login.html', destination: '/login', permanent: true },
