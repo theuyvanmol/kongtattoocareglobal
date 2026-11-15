@@ -1,8 +1,13 @@
 import { NextRequest, NextResponse } from 'next/server'
 
-// Shopify Storefront API proxy — keeps SHOPIFY_STOREFRONT_PRIVATE_TOKEN server-side only
+// Shopify Storefront API proxy — token kept server-side only
 const SHOPIFY_DOMAIN = process.env.SHOPIFY_STORE_DOMAIN || 'kongtattoocareuk.myshopify.com'
-const STOREFRONT_TOKEN = process.env.SHOPIFY_STOREFRONT_PRIVATE_TOKEN
+const STOREFRONT_TOKEN =
+  process.env.SHOPIFY_STOREFRONT_PRIVATE_TOKEN ||
+  process.env.SHOPIFY_STOREFRONT_ACCESS_TOKEN ||
+  process.env.NEXT_PUBLIC_SHOPIFY_STOREFRONT_TOKEN ||
+  process.env.SHOPIFY_STOREFRONT_PUBLIC_TOKEN ||
+  ''
 
 export async function POST(req: NextRequest) {
   if (!STOREFRONT_TOKEN) {
