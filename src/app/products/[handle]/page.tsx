@@ -25,9 +25,8 @@ export async function generateMetadata({
 }): Promise<Metadata> {
   try {
     const { handle } = await params
-    const data = await getProduct(handle)
-    if (!data?.product) return {}
-    const p = data.product
+    const p = await getProduct(handle)
+    if (!p) return {}
     const img = p.images.edges[0]?.node.url
     return productMetadata(p.title, p.description || '', img)
   } catch {
@@ -41,17 +40,17 @@ export default async function ProductPage({
   params: Promise<{ handle: string }>
 }) {
   const { handle } = await params
-  let product
+  let product: import('@/lib/types').ShopifyProduct | null = null
   try {
-    const data = await getProduct(handle)
-    product = data?.product
+    product = await getProduct(handle)
   } catch {}
   if (!product) notFound()
+  const p = product!
 
-  const images = product.images.edges.map((e: { node: { url: string; altText?: string } }) => e.node)
-  const variants = product.variants.edges.map((e: { node: { id: string; title: string; priceV2: { amount: string }; availableForSale: boolean } }) => e.node)
-  const price = product.priceRange.minVariantPrice
-  const comparePrice = product.compareAtPriceRange?.minVariantPrice
+  const images = p.images.edges.map((e: { node: { url: string; altText?: string } }) => e.node)
+  const variants = p.variants.edges.map((e: { node: { id: string; title: string; price: { amount: string }; availableForSale: boolean } }) => e.node)
+  const price = p.priceRange.minVariantPrice
+  const comparePrice = p.compareAtPriceRange?.minVariantPrice
   const hasDiscount =
     comparePrice && parseFloat(comparePrice.amount) > parseFloat(price.amount)
   const pct = hasDiscount
@@ -61,10 +60,10 @@ export default async function ProductPage({
   const schema = {
     '@context': 'https://schema.org',
     '@type': 'Product',
-    name: product.title,
-    description: product.description,
+    name: p.title,
+    description: p.description,
     image: images.map((i: { url: string }) => i.url),
-    brand: { '@type': 'Brand', name: product.vendor || 'KONG Tattoo Care' },
+    brand: { '@type': 'Brand', name: p.vendor || 'KONG Tattoo Care' },
     offers: {
       '@type': 'AggregateOffer',
       lowPrice: price.amount,
@@ -89,7 +88,7 @@ export default async function ProductPage({
             <span className="mx-2">/</span>
             <a href="/shop-all" className="hover:text-[var(--fg-70)]">Shop</a>
             <span className="mx-2">/</span>
-            <span style={{ color: 'var(--fg-70)' }}>{product.title}</span>
+            <span style={{ color: 'var(--fg-70)' }}>{p.title}</span>
           </nav>
 
           <div className="grid grid-cols-1 lg:grid-cols-2 gap-12 items-start">
@@ -99,7 +98,7 @@ export default async function ProductPage({
                 {images[0] && (
                   <Image
                     src={images[0].url}
-                    alt={images[0].altText || product.title}
+                    alt={images[0].altText || p.title}
                     fill
                     className="object-cover"
                     priority
@@ -113,7 +112,7 @@ export default async function ProductPage({
                     <div key={i} className="relative aspect-square rounded-lg overflow-hidden" style={{ background: 'var(--bg3)' }}>
                       <Image
                         src={img.url}
-                        alt={img.altText || product.title}
+                        alt={img.altText || p.title}
                         fill
                         className="object-cover"
                         sizes="25vw"
@@ -127,8 +126,8 @@ export default async function ProductPage({
             {/* Info */}
             <div className="flex flex-col gap-6 lg:sticky lg:top-28">
               <div>
-                <p className="lbl mb-2">{product.vendor || 'KONG Tattoo Care'}</p>
-                <h1 className="hed text-[clamp(32px,5vw,52px)] mb-4">{product.title}</h1>
+                <p className="lbl mb-2">{p.vendor || 'KONG Tattoo Care'}</p>
+                <h1 className="hed text-[clamp(32px,5vw,52px)] mb-4">{p.title}</h1>
 
                 <div className="flex items-center gap-3 mb-4">
                   <span className="hed text-4xl" style={{ color: 'var(--lime)' }}>
@@ -147,13 +146,13 @@ export default async function ProductPage({
                 </div>
               </div>
 
-              <AddToCartButton product={product} variants={variants} />
+              <AddToCartButton product={p} variants={variants} />
 
               {/* Description */}
-              {product.description && (
+              {p.description && (
                 <div>
                   <p className="text-sm leading-relaxed" style={{ color: 'var(--fg-70)', whiteSpace: 'pre-line' }}>
-                    {product.description}
+                    {p.description}
                   </p>
                 </div>
               )}
