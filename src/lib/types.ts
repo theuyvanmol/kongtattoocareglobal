@@ -31,6 +31,7 @@ export interface ShopifyProduct {
   vendor: string
   productType: string
   priceRange: { minVariantPrice: ShopifyMoney; maxVariantPrice: ShopifyMoney }
+  compareAtPriceRange?: { minVariantPrice: ShopifyMoney; maxVariantPrice: ShopifyMoney }
   images: { edges: { node: ShopifyImage }[] }
   variants: { edges: { node: ShopifyVariant }[] }
   collections?: { edges: { node: { handle: string; title: string } }[] }

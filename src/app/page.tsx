@@ -6,6 +6,7 @@ import Footer from '@/components/Footer'
 import { getProducts } from '@/lib/shopify'
 import ProductCard from '@/components/ProductCard'
 import { defaultMetadata } from '@/lib/metadata'
+import type { ShopifyProduct } from '@/lib/types'
 
 export const metadata: Metadata = defaultMetadata
 
@@ -20,7 +21,7 @@ const COLLECTIONS = [
 ]
 
 export default async function HomePage() {
-  let products = []
+  let products: ShopifyProduct[] = []
   try {
     const data = await getProducts(8)
     products = data.slice(0, 4)
@@ -121,8 +122,8 @@ export default async function HomePage() {
             <Link href="/shop-all" className="btn btn-out text-xs whitespace-nowrap">Shop All →</Link>
           </div>
           <div className="grid grid-cols-2 md:grid-cols-4 gap-4">
-            {products.map((p: { id: string }, idx: number) => (
-              <ProductCard key={p.id as string} product={p as any} priority={idx < 2} />
+            {products.map((p, idx) => (
+              <ProductCard key={p.id} product={p} priority={idx < 2} />
             ))}
           </div>
         </section>
