@@ -7,6 +7,7 @@ import { getProducts } from '@/lib/shopify'
 import ProductCard from '@/components/ProductCard'
 import { defaultMetadata } from '@/lib/metadata'
 import type { ShopifyProduct } from '@/lib/types'
+import NewsletterForm from '@/components/NewsletterForm'
 
 export const metadata: Metadata = defaultMetadata
 
@@ -156,17 +157,7 @@ export default async function HomePage() {
             <h2 className="hed text-[clamp(36px,6vw,56px)] text-white mb-3">Join the Kingdom</h2>
             <p className="text-white/80 text-base max-w-md">Subscribe for exclusive drops, artist collabs, early access and 10% off your first order.</p>
           </div>
-          <form className="flex flex-col sm:flex-row gap-3 w-full md:w-auto" onSubmit={(e) => e.preventDefault()}>
-            <input
-              type="email"
-              placeholder="your@email.com"
-              className="rounded-xl px-4 h-12 text-sm outline-none flex-1 md:w-56"
-              style={{ background: 'rgba(255,255,255,.12)', border: '1px solid rgba(255,255,255,.25)', color: '#fff' }}
-            />
-            <button type="submit" className="btn h-12 px-6 whitespace-nowrap" style={{ background: '#fff', color: 'var(--red)' }}>
-              Subscribe →
-            </button>
-          </form>
+          <NewsletterForm />
         </div>
       </section>
 
