@@ -22,9 +22,9 @@ const COLLECTIONS = [
 ]
 
 const UPSELL = [
-  { name: 'Foam Cleanser',   coll: 'Renew Collection',  price: '£18.99', desc: 'pH-balanced formula. Removes bacteria, oils and plasma from fresh ink. Essential for the first 2 weeks.', img: '/assets/img/img-product-2.webp', badge: 'Most Popular' },
-  { name: 'Numb Cream',      coll: 'Numb Collection',   price: '£29.99', desc: 'Pre-session topical anaesthetic. Reduces discomfort for longer sittings. Trusted by UK studios.', img: '/assets/img/img-product-5.webp', badge: null },
-  { name: 'Glow Serum',      coll: 'Glow Collection',   price: '£22.99', desc: 'Vitamin C brightening complex. Keeps colour saturation vivid for years after healing.', img: '/assets/img/img-product-8.webp', badge: null },
+  { name: 'Foam Cleanser',   coll: 'Renew Collection',  price: '£18.99', desc: 'pH-balanced formula. Removes bacteria, oils and plasma from fresh ink. Essential for the first 2 weeks.', img: '/assets/img/real-products-studio.jpg', badge: 'Most Popular' },
+  { name: 'Numb Cream',      coll: 'Numb Collection',   price: '£29.99', desc: 'Pre-session topical anaesthetic. Reduces discomfort for longer sittings. Trusted by UK studios.', img: '/assets/img/real-barbell-kong.png', badge: null },
+  { name: 'Glow Serum',      coll: 'Glow Collection',   price: '£22.99', desc: 'Vitamin C brightening complex. Keeps colour saturation vivid for years after healing.', img: '/assets/img/real-boxing-kong.png', badge: null },
 ]
 
 const REVIEWS = [
@@ -41,21 +41,21 @@ const STEPS = [
 ]
 
 const GALLERY_IMGS = [
-  { img: '/assets/img/img-home-1.webp',  cls: 'g1', span: 'col-span-2 row-span-2' },
-  { img: '/assets/img/img-home-3.webp',  cls: 'g2', span: 'col-span-2' },
-  { img: '/assets/img/img-home-5.webp',  cls: 'g3', span: 'col-span-2' },
-  { img: '/assets/img/img-home-8.webp',  cls: 'g4', span: 'col-span-1' },
-  { img: '/assets/img/img-home-9.webp',  cls: 'g5', span: 'col-span-1' },
-  { img: '/assets/img/img-home-11.webp', cls: 'g6', span: 'col-span-2' },
+  { img: '/assets/img/real-tattoo-studio-1.jpg', cls: 'g1', span: 'col-span-2 row-span-2' },
+  { img: '/assets/img/real-barbell-kong.png',    cls: 'g2', span: 'col-span-2' },
+  { img: '/assets/img/real-boxing-kong.png',     cls: 'g3', span: 'col-span-2' },
+  { img: '/assets/img/real-products-studio.jpg', cls: 'g4', span: 'col-span-1' },
+  { img: '/assets/img/real-defend-your-ink.jpg', cls: 'g5', span: 'col-span-1' },
+  { img: '/assets/img/real-tattoo-studio-2.jpg', cls: 'g6', span: 'col-span-2' },
 ]
 
 const SOC_IMGS = [
-  '/assets/img/img-home-1.webp',
-  '/assets/img/img-home-3.webp',
-  '/assets/img/img-home-5.webp',
-  '/assets/img/img-home-7.webp',
-  '/assets/img/img-home-9.webp',
-  '/assets/img/img-home-11.webp',
+  '/assets/img/real-tattoo-studio-1.jpg',
+  '/assets/img/real-barbell-kong.png',
+  '/assets/img/real-boxing-kong.png',
+  '/assets/img/real-products-studio.jpg',
+  '/assets/img/real-defend-your-ink.jpg',
+  '/assets/img/real-tattoo-studio-2.jpg',
 ]
 
 export default async function HomePage() {
@@ -83,12 +83,12 @@ export default async function HomePage() {
         {/* Background image */}
         <div style={{ position: 'absolute', inset: 0 }}>
           <Image
-            src="/assets/img/img-home-1.webp"
+            src="/assets/img/real-hero-gym.png"
             alt="KONG Tattoo Care — premium UK aftercare"
             fill
             priority
             className="object-cover object-center"
-            style={{ opacity: 0.45 }}
+            style={{ opacity: 0.55 }}
           />
           <div style={{ position: 'absolute', inset: 0, background: 'linear-gradient(115deg,rgba(10,10,10,.96) 0%,rgba(10,10,10,.55) 55%,rgba(10,10,10,.15) 100%),linear-gradient(0deg,rgba(10,10,10,.99) 0%,rgba(10,10,10,.4) 32%,transparent 60%)' }} />
         </div>
@@ -284,9 +284,9 @@ export default async function HomePage() {
         <h2 className="hed" style={{ fontSize: 'clamp(44px,6vw,88px)', marginTop: 10, marginBottom: 48 }}>Before &amp; <em style={{ color: 'var(--lime)' }}>After</em></h2>
         <div style={{ display: 'grid', gridTemplateColumns: 'repeat(3,1fr)', gap: 16 }} className="ba-grid-resp">
           {[
-            { img1: '/assets/img/img-home-2.webp',  img2: '/assets/img/img-home-3.webp',  name: 'Renew Butter · 14 Days',  meta: 'Customer: Jake T. · Bristol'    },
-            { img1: '/assets/img/img-home-6.webp',  img2: '/assets/img/img-home-7.webp',  name: 'Glow Serum · 6 Weeks',    meta: 'Customer: Priya M. · London'   },
-            { img1: '/assets/img/img-home-10.webp', img2: '/assets/img/img-home-11.webp', name: 'Defend SPF · 8 Weeks',    meta: 'Customer: Sam W. · Manchester' },
+            { img1: '/assets/img/real-tattoo-studio-1.jpg', img2: '/assets/img/real-tattoo-studio-2.jpg', name: 'Renew Butter · 14 Days',  meta: 'Customer: Jake T. · Bristol'    },
+            { img1: '/assets/img/real-barbell-kong.png',    img2: '/assets/img/real-boxing-kong.png',     name: 'Glow Serum · 6 Weeks',    meta: 'Customer: Priya M. · London'   },
+            { img1: '/assets/img/real-products-studio.jpg', img2: '/assets/img/real-defend-your-ink.jpg', name: 'Defend SPF · 8 Weeks',    meta: 'Customer: Sam W. · Manchester' },
           ].map(ba => (
             <div key={ba.name} style={{ borderRadius: 14, overflow: 'hidden', border: '1px solid var(--rule)', position: 'relative' }}>
               <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr' }}>
@@ -406,7 +406,7 @@ export default async function HomePage() {
       <section className="wrap-wide cap" style={{ paddingBlock: 100, background: 'var(--bg)' }}>
         <div style={{ display: 'grid', gridTemplateColumns: '1fr 1.1fr', gap: 72, alignItems: 'center' }} className="artist-grid-resp">
           <div style={{ position: 'relative', borderRadius: 16, overflow: 'hidden', aspectRatio: '4/5' }}>
-            <Image src="/assets/img/img-home-19.webp" alt="Featured artist" fill className="object-cover" />
+            <Image src="/assets/img/real-tattoo-studio-1.jpg" alt="Featured artist" fill className="object-cover" />
             <div style={{ position: 'absolute', inset: -2, borderRadius: 'inherit', border: '2px solid var(--lime)', pointerEvents: 'none' }} />
           </div>
           <div style={{ display: 'flex', flexDirection: 'column', gap: 18 }}>
@@ -448,7 +448,7 @@ export default async function HomePage() {
       {/* ── FINAL CTA ─────────────────────────────────────────────────────── */}
       <section style={{ position: 'relative', overflow: 'hidden', minHeight: '60vh', display: 'flex', alignItems: 'center', background: 'var(--bg3)' }}>
         <div style={{ position: 'absolute', inset: 0 }}>
-          <Image src="/assets/img/img-home-21.webp" alt="" fill className="object-cover" style={{ opacity: 0.18 }} />
+          <Image src="/assets/img/real-defend-your-ink.jpg" alt="" fill className="object-cover object-top" style={{ opacity: 0.25 }} />
           <div style={{ position: 'absolute', inset: 0, background: 'linear-gradient(110deg,rgba(10,10,10,.98) 0%,rgba(10,10,10,.7) 55%,rgba(10,10,10,.25) 100%)' }} />
         </div>
         <div className="wrap-wide cap" style={{ position: 'relative', zIndex: 2, paddingBlock: 90 }}>
