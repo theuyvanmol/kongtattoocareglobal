@@ -12,6 +12,17 @@ import NewsletterForm from '@/components/NewsletterForm'
 export const metadata: Metadata = defaultMetadata
 export const revalidate = 60
 
+// ── Types ────────────────────────────────────────────────────────────────────
+interface UpsellProduct {
+  name: string
+  coll: string
+  price: string
+  desc: string
+  img: string
+  badge: string | null
+  handle: string
+}
+
 // ── Collection data ─────────────────────────────────────────────────────────
 const COLLECTIONS = [
   { id: 'numb',   label: 'Numb',   desc: 'Pre-session pain relief · 3 products',   img: '/assets/img/img-home-4.webp',  href: '/shop-all?c=numb'   },
@@ -21,11 +32,8 @@ const COLLECTIONS = [
   { id: 'expert', label: 'Expert', desc: 'Studio-grade pro · 6 products',           img: '/assets/img/img-home-16.webp', href: '/shop-all?c=expert' },
 ]
 
-const UPSELL = [
-  { name: 'Foam Cleanser',   coll: 'Renew Collection',  price: '£18.99', desc: 'pH-balanced formula. Removes bacteria, oils and plasma from fresh ink. Essential for the first 2 weeks.', img: '/assets/img/real-products-studio.jpg', badge: 'Most Popular' },
-  { name: 'Numb Cream',      coll: 'Numb Collection',   price: '£29.99', desc: 'Pre-session topical anaesthetic. Reduces discomfort for longer sittings. Trusted by UK studios.', img: '/assets/img/real-barbell-kong.png', badge: null },
-  { name: 'Glow Serum',      coll: 'Glow Collection',   price: '£22.99', desc: 'Vitamin C brightening complex. Keeps colour saturation vivid for years after healing.', img: '/assets/img/real-boxing-kong.png', badge: null },
-]
+// Upsell product handles — images fetched live from Shopify
+const UPSELL_HANDLES = ['foam-cleanser', 'numb-cream', 'glow-serum']
 
 const REVIEWS = [
   { name: 'James K.', location: 'Manchester', title: 'Best tattoo aftercare I\'ve tried', body: '"My sleeve healed in record time. No peeling, no itching, the colours came out so clean. The Renew Butter is now a permanent part of my kit."', product: 'Tattoo Butter · Renew Collection' },
@@ -58,11 +66,33 @@ const SOC_IMGS = [
   '/assets/img/real-tattoo-studio-2.jpg',
 ]
 
+// Fallback upsell data when Shopify products can't be fetched by handle
+const UPSELL_FALLBACK: UpsellProduct[] = [
+  { name: 'Foam Cleanser', coll: 'Renew Collection', price: '£18.99', desc: 'pH-balanced formula. Removes bacteria, oils and plasma from fresh ink. Essential for the first 2 weeks.', img: '/assets/img/real-products-studio.jpg', badge: 'Most Popular', handle: 'foam-cleanser' },
+  { name: 'Numb Cream',    coll: 'Numb Collection',  price: '£29.99', desc: 'Pre-session topical anaesthetic. Reduces discomfort for longer sittings. Trusted by UK studios.',          img: '/assets/img/real-products-studio.jpg', badge: null, handle: 'numb-cream' },
+  { name: 'Glow Serum',    coll: 'Glow Collection',  price: '£22.99', desc: 'Vitamin C brightening complex. Keeps colour saturation vivid for years after healing.',                    img: '/assets/img/real-products-studio.jpg', badge: null, handle: 'glow-serum' },
+]
+
 export default async function HomePage() {
   let products: ShopifyProduct[] = []
+  let upsellProducts: UpsellProduct[] = UPSELL_FALLBACK
   try {
-    const data = await getProducts(8)
+    const data = await getProducts(20)
     products = data.slice(0, 4)
+    // Build upsell from real Shopify data matched by handle or title keywords
+    const upsellMapped = UPSELL_FALLBACK.map(fallback => {
+      const match = data.find(p =>
+        p.handle === fallback.handle ||
+        p.title.toLowerCase().includes(fallback.handle.replace(/-/g, ' '))
+      )
+      if (!match) return fallback
+      const img = match.images?.edges?.[0]?.node?.url || fallback.img
+      const price = match.priceRange?.minVariantPrice?.amount
+        ? `£${parseFloat(match.priceRange.minVariantPrice.amount).toFixed(2)}`
+        : fallback.price
+      return { ...fallback, name: match.title, img, price }
+    })
+    upsellProducts = upsellMapped
   } catch {}
 
   return (
@@ -176,7 +206,7 @@ export default async function HomePage() {
         </div>
         <p style={{ fontSize: 14, color: 'var(--fg-70)', marginBottom: 40 }}>Customers who bought Tattoo Butter also added these to their order.</p>
         <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fill,minmax(260px,1fr))', gap: 16, marginBottom: 40 }}>
-          {UPSELL.map((item, i) => (
+          {upsellProducts.map((item, i) => (
             <div key={item.name} style={{ background: 'var(--bg)', border: `1px solid ${i === 0 ? 'var(--lime)' : 'var(--rule)'}`, borderRadius: 14, overflow: 'hidden', position: 'relative', transition: 'border-color .3s,transform .25s', cursor: 'pointer' }}>
               {item.badge && (
                 <div style={{ position: 'absolute', top: 12, right: 12, background: 'var(--lime)', color: '#0a0a0a', fontFamily: 'var(--font-barlow-condensed)', fontWeight: 800, fontSize: 9, letterSpacing: '.16em', textTransform: 'uppercase', padding: '4px 8px', borderRadius: 5, zIndex: 2 }}>
