@@ -3,7 +3,7 @@ import Stripe from 'stripe'
 
 // STRIPE_SECRET_KEY is NEVER in code — only in Vercel env vars
 const stripe = new Stripe(process.env.STRIPE_SECRET_KEY!, {
-  apiVersion: '2024-11-20.acacia',
+  apiVersion: '2025-02-24.acacia',
 })
 
 const BASE_URL = process.env.NEXT_PUBLIC_SITE_URL || 'https://www.kongtattoocareglobal.com'
