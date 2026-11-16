@@ -272,67 +272,50 @@ export default async function HomePage() {
         <div className="wrap-wide cap reveal-section">
           <p className="lbl reveal-child">Studio Stories</p>
           <h2 className="hed reveal-child" style={{ fontSize: 'clamp(44px,6vw,88px)', marginTop: 10, marginBottom: 48 }}>See It In <em style={{ color: 'var(--red)' }}>Action</em></h2>
-          {/* 5 Instagram Reels in a responsive grid — 2 large + 3 small on desktop, stacked on mobile */}
-          <div style={{ display: 'grid', gridTemplateColumns: 'repeat(2,1fr)', gridTemplateRows: 'auto auto', gap: 14 }} className="ig-grid-resp">
-            {/* Large featured reel */}
-            <a
-              href="https://www.instagram.com/p/Dfu0zViKx-2/"
-              target="_blank" rel="noopener noreferrer"
-              className="reveal-child ig-card"
-              style={{ gridRow: 'span 2', borderRadius: 16, overflow: 'hidden', border: '1px solid var(--rule)', background: '#000', position: 'relative', display: 'block', aspectRatio: '9/16' } as React.CSSProperties}
-            >
-              <iframe
-                src="https://www.instagram.com/p/Dfu0zViKx-2/embed/"
-                style={{ width: '100%', height: '100%', border: 'none', position: 'absolute', inset: 0 }}
-                allowFullScreen
-                loading="lazy"
-              />
-            </a>
-            {/* Right column — 2 reels stacked */}
-            <div style={{ display: 'flex', flexDirection: 'column', gap: 14 }}>
-              {[
-                'https://www.instagram.com/p/DfVCAM8Nckr/',
-                'https://www.instagram.com/p/DfM76LKqWnH/',
-              ].map((url, i) => (
-                <a
-                  key={url}
-                  href={url}
-                  target="_blank" rel="noopener noreferrer"
-                  className="reveal-child ig-card"
-                  style={{ borderRadius: 14, overflow: 'hidden', border: '1px solid var(--rule)', background: '#000', position: 'relative', display: 'block', aspectRatio: '9/16', '--delay': `${i*80}ms` } as React.CSSProperties}
-                >
-                  <iframe
-                    src={`${url}embed/`}
-                    style={{ width: '100%', height: '100%', border: 'none', position: 'absolute', inset: 0 }}
-                    allowFullScreen
-                    loading="lazy"
-                  />
-                </a>
-              ))}
-            </div>
-          </div>
-          {/* Bottom row — 2 more reels side by side */}
-          <div style={{ display: 'grid', gridTemplateColumns: 'repeat(2,1fr)', gap: 14, marginTop: 14 }} className="ig-row2-resp">
-            {[
-              'https://www.instagram.com/p/DfB8Cruttbb/',
-              'https://www.instagram.com/p/DfPBhDeNhAS/',
-            ].map((url, i) => (
-              <a
-                key={url}
-                href={url}
-                target="_blank" rel="noopener noreferrer"
-                className="reveal-child ig-card"
-                style={{ borderRadius: 14, overflow: 'hidden', border: '1px solid var(--rule)', background: '#000', position: 'relative', display: 'block', aspectRatio: '9/16', '--delay': `${i*80}ms` } as React.CSSProperties}
-              >
-                <iframe
-                  src={`${url}embed/`}
-                  style={{ width: '100%', height: '100%', border: 'none', position: 'absolute', inset: 0 }}
-                  allowFullScreen
-                  loading="lazy"
-                />
-              </a>
-            ))}
-          </div>
+          {/* 5 Reels grid — clean video tiles, no Instagram chrome */}
+          {(() => {
+            const reels = [
+              { url: 'https://www.instagram.com/p/Dfu0zViKx-2/', img: '/assets/img/real-tattoo-studio-1.jpg', big: true },
+              { url: 'https://www.instagram.com/p/DfVCAM8Nckr/', img: '/assets/img/real-barbell-kong.png', big: false },
+              { url: 'https://www.instagram.com/p/DfM76LKqWnH/', img: '/assets/img/real-tattoo-studio-2.jpg', big: false },
+              { url: 'https://www.instagram.com/p/DfB8Cruttbb/', img: '/assets/img/real-products-studio.jpg', big: false },
+              { url: 'https://www.instagram.com/p/DfPBhDeNhAS/', img: '/assets/img/real-defend-your-ink.jpg', big: false },
+            ];
+            return (
+              <div style={{ display: 'grid', gridTemplateColumns: 'repeat(3,1fr)', gap: 12 }} className="ig-grid-resp">
+                {reels.map(({ url, img, big }, i) => (
+                  <a
+                    key={url}
+                    href={url}
+                    target="_blank" rel="noopener noreferrer"
+                    className="reveal-child ig-card"
+                    style={{
+                      borderRadius: 16, overflow: 'hidden', background: '#000',
+                      position: 'relative', display: 'block', aspectRatio: '9/16',
+                      gridColumn: big ? 'span 1' : 'span 1',
+                      gridRow: big ? 'span 2' : 'span 1',
+                      ...(i === 0 ? { gridColumn: 'span 1', gridRow: 'span 2' } : {}),
+                    } as React.CSSProperties}
+                  >
+                    <Image src={img} alt="KONG Reel" fill className="object-cover" style={{ transition: 'transform .5s ease', opacity: .85 }} />
+                    {/* Dark overlay */}
+                    <div style={{ position: 'absolute', inset: 0, background: 'linear-gradient(0deg,rgba(0,0,0,.55) 0%,transparent 50%)' }} />
+                    {/* Play icon */}
+                    <div style={{ position: 'absolute', inset: 0, display: 'flex', alignItems: 'center', justifyContent: 'center' }}>
+                      <div style={{ width: 48, height: 48, borderRadius: '50%', background: 'rgba(255,255,255,.18)', backdropFilter: 'blur(8px)', display: 'flex', alignItems: 'center', justifyContent: 'center', border: '1.5px solid rgba(255,255,255,.35)', transition: 'transform .2s ease, background .2s ease' }} className="ig-play-btn">
+                        <svg width="18" height="18" viewBox="0 0 18 18" fill="none"><path d="M6 4l9 5-9 5V4z" fill="#fff"/></svg>
+                      </div>
+                    </div>
+                    {/* Reel label bottom */}
+                    <div style={{ position: 'absolute', bottom: 12, left: 12, right: 12, display: 'flex', alignItems: 'center', gap: 6 }}>
+                      <svg width="14" height="14" viewBox="0 0 24 24" fill="none"><rect x="2" y="2" width="20" height="20" rx="5" stroke="white" strokeWidth="1.5"/><circle cx="12" cy="12" r="4" stroke="white" strokeWidth="1.5"/><circle cx="17.5" cy="6.5" r="1" fill="white"/></svg>
+                      <span style={{ fontSize: 10, color: 'rgba(255,255,255,.8)', fontFamily: 'var(--font-barlow-condensed)', fontWeight: 700, letterSpacing: '.08em', textTransform: 'uppercase' }}>Watch Reel</span>
+                    </div>
+                  </a>
+                ))}
+              </div>
+            );
+          })()}
         </div>
       </section>
 
@@ -583,7 +566,9 @@ export default async function HomePage() {
         /* Responsive */
         /* Instagram embed cards */
         .ig-card { text-decoration: none; }
-        .ig-card iframe { pointer-events: none; }
+        .ig-card:hover img { transform: scale(1.05); }
+        .ig-card:hover .ig-play-btn { transform: scale(1.15); background: rgba(230,30,50,.7) !important; border-color: rgba(230,30,50,.8) !important; }
+        @media(max-width:640px){ .ig-grid-resp { grid-template-columns: repeat(2,1fr) !important; } .ig-grid-resp a[style*="span 2"] { grid-row: span 1 !important; } }
         .ig-card:hover { border-color: var(--lime) !important; }
 
         @media (max-width: 1100px) {
