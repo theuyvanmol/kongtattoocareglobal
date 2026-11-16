@@ -14,7 +14,12 @@ export async function GET(req: NextRequest) {
   const clientSecret = process.env.SHOPIFY_API_SECRET || ''
 
   try {
-    const resp = await fetch(`https://${shop}/admin/oauth/access_token`, {
+    // Dev Dashboard apps use admin.shopify.com for token exchange
+    const storeHandle = shop.replace('.myshopify.com', '')
+    const tokenUrl = shop.includes('myshopify.com')
+      ? `https://admin.shopify.com/store/${storeHandle}/oauth/access_token`
+      : `https://${shop}/admin/oauth/access_token`
+    const resp = await fetch(tokenUrl, {
       method: 'POST',
       headers: { 'Content-Type': 'application/json' },
       body: JSON.stringify({
