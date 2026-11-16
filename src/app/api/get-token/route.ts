@@ -44,12 +44,15 @@ export async function GET() {
 
     const resp = await fetch(`https://admin.shopify.com/store/${storeHandle}/oauth/access_token`, {
       method: 'POST',
-      headers: { 'Content-Type': 'application/x-www-form-urlencoded' },
+      headers: {
+        'Content-Type': 'application/x-www-form-urlencoded',
+        'User-Agent': 'Kong-Tattoo-Care/1.0',
+        'Accept': 'application/json',
+      },
       body: new URLSearchParams({
         grant_type: 'urn:ietf:params:oauth:grant-type:jwt-bearer',
         assertion: jwt,
         client_id: clientId,
-        client_secret: clientSecret,
       }).toString(),
       cache: 'no-store',
     })
