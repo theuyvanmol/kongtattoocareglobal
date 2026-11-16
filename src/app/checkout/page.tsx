@@ -137,8 +137,38 @@ export default function CheckoutPage() {
                   {loading ? 'Processing…' : 'Proceed to Checkout →'}
                 </button>
                 <p className="text-xs text-center mt-3" style={{ color: 'var(--fg-40)' }}>
-                  Secure checkout via Stripe. You\'ll be redirected to complete payment.
+                  Secure checkout — pay your way. Redirected to complete payment.
                 </p>
+                {/* Payment options */}
+                <div className="mt-5">
+                  <p className="text-center text-[10px] mb-3" style={{ color: 'var(--fg-40)', fontFamily: 'var(--font-barlow-condensed)', fontWeight: 700, letterSpacing: '.08em', textTransform: 'uppercase' }}>We Accept</p>
+                  <div className="flex flex-wrap items-center justify-center gap-2">
+                    {[
+                      { label: 'Visa', bg: '#1a1f71', color: '#fff', w: 48 },
+                      { label: 'Mastercard', bg: '#252525', color: '#fff', w: 54 },
+                      { label: 'Amex', bg: '#007bc1', color: '#fff', w: 54 },
+                      { label: 'Apple Pay', bg: '#000', color: '#fff', w: 60 },
+                      { label: 'Google Pay', bg: '#fff', color: '#000', w: 64, border: true },
+                      { label: 'Klarna', bg: '#ffb3c7', color: '#000', w: 56 },
+                      { label: 'Revolut Pay', bg: '#191c1f', color: '#fff', w: 72 },
+                    ].map(p => (
+                      <div
+                        key={p.label}
+                        style={{
+                          background: p.bg, color: p.color,
+                          borderRadius: 6, padding: '4px 8px',
+                          fontSize: 10, fontWeight: 800,
+                          fontFamily: 'var(--font-barlow-condensed)',
+                          letterSpacing: '.04em',
+                          border: p.border ? '1px solid #ddd' : '1px solid transparent',
+                          whiteSpace: 'nowrap',
+                        }}
+                      >
+                        {p.label}
+                      </div>
+                    ))}
+                  </div>
+                </div>
                 <div className="flex items-center justify-center gap-3 mt-4" style={{ color: 'var(--fg-40)', fontSize: 11 }}>
                   <span>🔒 Secure</span>
                   <span>·</span>

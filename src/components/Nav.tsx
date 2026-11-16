@@ -69,6 +69,7 @@ export default function Nav({ active }: { active?: string }) {
             </Link>
           ))}
           <Link href="/login" onClick={() => setMobileOpen(false)} className="mt-2 text-lg" style={{ color: 'var(--fg-70)' }}>Login →</Link>
+          <Link href="/admin" onClick={() => setMobileOpen(false)} className="text-base" style={{ color: 'var(--fg-40)' }}>Admin →</Link>
           <Link href="/checkout" onClick={() => setMobileOpen(false)} className="text-lg font-bold" style={{ color: 'var(--lime)' }}>Checkout →</Link>
         </nav>
       )}
@@ -121,6 +122,11 @@ export default function Nav({ active }: { active?: string }) {
 
           {/* Actions */}
           <div className="flex items-center gap-3 ml-auto md:ml-0">
+            {/* Admin — desktop only, subtle */}
+            <Link href="/admin" className="hidden md:flex items-center gap-1.5 text-[10px] px-3 py-1.5 rounded-lg" style={{ color: 'var(--fg-40)', border: '1px solid var(--rule)', fontFamily: 'var(--font-barlow-condensed)', fontWeight: 700, letterSpacing: '.08em', textTransform: 'uppercase' }}>
+              <svg width="11" height="11" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5" aria-hidden="true"><rect x="3" y="11" width="18" height="11" rx="2"/><path d="M7 11V7a5 5 0 0 1 10 0v4"/></svg>
+              Admin
+            </Link>
             {/* Login — desktop only */}
             <Link href="/login" className="hidden md:flex btn btn-out text-[11px] py-2 px-4">Login</Link>
             {/* Shop CTA — desktop only */}

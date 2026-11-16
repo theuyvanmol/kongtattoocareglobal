@@ -42,6 +42,13 @@ export default function RootLayout({ children }: { children: React.ReactNode }) 
         <link rel="preconnect" href="https://fonts.googleapis.com" />
         <link rel="preconnect" href="https://fonts.gstatic.com" crossOrigin="anonymous" />
         <link rel="preconnect" href="https://js.stripe.com" />
+        {/* Google Search Console verification */}
+        <meta name="google-site-verification" content="XoVJoKNy1zY6l5PgdziQ9j0e-UsXxqukNmacVJ-pgk0" />
+        {/* SEO: additional meta */}
+        <meta name="theme-color" content="#E61E32" />
+        <meta name="format-detection" content="telephone=no" />
+        <meta name="geo.region" content="GB" />
+        <meta name="geo.placename" content="United Kingdom" />
         {/* Favicons */}
         <link rel="icon" href="/favicon.ico" sizes="any" />
         <link rel="apple-touch-icon" href="/apple-touch-icon.png" />

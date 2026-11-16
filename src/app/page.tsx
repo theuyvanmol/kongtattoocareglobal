@@ -14,11 +14,11 @@ export const revalidate = 60
 
 // ── Collection metadata (fallback images for when Shopify collection has no image) ──
 const COLLECTION_META: Record<string, { label: string; desc: string; fallbackImg: string; href: string }> = {
-  numb:   { label: 'Numb',   desc: 'Pre-session pain relief',    fallbackImg: '/assets/img/img-home-4.webp',  href: '/shop-all?c=numb'   },
-  renew:  { label: 'Renew',  desc: 'Healing & repair',           fallbackImg: '/assets/img/img-home-7.webp',  href: '/shop-all?c=renew'  },
-  glow:   { label: 'Glow',   desc: 'Vibrance & brightness',      fallbackImg: '/assets/img/img-home-10.webp', href: '/shop-all?c=glow'   },
-  defend: { label: 'Defend', desc: 'SPF & protection',           fallbackImg: '/assets/img/img-home-13.webp', href: '/shop-all?c=defend' },
-  expert: { label: 'Expert', desc: 'Studio-grade pro',           fallbackImg: '/assets/img/img-home-16.webp', href: '/shop-all?c=expert' },
+  numb:   { label: 'Numb',   desc: 'Pre-session pain relief',  fallbackImg: '/assets/img/img-home-4.webp',  href: '/shop-all?c=numb'   },
+  renew:  { label: 'Renew',  desc: 'Healing & repair',         fallbackImg: '/assets/img/img-home-5.webp',  href: '/shop-all?c=renew'  },
+  glow:   { label: 'Glow',   desc: 'Vibrance & brightness',    fallbackImg: '/assets/img/img-home-11.webp', href: '/shop-all?c=glow'   },
+  defend: { label: 'Defend', desc: 'SPF & protection',         fallbackImg: '/assets/img/img-home-7.webp',  href: '/shop-all?c=defend' },
+  expert: { label: 'Expert', desc: 'Studio-grade pro',         fallbackImg: '/assets/img/img-home-8.webp',  href: '/shop-all?c=expert' },
 }
 
 const REVIEWS = [
@@ -244,7 +244,7 @@ export default async function HomePage() {
       <section className="reveal-section" style={{ paddingBlock: 100, background: 'var(--bg)', overflow: 'hidden' }}>
         <div className="wrap-wide cap">
           <p className="lbl reveal-child">Shop by Collection</p>
-          <h2 className="hed reveal-child" style={{ fontSize: 'clamp(44px,6vw,88px)', marginTop: 10, marginBottom: 48 }}>What&apos;s Your <em style={{ color: 'var(--lime)' }}>Ink?</em></h2>
+          <h2 className="hed reveal-child" style={{ fontSize: 'clamp(44px,6vw,88px)', marginTop: 10, marginBottom: 48 }}>Shop by <em style={{ color: 'var(--lime)' }}>Collection</em></h2>
         </div>
         <div className="wrap-wide cap" style={{ display: 'grid', gridTemplateColumns: 'repeat(5,1fr)', gap: 14 }} id="coll-grid">
           {collectionData.map((c, i) => (
@@ -254,7 +254,7 @@ export default async function HomePage() {
               style={{ position: 'relative', borderRadius: 14, overflow: 'hidden', border: '1px solid var(--rule)', aspectRatio: '3/4', display: 'block', transform: 'translateY(60px)', opacity: 0, transition: `transform .7s cubic-bezier(.16,1,.3,1) ${i*80}ms, opacity .6s ease ${i*80}ms` }}
               className="coll-card-hover coll-card-anim"
             >
-              <Image src={c.img} alt={c.label} fill className="object-cover" style={{ transition: 'transform .6s cubic-bezier(.16,1,.3,1)', transform: 'scale(1.08)' }} />
+              <Image src={c.img} alt={c.label} fill className="object-contain" style={{ transition: 'transform .6s cubic-bezier(.16,1,.3,1)', transform: 'scale(1)', padding: '12px 12px 60px' }} />
               <div style={{ position: 'absolute', inset: 0, background: 'linear-gradient(0deg,rgba(10,10,10,.96) 0%,rgba(10,10,10,.3) 55%,transparent 80%)' }} />
               <div style={{ position: 'absolute', bottom: 0, left: 0, right: 0, padding: 20 }}>
                 <div className="hed" style={{ fontSize: 26, marginBottom: 3 }}>{c.label}</div>
@@ -328,19 +328,19 @@ export default async function HomePage() {
           </div>
           <a href="https://instagram.com/kongtattoocare_uk" target="_blank" rel="noopener noreferrer" className="btn btn-out reveal-child" style={{ fontSize: 11, padding: '9px 18px' }}>Follow @kongtattoocare_uk</a>
         </div>
-        <div style={{ display: 'grid', gridTemplateColumns: 'repeat(6,1fr)', gridTemplateRows: 'repeat(2,220px)', gap: 12 }} className="gal-grid-resp">
+        <div style={{ display: 'grid', gridTemplateColumns: 'repeat(6,1fr)', gap: 12 }} className="gal-grid-resp">
           {GALLERY_IMGS.map(({ img, big }, gi) => (
             <div
               key={img}
               className="gal-item-hover gal-reveal"
               style={{
                 overflow: 'hidden', borderRadius: 12, border: '1px solid var(--rule)', position: 'relative',
-                ...(big ? { gridColumn: 'span 2', gridRow: 'span 2' } : { gridColumn: 'span 2' }),
+                ...(big ? { gridColumn: 'span 2', gridRow: 'span 2', aspectRatio: '1/1' } : { gridColumn: 'span 2', aspectRatio: '4/3' }),
                 transform: 'scale(.95)', opacity: 0,
                 transition: `transform .6s cubic-bezier(.16,1,.3,1) ${gi*60}ms, opacity .5s ease ${gi*60}ms`,
               }}
             >
-              <Image src={img} alt="KONG community" fill className="object-cover" style={{ transition: 'transform .6s cubic-bezier(.16,1,.3,1)' }} />
+              <Image src={img} alt="KONG community" fill className="object-cover" sizes="(max-width:768px) 50vw, 33vw" style={{ transition: 'transform .6s cubic-bezier(.16,1,.3,1)' }} />
             </div>
           ))}
         </div>
@@ -354,7 +354,7 @@ export default async function HomePage() {
           <p className="lbl reveal-child">How It Works</p>
           <h2 className="hed reveal-child" style={{ fontSize: 'clamp(44px,6vw,88px)', marginTop: 10, marginBottom: 52 }}>The Kong <em style={{ color: 'var(--lime)' }}>Method</em></h2>
           <div style={{ display: 'grid', gridTemplateColumns: 'repeat(4,1fr)', gap: 28, position: 'relative' }} className="steps-grid-resp">
-            <div style={{ position: 'absolute', top: 28, left: 'calc(12.5% + 14px)', right: 'calc(12.5% + 14px)', height: 1, background: 'linear-gradient(90deg,var(--red),var(--lime))' }} className="steps-line-resp" />
+            <div style={{ position: 'absolute', top: 27, left: 'calc(12.5% + 28px)', right: 'calc(12.5% + 28px)', height: 2, background: 'linear-gradient(90deg,var(--red) 0%,var(--red) 50%,var(--lime) 100%)', zIndex: 0 }} className="steps-line-resp" />
             {STEPS.map((s, si) => (
               <div key={s.n} className="reveal-child" style={{ position: 'relative', zIndex: 1, '--delay': `${si*120}ms` } as React.CSSProperties}>
                 <div style={{ width: 56, height: 56, borderRadius: '50%', background: 'var(--red)', display: 'grid', placeItems: 'center', fontFamily: 'var(--font-barlow-condensed)', fontWeight: 900, fontSize: 20, color: '#fff', marginBottom: 18, transition: 'transform .3s, box-shadow .3s' }} className="step-num">
@@ -469,7 +469,7 @@ export default async function HomePage() {
       {/* ── FINAL CTA ─────────────────────────────────────────────────────── */}
       <section id="cta-section" style={{ position: 'relative', overflow: 'hidden', minHeight: '70vh', display: 'flex', alignItems: 'center', background: '#0a0a0a' }}>
         <div id="cta-bg" style={{ position: 'absolute', inset: '-20%', willChange: 'transform' }}>
-          <Image src="/assets/img/real-defend-your-ink.jpg" alt="" fill className="object-cover object-top" style={{ opacity: 0.3 }} />
+          <Image src="/assets/img/real-defend-your-ink.jpg" alt="" fill className="object-cover object-center" style={{ opacity: 0.55 }} />
           <div style={{ position: 'absolute', inset: 0, background: 'linear-gradient(110deg,rgba(10,10,10,.98) 0%,rgba(10,10,10,.7) 55%,rgba(10,10,10,.25) 100%)' }} />
         </div>
         <div className="wrap-wide cap reveal-section" style={{ position: 'relative', zIndex: 2, paddingBlock: 90 }}>

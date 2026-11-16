@@ -16,6 +16,8 @@ export const defaultMetadata: Metadata = {
     'tattoo aftercare UK', 'tattoo healing cream', 'tattoo butter UK',
     'best tattoo aftercare', 'KONG tattoo', 'numb cream tattoo',
     'tattoo healing balm', 'tattoo glow', 'tattoo care products',
+    'tattoo numbing cream', 'tattoo suncream SPF', 'tattoo piercing aftercare',
+    'professional tattoo care', 'vegan tattoo aftercare', 'tattoo ink protection',
   ],
   authors: [{ name: 'KONG Tattoo Care UK', url: BASE_URL }],
   creator: 'KONG Tattoo Care',
