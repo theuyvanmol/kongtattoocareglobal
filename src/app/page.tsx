@@ -54,27 +54,23 @@ export default async function HomePage() {
   // Upsell = top 3 real products
   const upsell = products.slice(0, Math.min(3, products.length))
 
-  // Fetch collection images from Shopify (each collection has its own hero image)
+  // Fetch product counts per collection from Shopify
   const collectionHandles = ['numb', 'renew', 'glow', 'defend', 'expert']
   const collectionData = await Promise.all(
     collectionHandles.map(async (handle) => {
+      const meta = COLLECTION_META[handle]
       try {
         const coll = await getCollection(handle)
-        const meta = COLLECTION_META[handle]
-        // Use collection image if available, otherwise fall back to first product image
-        const img = coll?.image?.url
-          || coll?.products?.edges?.[0]?.node?.images?.edges?.[0]?.node?.url
-          || meta.fallbackImg
         const count = coll?.products?.edges?.length ?? 0
         return {
           id: handle,
           label: meta.label,
+          // Always use local curated image — Shopify collection images aren't set
+          img: meta.fallbackImg,
           desc: count > 0 ? `${meta.desc} · ${count} product${count !== 1 ? 's' : ''}` : meta.desc,
-          img,
           href: meta.href,
         }
       } catch {
-        const meta = COLLECTION_META[handle]
         return { id: handle, label: meta.label, desc: meta.desc, img: meta.fallbackImg, href: meta.href }
       }
     })
