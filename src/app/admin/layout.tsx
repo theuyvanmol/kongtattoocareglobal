@@ -2,16 +2,21 @@
 import { useState, useEffect, ReactNode } from 'react'
 import { usePathname, useRouter } from 'next/navigation'
 
-const NAV: [string, string][] = [
+const NAV: [string, string, string?][] = [
   ['/admin', 'Dashboard'],
+  ['---', 'SALES'],
   ['/admin/orders', 'Orders'],
   ['/admin/payments', 'Payments'],
-  ['/admin/products', 'Products'],
-  ['/admin/discounts', 'Discounts'],
   ['/admin/customers', 'Customers'],
-  ['/admin/blog', 'Blog'],
+  ['/admin/discounts', 'Discounts'],
+  ['---', 'CONTENT'],
+  ['/admin/products', 'Products'],
+  ['/admin/blogs', 'Blog Posts'],
+  ['/admin/pages', 'Pages'],
+  ['---', 'COMMS'],
   ['/admin/enquiries', 'Enquiries'],
   ['/admin/email', 'Email'],
+  ['---', 'SYSTEM'],
   ['/admin/settings', 'Settings'],
 ]
 
@@ -118,7 +123,8 @@ export default function AdminLayout({ children }: { children: ReactNode }) {
             </div>
           </div>
           <nav className="adm-nav">
-            {NAV.map(([href, label]) => {
+            {NAV.map(([href, label], i) => {
+              if (href === '---') return <div key={i} style={{ padding: '8px 12px 4px', fontSize: 9, letterSpacing: '1.5px', color: '#444', textTransform: 'uppercase', fontWeight: 600 }}>{label}</div>
               const active = href === '/admin' ? pathname === '/admin' : pathname.startsWith(href)
               return <a key={href} href={href} className={active ? 'active' : ''}>{label}</a>
             })}
