@@ -2,59 +2,40 @@
 import { useEffect, useState, useRef } from 'react'
 import LiveNow from '@/components/LiveNow'
 
-interface Analytics {
-  totalOrders: number
-  revenueAllTime: number
-  revenue30d: number
-  orders30d: number
-  orders7d: number
-  newCustomers30d: number
-  avgOrderValue: number
-  dailyRevenue: { date: string; revenue: number }[]
-}
-
-interface Order {
-  id: number
-  name: string
-  email: string
-  total: string
+interface StripeCharge {
+  id: string
+  amount: number
+  currency: string
   status: string
-  financial_status: string
-  fulfillment_status: string
-  created_at: string
+  email: string
+  name: string
+  created: string
+  refunded: boolean
+  receipt_url: string | null
 }
 
-interface Discount {
-  id: number
-  title: string
-  value: string
-  valueType: string
-  usageCount: number
-  usageLimit: number | null
-  endsAt: string | null
-  codes: { id: number; code: string; usageCount: number }[]
+interface StripeBalance {
+  available: number
+  pending: number
 }
 
 export default function AdminDashboard() {
-  const [analytics, setAnalytics] = useState<Analytics | null>(null)
-  const [orders, setOrders] = useState<Order[]>([])
-  const [discounts, setDiscounts] = useState<Discount[]>([])
+  const [charges, setCharges] = useState<StripeCharge[]>([])
+  const [balance, setBalance] = useState<StripeBalance>({ available: 0, pending: 0 })
   const [loading, setLoading] = useState(true)
   const [error, setError] = useState('')
   const globeRef = useRef<HTMLCanvasElement>(null)
 
   useEffect(() => {
-    Promise.all([
-      fetch('/api/admin/analytics').then(r => r.json()),
-      fetch('/api/admin/orders').then(r => r.json()),
-      fetch('/api/admin/discounts').then(r => r.json()),
-    ]).then(([a, o, d]) => {
-      if (a.error) setError(a.error)
-      else setAnalytics(a)
-      setOrders((o.orders || []).slice(0, 5))
-      setDiscounts(d.discounts || [])
-      setLoading(false)
-    }).catch(e => { setError(String(e)); setLoading(false) })
+    fetch('/api/admin/stripe')
+      .then(r => r.json())
+      .then(d => {
+        if (d.error) { setError(d.error); setLoading(false); return }
+        setCharges(d.charges || [])
+        setBalance(d.balance || { available: 0, pending: 0 })
+        setLoading(false)
+      })
+      .catch(e => { setError(String(e)); setLoading(false) })
   }, [])
 
   // Animated 3D dot globe
@@ -74,30 +55,18 @@ export default function AdminDashboard() {
     let angle = 0
     let raf: number
 
-    // Dot positions (simplified land masses as lat/lon clusters)
-    const landDots: [number, number][] = []
-    // Generate dots that approximate continents
-    const regions = [
-      // Europe
+    const regions: [number, number][] = [
       ...Array.from({ length: 80 }, () => [35 + Math.random() * 25, -10 + Math.random() * 40] as [number, number]),
-      // North America
       ...Array.from({ length: 120 }, () => [25 + Math.random() * 50, -130 + Math.random() * 65] as [number, number]),
-      // South America
       ...Array.from({ length: 80 }, () => [-50 + Math.random() * 60, -80 + Math.random() * 35] as [number, number]),
-      // Africa
       ...Array.from({ length: 100 }, () => [-35 + Math.random() * 72, -18 + Math.random() * 55] as [number, number]),
-      // Asia
       ...Array.from({ length: 160 }, () => [5 + Math.random() * 65, 25 + Math.random() * 115] as [number, number]),
-      // Australia
       ...Array.from({ length: 50 }, () => [-38 + Math.random() * 30, 115 + Math.random() * 40] as [number, number]),
-      // UK/Ireland (highlight for Kong)
       ...Array.from({ length: 20 }, () => [50 + Math.random() * 10, -8 + Math.random() * 10] as [number, number]),
     ]
 
     function draw() {
       ctx!.clearRect(0, 0, W, H)
-
-      // Glow
       const grd = ctx!.createRadialGradient(cx, cy, R * 0.3, cx, cy, R * 1.1)
       grd.addColorStop(0, 'rgba(230,30,50,0.06)')
       grd.addColorStop(1, 'rgba(0,0,0,0)')
@@ -106,14 +75,12 @@ export default function AdminDashboard() {
       ctx!.arc(cx, cy, R * 1.1, 0, Math.PI * 2)
       ctx!.fill()
 
-      // Globe outline
       ctx!.strokeStyle = 'rgba(255,255,255,0.04)'
       ctx!.lineWidth = 1
       ctx!.beginPath()
       ctx!.arc(cx, cy, R, 0, Math.PI * 2)
       ctx!.stroke()
 
-      // Lat/lon grid lines
       ctx!.strokeStyle = 'rgba(255,255,255,0.04)'
       ctx!.lineWidth = 0.5
       for (let lat = -60; lat <= 60; lat += 30) {
@@ -125,59 +92,57 @@ export default function AdminDashboard() {
         ctx!.stroke()
       }
 
-      // Land dots
       regions.forEach(([lat, lon]) => {
         const latRad = (lat * Math.PI) / 180
         const lonRad = ((lon + angle) * Math.PI) / 180
         const x3 = Math.cos(latRad) * Math.sin(lonRad)
         const y3 = Math.sin(latRad)
         const z3 = Math.cos(latRad) * Math.cos(lonRad)
-        if (z3 < 0) return // back face
-
+        if (z3 < 0) return
         const px = cx + x3 * R
         const py = cy - y3 * R
         const brightness = 0.4 + z3 * 0.6
         const isUK = lat > 50 && lon > -8 && lon < 2
-
         ctx!.beginPath()
         ctx!.arc(px, py, z3 * 3 + 1, 0, Math.PI * 2)
-        ctx!.fillStyle = isUK
-          ? `rgba(230,30,50,${brightness})`
-          : `rgba(200,255,0,${brightness * 0.6})`
+        ctx!.fillStyle = isUK ? `rgba(230,30,50,${brightness})` : `rgba(200,255,0,${brightness * 0.6})`
         ctx!.fill()
       })
-
-      // Longitude meridians (faint)
-      for (let lon = 0; lon < 360; lon += 30) {
-        const lonRad = ((lon + angle) * Math.PI) / 180
-        const cosL = Math.cos(lonRad)
-        if (cosL < 0) continue
-        ctx!.strokeStyle = `rgba(255,255,255,${cosL * 0.03})`
-        ctx!.lineWidth = 0.5
-        ctx!.beginPath()
-        for (let la = -80; la <= 80; la += 5) {
-          const laRad = (la * Math.PI) / 180
-          const x3 = Math.cos(laRad) * Math.sin(lonRad)
-          const y3 = Math.sin(laRad)
-          const z3 = Math.cos(laRad) * Math.cos(lonRad)
-          if (z3 < 0) continue
-          const px = cx + x3 * R
-          const py = cy - y3 * R
-          la === -80 ? ctx!.moveTo(px, py) : ctx!.lineTo(px, py)
-        }
-        ctx!.stroke()
-      }
 
       angle -= 0.12
       raf = requestAnimationFrame(draw)
     }
-
     draw()
     return () => cancelAnimationFrame(raf)
   }, [])
 
   const fmt = (n: number) => `£${n.toLocaleString('en-GB', { minimumFractionDigits: 2, maximumFractionDigits: 2 })}`
-  const fmtDate = (s: string) => new Date(s).toLocaleDateString('en-GB', { day: '2-digit', month: 'short' })
+  const fmtDate = (s: string) => new Date(s).toLocaleDateString('en-GB', { day: '2-digit', month: 'short', year: 'numeric' })
+
+  // Compute stats from Stripe charges
+  const succeeded = charges.filter(c => c.status === 'succeeded' && !c.refunded)
+  const totalRevenue = succeeded.reduce((s, c) => s + c.amount, 0)
+  const avgOrder = succeeded.length > 0 ? totalRevenue / succeeded.length : 0
+
+  const now = Date.now()
+  const ms30d = 30 * 24 * 60 * 60 * 1000
+  const ms7d = 7 * 24 * 60 * 60 * 1000
+  const charges30d = succeeded.filter(c => now - new Date(c.created).getTime() < ms30d)
+  const charges7d = succeeded.filter(c => now - new Date(c.created).getTime() < ms7d)
+  const revenue30d = charges30d.reduce((s, c) => s + c.amount, 0)
+  const revenue7d = charges7d.reduce((s, c) => s + c.amount, 0)
+
+  // Daily revenue chart (last 14 days)
+  const dailyMap: Record<string, number> = {}
+  for (let i = 13; i >= 0; i--) {
+    const d = new Date(now - i * 24 * 60 * 60 * 1000)
+    dailyMap[d.toISOString().split('T')[0]] = 0
+  }
+  for (const c of charges30d) {
+    const key = c.created.split('T')[0]
+    if (key in dailyMap) dailyMap[key] += c.amount
+  }
+  const dailyRevenue = Object.entries(dailyMap).map(([date, revenue]) => ({ date, revenue }))
 
   function Sparkline({ data }: { data: { date: string; revenue: number }[] }) {
     if (!data || data.length < 2) return null
@@ -203,8 +168,6 @@ export default function AdminDashboard() {
     )
   }
 
-  const activeDiscounts = discounts.filter(d => !d.endsAt || new Date(d.endsAt) > new Date())
-
   return (
     <>
       <style>{`
@@ -223,22 +186,14 @@ export default function AdminDashboard() {
         .stat.lime{border-color:#C8FF0040} .stat.lime b{color:#C8FF00}
         .live-panel{background:#161616;border:1px solid #222;border-radius:12px;overflow:hidden}
         .live-head{padding:14px 16px;border-bottom:1px solid #1e1e1e;display:flex;align-items:center;gap:8px}
-        .live-dot{width:8px;height:8px;background:#C8FF00;border-radius:50%;animation:pulse 2s infinite}
-        @keyframes pulse{0%,100%{opacity:1;box-shadow:0 0 0 0 #C8FF0060}50%{opacity:.8;box-shadow:0 0 0 6px #C8FF0000}}
+        .live-dot{width:8px;height:8px;background:#C8FF00;border-radius:50%;animation:kpulse 2s infinite}
+        @keyframes kpulse{0%,100%{opacity:1;box-shadow:0 0 0 0 #C8FF0060}50%{opacity:.8;box-shadow:0 0 0 6px #C8FF0000}}
         .live-head-title{font-size:12px;font-weight:600;color:#ccc;letter-spacing:.5px;text-transform:uppercase}
-        .live-stats{display:grid;grid-template-columns:repeat(2,1fr);gap:1px;background:#1e1e1e}
-        .live-stat{background:#161616;padding:14px 16px;text-align:center}
-        .live-stat b{display:block;font-size:22px;font-weight:700;color:#fff}
-        .live-stat span{font-size:10px;color:#555;letter-spacing:.5px;text-transform:uppercase}
         .globe-wrap{background:#0a0a0a;border-top:1px solid #1e1e1e;position:relative;height:200px;overflow:hidden;display:flex;align-items:center;justify-content:center}
         .globe-label{position:absolute;top:10px;right:12px;font-size:10px;color:#333;letter-spacing:.5px}
         canvas.globe{width:100%;height:100%}
-        .disc-row{display:flex;align-items:center;gap:10px;padding:10px 0;border-bottom:1px solid #1a1a1a}
-        .disc-row:last-child{border-bottom:0}
-        .disc-code{font-family:monospace;background:#1a1a1a;padding:4px 10px;border-radius:6px;color:#C8FF00;font-size:12px;letter-spacing:1px;flex-shrink:0}
-        .disc-bar-wrap{flex:1;height:4px;background:#1a1a1a;border-radius:2px;overflow:hidden}
-        .disc-bar{height:100%;background:#E61E32;border-radius:2px;transition:width .4s}
-        .disc-usage{font-size:11px;color:#555;white-space:nowrap}
+        .order-row{display:flex;align-items:center;gap:12px;padding:10px 0;border-bottom:1px solid #1a1a1a}
+        .order-row:last-child{border-bottom:0}
         @media(max-width:720px){.g3,.g3b{grid-template-columns:1fr 1fr}.g2,.g-live{grid-template-columns:1fr}}
       `}</style>
 
@@ -251,21 +206,21 @@ export default function AdminDashboard() {
         {error && <div className="adm-error">{error}</div>}
 
         {loading ? (
-          <div className="adm-loading">Loading Shopify data…</div>
-        ) : analytics ? (
+          <div className="adm-loading">Loading Stripe data…</div>
+        ) : (
           <>
             {/* All-time stats */}
             <div className="g3">
               <div className="stat red">
-                <b>{fmt(analytics.revenueAllTime)}</b>
-                <span>Total revenue</span>
+                <b>{fmt(totalRevenue)}</b>
+                <span>Total revenue (Stripe)</span>
               </div>
               <div className="stat lime">
-                <b>{analytics.totalOrders}</b>
+                <b>{succeeded.length}</b>
                 <span>Total orders</span>
               </div>
               <div className="stat">
-                <b>{fmt(analytics.avgOrderValue)}</b>
+                <b>{fmt(avgOrder)}</b>
                 <span>Avg order value</span>
               </div>
             </div>
@@ -273,71 +228,52 @@ export default function AdminDashboard() {
             {/* Recent stats */}
             <div className="g3b">
               <div className="stat">
-                <b>{fmt(analytics.revenue30d)}</b>
+                <b>{fmt(revenue30d)}</b>
                 <span>Revenue · 30 days</span>
               </div>
               <div className="stat">
-                <b>{analytics.orders30d}</b>
+                <b>{charges30d.length}</b>
                 <span>Orders · 30 days</span>
               </div>
               <div className="stat">
-                <b>{analytics.newCustomers30d}</b>
-                <span>New customers · 30d</span>
+                <b>{fmt(revenue7d)}</b>
+                <span>Revenue · 7 days</span>
               </div>
             </div>
 
-            {/* Revenue sparkline + discount codes */}
+            {/* Balance + sparkline */}
             <div className="g2">
               <div className="adm-card">
                 <div className="adm-card-title">Revenue · last 14 days</div>
-                <Sparkline data={analytics.dailyRevenue} />
+                <Sparkline data={dailyRevenue} />
                 <div style={{ display: 'flex', justifyContent: 'space-between', marginTop: 6 }}>
-                  <span className="adm-muted">{analytics.dailyRevenue[0]?.date}</span>
+                  <span className="adm-muted">{dailyRevenue[0]?.date}</span>
                   <span className="adm-muted">Today</span>
                 </div>
               </div>
 
               <div className="adm-card">
-                <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: 14 }}>
-                  <div className="adm-card-title" style={{ marginBottom: 0 }}>Active discount codes</div>
-                  <a href="/admin/discounts" className="adm-btn ghost" style={{ padding: '4px 10px', fontSize: 11 }}>Manage →</a>
+                <div className="adm-card-title" style={{ marginBottom: 16 }}>Stripe balance</div>
+                <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: 10 }}>
+                  <div style={{ background: '#1a1a1a', borderRadius: 8, padding: '14px', textAlign: 'center' }}>
+                    <div style={{ fontSize: 22, fontWeight: 700, color: '#C8FF00' }}>{fmt(balance.available)}</div>
+                    <div style={{ fontSize: 11, color: '#666', marginTop: 4 }}>Available</div>
+                  </div>
+                  <div style={{ background: '#1a1a1a', borderRadius: 8, padding: '14px', textAlign: 'center' }}>
+                    <div style={{ fontSize: 22, fontWeight: 700, color: '#fff' }}>{fmt(balance.pending)}</div>
+                    <div style={{ fontSize: 11, color: '#666', marginTop: 4 }}>Pending</div>
+                  </div>
                 </div>
-                {activeDiscounts.length === 0 ? (
-                  <div className="adm-muted" style={{ fontSize: 12 }}>No active codes</div>
-                ) : activeDiscounts.flatMap(d => d.codes).slice(0, 6).map((c, i) => {
-                  const rule = discounts.find(d => d.codes.some(dc => dc.id === c.id))
-                  const limit = rule?.usageLimit
-                  const pct = limit ? Math.min((c.usageCount / limit) * 100, 100) : 0
-                  return (
-                    <div key={c.id} className="disc-row">
-                      <span className="disc-code">{c.code}</span>
-                      <div style={{ flex: 1 }}>
-                        <div style={{ fontSize: 11, color: '#666', marginBottom: 4 }}>
-                          {rule ? (rule.valueType === 'percentage' ? `${Math.abs(parseFloat(rule.value))}% off` : `£${Math.abs(parseFloat(rule.value))} off`) : ''}
-                        </div>
-                        {limit ? (
-                          <div className="disc-bar-wrap">
-                            <div className="disc-bar" style={{ width: `${pct}%` }} />
-                          </div>
-                        ) : null}
-                      </div>
-                      <span className="disc-usage">{c.usageCount}{limit ? `/${limit}` : ''} uses</span>
-                    </div>
-                  )
-                })}
               </div>
             </div>
 
             {/* Live view + globe */}
             <div className="g-live">
-              {/* Real Analytics Live View */}
               <div className="live-panel">
                 <div style={{ padding: '16px' }}>
                   <LiveNow />
                 </div>
               </div>
-
-              {/* 3D Globe */}
               <div className="live-panel">
                 <div className="live-head">
                   <div className="live-dot" style={{ background: '#E61E32', animationDelay: '.5s' }} />
@@ -349,44 +285,42 @@ export default function AdminDashboard() {
                 </div>
               </div>
             </div>
-          </>
-        ) : null}
 
-        {/* Recent orders */}
-        <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: 10 }}>
-          <div className="adm-card-title">Recent orders</div>
-          <a href="/admin/orders" className="adm-btn ghost" style={{ padding: '5px 12px', fontSize: 11 }}>View all →</a>
-        </div>
-        <div className="adm-table-wrap">
-          <table className="adm-table">
-            <thead>
-              <tr>
-                <th>Order</th>
-                <th>Customer</th>
-                <th>Date</th>
-                <th>Total</th>
-                <th>Payment</th>
-                <th>Fulfillment</th>
-              </tr>
-            </thead>
-            <tbody>
-              {orders.length === 0 ? (
-                <tr><td colSpan={6}><div className="adm-empty">No orders found</div></td></tr>
-              ) : orders.map(o => (
-                <tr key={o.id}>
-                  <td style={{ color: '#fff', fontWeight: 600 }}>{o.name}</td>
-                  <td className="adm-muted">{o.email || '—'}</td>
-                  <td className="adm-muted">{fmtDate(o.created_at)}</td>
-                  <td style={{ color: '#C8FF00', fontWeight: 600 }}>£{parseFloat(o.total || '0').toFixed(2)}</td>
-                  <td><span className={`adm-badge ${o.financial_status}`}>{o.financial_status}</span></td>
-                  <td><span className={`adm-badge ${o.fulfillment_status || 'unfulfilled'}`}>{o.fulfillment_status || 'unfulfilled'}</span></td>
-                </tr>
-              ))}
-            </tbody>
-          </table>
-        </div>
+            {/* Recent Stripe orders */}
+            <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: 10 }}>
+              <div className="adm-card-title">Recent payments</div>
+            </div>
+            <div className="adm-table-wrap">
+              <table className="adm-table">
+                <thead>
+                  <tr>
+                    <th>ID</th>
+                    <th>Customer</th>
+                    <th>Date</th>
+                    <th>Amount</th>
+                    <th>Status</th>
+                    <th>Receipt</th>
+                  </tr>
+                </thead>
+                <tbody>
+                  {charges.length === 0 ? (
+                    <tr><td colSpan={6}><div className="adm-empty">No payments found</div></td></tr>
+                  ) : charges.slice(0, 10).map(c => (
+                    <tr key={c.id}>
+                      <td style={{ color: '#fff', fontWeight: 600, fontFamily: 'monospace', fontSize: 11 }}>{c.id.slice(-8)}</td>
+                      <td className="adm-muted">{c.name || c.email || '—'}</td>
+                      <td className="adm-muted">{fmtDate(c.created)}</td>
+                      <td style={{ color: '#C8FF00', fontWeight: 600 }}>{fmt(c.amount)}</td>
+                      <td><span className={`adm-badge ${c.status}`}>{c.refunded ? 'refunded' : c.status}</span></td>
+                      <td>{c.receipt_url ? <a href={c.receipt_url} target="_blank" rel="noreferrer" style={{ color: '#E61E32', fontSize: 11 }}>View →</a> : '—'}</td>
+                    </tr>
+                  ))}
+                </tbody>
+              </table>
+            </div>
+          </>
+        )}
       </div>
     </>
   )
 }
-
