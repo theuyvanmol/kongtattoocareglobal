@@ -1,5 +1,6 @@
 'use client'
 import { useEffect, useState, useRef } from 'react'
+import LiveNow from '@/components/LiveNow'
 
 interface Analytics {
   totalOrders: number
@@ -329,15 +330,10 @@ export default function AdminDashboard() {
 
             {/* Live view + globe */}
             <div className="g-live">
-              {/* Shopify Live View embed */}
+              {/* Real Analytics Live View */}
               <div className="live-panel">
-                <div className="live-head">
-                  <div className="live-dot" />
-                  <span className="live-head-title">Live visitors</span>
-                  <a href="https://admin.shopify.com/store/kongtattoocareuk/live_view" target="_blank" rel="noopener" style={{ marginLeft: 'auto', fontSize: 11, color: '#555', textDecoration: 'none' }}>Open in Shopify ↗</a>
-                </div>
-                <div style={{ padding: '20px 16px' }}>
-                  <LiveVisitors />
+                <div style={{ padding: '16px' }}>
+                  <LiveNow />
                 </div>
               </div>
 
@@ -394,43 +390,3 @@ export default function AdminDashboard() {
   )
 }
 
-// Live visitors widget — polls Shopify Analytics API
-function LiveVisitors() {
-  const [data, setData] = useState<{ visitors: number; sessions: number; activeCarts: number; checkingOut: number } | null>(null)
-
-  useEffect(() => {
-    async function poll() {
-      try {
-        const r = await fetch('/api/admin/live')
-        if (r.ok) {
-          const d = await r.json()
-          setData(d)
-        }
-      } catch {}
-    }
-    poll()
-    const id = setInterval(poll, 30000) // poll every 30s
-    return () => clearInterval(id)
-  }, [])
-
-  return (
-    <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: 10 }}>
-      {[
-        { label: 'Visitors now', value: data?.visitors ?? '—' },
-        { label: 'Sessions', value: data?.sessions ?? '—' },
-        { label: 'Active carts', value: data?.activeCarts ?? '—' },
-        { label: 'Checking out', value: data?.checkingOut ?? '—' },
-      ].map(s => (
-        <div key={s.label} style={{ background: '#0f0f0f', border: '1px solid #1e1e1e', borderRadius: 10, padding: '12px 14px', textAlign: 'center' }}>
-          <div style={{ fontSize: 24, fontWeight: 700, color: '#fff', lineHeight: 1.2 }}>{s.value}</div>
-          <div style={{ fontSize: 10, color: '#555', marginTop: 4, textTransform: 'uppercase', letterSpacing: '.5px' }}>{s.label}</div>
-        </div>
-      ))}
-      <div style={{ gridColumn: '1/-1', textAlign: 'center', marginTop: 4 }}>
-        <a href="https://admin.shopify.com/store/kongtattoocareuk/live_view" target="_blank" rel="noopener" className="adm-btn" style={{ width: '100%', justifyContent: 'center', fontSize: 12 }}>
-          Open full Live View in Shopify →
-        </a>
-      </div>
-    </div>
-  )
-}

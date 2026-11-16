@@ -3,6 +3,7 @@ import { Barlow, Barlow_Condensed } from 'next/font/google'
 import Script from 'next/script'
 import './globals.css'
 import { defaultMetadata } from '@/lib/metadata'
+import Tracker from '@/components/Tracker'
 
 const barlow = Barlow({
   subsets: ['latin'],
@@ -47,6 +48,7 @@ export default function RootLayout({ children }: { children: React.ReactNode }) 
         <link rel="manifest" href="/site.webmanifest" />
       </head>
       <body className={`${barlow.variable} ${barlowCondensed.variable}`}>
+        <Tracker />
         {children}
 
         {/* Google Analytics */}
