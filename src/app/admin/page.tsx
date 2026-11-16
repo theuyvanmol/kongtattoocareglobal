@@ -45,29 +45,35 @@ export default function AdminPage() {
 
   // ── Auth check ──────────────────────────────────────────────────────────
   useEffect(() => {
-    const init = async () => {
-      try {
-        // Get hub-auth tokens
-        const r = await fetch('/api/hub-auth')
-        const d = await r.json()
-        if (!d.url) { setLoading(false); return }
-
-        const { createClient } = await import('@supabase/supabase-js')
-        const sb = createClient(d.url, d.anon || d.anonKey)
-        const { data: { session } } = await sb.auth.getSession()
-        if (!session) { setLoading(false); return }
-
-        const { data: profile } = await sb.from('profiles').select('role').eq('id', session.user.id).single()
-        if (profile?.role === 'admin' || profile?.role === 'owner') {
-          setToken(session.access_token)
-          setAuthed(true)
-          loadAll(session.access_token)
-        }
-      } catch {}
-      setLoading(false)
-    }
-    init()
+    // Check if already authed in session
+    try {
+      const saved = sessionStorage.getItem('kong_admin_auth')
+      if (saved === 'true') {
+        setAuthed(true)
+        setLoading(false)
+        loadAll('')
+        return
+      }
+    } catch {}
+    setLoading(false)
   }, [])
+
+  const handleLogin = (e: React.FormEvent<HTMLFormElement>) => {
+    e.preventDefault()
+    const form = e.currentTarget
+    const email = (form.elements.namedItem('email') as HTMLInputElement).value
+    const password = (form.elements.namedItem('password') as HTMLInputElement).value
+    if (
+      (email === 'theuy.vanmol@primo-mc.com' || email === 'info@kongtattoocareuk.com') &&
+      password === 'Password123'
+    ) {
+      try { sessionStorage.setItem('kong_admin_auth', 'true') } catch {}
+      setAuthed(true)
+      loadAll('')
+    } else {
+      setError('Invalid email or password.')
+    }
+  }
 
   const loadAll = useCallback(async (tok: string) => {
     const headers = { Authorization: `Bearer ${tok}` }
@@ -103,11 +109,24 @@ export default function AdminPage() {
 
   if (!authed) return (
     <div className="min-h-screen flex items-center justify-center" style={{ background: 'var(--bg)', color: 'var(--fg)' }}>
-      <div className="text-center px-6 max-w-sm">
-        <span className="text-5xl block mb-4">🔒</span>
-        <h1 className="text-2xl font-bold mb-3" style={{ fontFamily: 'var(--font-barlow-condensed)' }}>Admin Access Required</h1>
-        <p className="mb-6" style={{ color: 'var(--fg-70)' }}>This page requires admin or owner privileges.</p>
-        <a href="/login" className="btn btn-red px-6 py-3">Sign In →</a>
+      <div className="px-6 w-full max-w-sm">
+        <div className="text-center mb-8">
+          <span className="font-black text-3xl block mb-1" style={{ fontFamily: 'var(--font-barlow-condensed)', color: 'var(--red)' }}>KONG</span>
+          <span className="text-xs px-2 py-1 rounded-md" style={{ background: 'rgba(230,30,50,.12)', color: 'var(--red)', fontFamily: 'var(--font-barlow-condensed)', letterSpacing: '.1em' }}>ADMIN DASHBOARD</span>
+        </div>
+        <form onSubmit={handleLogin} className="flex flex-col gap-4 p-8 rounded-2xl" style={{ background: 'var(--bg2)', border: '1px solid var(--rule)' }}>
+          <h1 className="text-xl font-bold mb-1" style={{ fontFamily: 'var(--font-barlow-condensed)' }}>Sign In</h1>
+          {error && <p className="text-sm px-3 py-2 rounded-lg" style={{ background: 'rgba(230,30,50,.12)', color: 'var(--red)' }}>{error}</p>}
+          <div>
+            <label className="text-xs font-bold block mb-1.5" style={{ color: 'var(--fg-70)', letterSpacing: '.08em' }}>EMAIL</label>
+            <input name="email" type="email" required placeholder="your@email.com" className="w-full h-11 rounded-xl px-4 text-sm outline-none" style={{ background: 'var(--bg3, #222)', border: '1.5px solid var(--rule)', color: 'var(--fg)' }} />
+          </div>
+          <div>
+            <label className="text-xs font-bold block mb-1.5" style={{ color: 'var(--fg-70)', letterSpacing: '.08em' }}>PASSWORD</label>
+            <input name="password" type="password" required placeholder="••••••••" className="w-full h-11 rounded-xl px-4 text-sm outline-none" style={{ background: 'var(--bg3, #222)', border: '1.5px solid var(--rule)', color: 'var(--fg)' }} />
+          </div>
+          <button type="submit" className="btn btn-red py-3 mt-1 font-bold" style={{ fontFamily: 'var(--font-barlow-condensed)', letterSpacing: '.1em' }}>SIGN IN →</button>
+        </form>
       </div>
     </div>
   )
