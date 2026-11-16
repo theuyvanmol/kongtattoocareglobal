@@ -1,5 +1,7 @@
 import { NextResponse } from 'next/server'
 
+export const dynamic = 'force-dynamic'
+
 const SHOP = 'kongtattoocareglobal.myshopify.com'
 const API_VERSION = '2026-10'
 

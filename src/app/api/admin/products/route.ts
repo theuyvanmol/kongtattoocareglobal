@@ -1,5 +1,7 @@
 import { NextResponse, NextRequest } from 'next/server'
 
+export const dynamic = 'force-dynamic'
+
 const SHOP = 'kongtattoocareglobal.myshopify.com'
 const API_VERSION = '2026-10'
 
@@ -8,6 +10,7 @@ function shopifyFetch(endpoint: string, options?: RequestInit) {
   if (!token) throw new Error('Missing SHOPIFY_ADMIN_TOKEN')
   return fetch(`https://${SHOP}/admin/api/${API_VERSION}${endpoint}`, {
     ...options,
+    cache: 'no-store',
     headers: {
       'X-Shopify-Access-Token': token,
       'Content-Type': 'application/json',
