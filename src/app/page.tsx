@@ -266,74 +266,73 @@ export default async function HomePage() {
         </div>
       </section>
 
-      {/* ── PARALLAX SPLIT — VIDEO SECTION ────────────────────────────────── */}
+      {/* ── VIDEO SECTION — Instagram Reels ───────────────────────────────── */}
       <section style={{ position: 'relative', overflow: 'hidden', background: 'var(--bg3)', paddingBlock: 100 }}>
-        {/* Parallax decorative element */}
         <div className="parallax-deco" data-speed="0.3" style={{ position: 'absolute', top: '-15%', right: '-5%', width: '55%', aspectRatio: '1', borderRadius: '50%', background: 'radial-gradient(circle, rgba(230,30,50,.06) 0%, transparent 70%)', pointerEvents: 'none', willChange: 'transform' }} />
         <div className="wrap-wide cap reveal-section">
           <p className="lbl reveal-child">Studio Stories</p>
           <h2 className="hed reveal-child" style={{ fontSize: 'clamp(44px,6vw,88px)', marginTop: 10, marginBottom: 48 }}>See It In <em style={{ color: 'var(--red)' }}>Action</em></h2>
-          <div style={{ display: 'grid', gridTemplateColumns: '1.5fr 1fr', gap: 20, alignItems: 'start' }} className="vid-grid-resp">
-            <div className="reveal-child" style={{ borderRadius: 16, overflow: 'hidden', border: '1px solid var(--rule)', cursor: 'pointer' }}>
-              <div style={{ width: '100%', aspectRatio: '16/9', background: '#000', position: 'relative' }}>
-                <Image src="/assets/img/img-home-1.webp" alt="The Renew Routine video" fill className="object-cover" style={{ opacity: 0.7 }} />
-                <div style={{ position: 'absolute', inset: 0, display: 'flex', alignItems: 'center', justifyContent: 'center' }}>
-                  <div style={{ width: 72, height: 72, borderRadius: '50%', border: '2px solid rgba(255,255,255,.8)', background: 'rgba(10,10,10,.5)', display: 'grid', placeItems: 'center', transition: 'transform .3s, background .3s' }} className="play-btn">
-                    <div style={{ borderStyle: 'solid', borderWidth: '12px 0 12px 20px', borderColor: 'transparent transparent transparent #fff', marginLeft: 4 }} />
-                  </div>
-                </div>
-              </div>
-              <div style={{ padding: '16px 20px', background: 'var(--bg2)', fontFamily: 'var(--font-barlow-condensed)', fontWeight: 900, fontStyle: 'italic', fontSize: 18, textTransform: 'uppercase' }}>
-                The Renew Routine — 24hr Aftercare Guide
-              </div>
-            </div>
-            <div style={{ display: 'flex', flexDirection: 'column', gap: 12 }}>
+          {/* 5 Instagram Reels in a responsive grid — 2 large + 3 small on desktop, stacked on mobile */}
+          <div style={{ display: 'grid', gridTemplateColumns: 'repeat(2,1fr)', gridTemplateRows: 'auto auto', gap: 14 }} className="ig-grid-resp">
+            {/* Large featured reel */}
+            <a
+              href="https://www.instagram.com/p/Dfu0zViKx-2/"
+              target="_blank" rel="noopener noreferrer"
+              className="reveal-child ig-card"
+              style={{ gridRow: 'span 2', borderRadius: 16, overflow: 'hidden', border: '1px solid var(--rule)', background: '#000', position: 'relative', display: 'block', aspectRatio: '9/16' } as React.CSSProperties}
+            >
+              <iframe
+                src="https://www.instagram.com/p/Dfu0zViKx-2/embed/"
+                style={{ width: '100%', height: '100%', border: 'none', position: 'absolute', inset: 0 }}
+                allowFullScreen
+                loading="lazy"
+              />
+            </a>
+            {/* Right column — 2 reels stacked */}
+            <div style={{ display: 'flex', flexDirection: 'column', gap: 14 }}>
               {[
-                { img: '/assets/img/img-home-4.webp', lbl: 'Numb — How It Works' },
-                { img: '/assets/img/img-home-7.webp', lbl: 'Glow — 6-Week Results' },
-                { img: '/assets/img/img-home-10.webp', lbl: 'Expert — Studio Session' },
-              ].map((v, vi) => (
-                <div key={v.lbl} className="reveal-child" style={{ position: 'relative', borderRadius: 12, overflow: 'hidden', border: '1px solid var(--rule)', cursor: 'pointer', '--delay': `${vi * 100}ms` } as React.CSSProperties}>
-                  <div style={{ width: '100%', aspectRatio: '16/9', background: '#000', position: 'relative' }}>
-                    <Image src={v.img} alt={v.lbl} fill className="object-cover" style={{ opacity: 0.6 }} />
-                  </div>
-                  <div style={{ position: 'absolute', inset: 0, display: 'flex', alignItems: 'center', justifyContent: 'center' }}>
-                    <div style={{ width: 40, height: 40, borderRadius: '50%', border: '1.5px solid rgba(255,255,255,.7)', background: 'rgba(10,10,10,.4)', display: 'grid', placeItems: 'center' }}>
-                      <div style={{ borderStyle: 'solid', borderWidth: '7px 0 7px 12px', borderColor: 'transparent transparent transparent #fff', marginLeft: 3 }} />
-                    </div>
-                  </div>
-                  <div style={{ position: 'absolute', bottom: 10, left: 12, fontFamily: 'var(--font-barlow-condensed)', fontWeight: 700, fontSize: 13, textTransform: 'uppercase', letterSpacing: '.06em', textShadow: '0 1px 4px rgba(0,0,0,.8)' }}>{v.lbl}</div>
-                </div>
+                'https://www.instagram.com/p/DfVCAM8Nckr/',
+                'https://www.instagram.com/p/DfM76LKqWnH/',
+              ].map((url, i) => (
+                <a
+                  key={url}
+                  href={url}
+                  target="_blank" rel="noopener noreferrer"
+                  className="reveal-child ig-card"
+                  style={{ borderRadius: 14, overflow: 'hidden', border: '1px solid var(--rule)', background: '#000', position: 'relative', display: 'block', aspectRatio: '9/16', '--delay': `${i*80}ms` } as React.CSSProperties}
+                >
+                  <iframe
+                    src={`${url}embed/`}
+                    style={{ width: '100%', height: '100%', border: 'none', position: 'absolute', inset: 0 }}
+                    allowFullScreen
+                    loading="lazy"
+                  />
+                </a>
               ))}
             </div>
           </div>
-        </div>
-      </section>
-
-      {/* ── BEFORE / AFTER ────────────────────────────────────────────────── */}
-      <section className="wrap-wide cap reveal-section" style={{ paddingBlock: 100, background: 'var(--bg2)' }}>
-        <p className="lbl reveal-child">Real Results</p>
-        <h2 className="hed reveal-child" style={{ fontSize: 'clamp(44px,6vw,88px)', marginTop: 10, marginBottom: 48 }}>Before &amp; <em style={{ color: 'var(--lime)' }}>After</em></h2>
-        <div style={{ display: 'grid', gridTemplateColumns: 'repeat(3,1fr)', gap: 16 }} className="ba-grid-resp">
-          {[
-            { img1: '/assets/img/real-tattoo-studio-1.jpg', img2: '/assets/img/real-tattoo-studio-2.jpg', name: 'Renew Butter · 14 Days',  meta: 'Customer: Jake T. · Bristol'    },
-            { img1: '/assets/img/real-barbell-kong.png',    img2: '/assets/img/real-boxing-kong.png',     name: 'Glow Serum · 6 Weeks',    meta: 'Customer: Priya M. · London'   },
-            { img1: '/assets/img/real-products-studio.jpg', img2: '/assets/img/real-defend-your-ink.jpg', name: 'Defend SPF · 8 Weeks',    meta: 'Customer: Sam W. · Manchester' },
-          ].map((ba, bi) => (
-            <div key={ba.name} className="reveal-child" style={{ borderRadius: 14, overflow: 'hidden', border: '1px solid var(--rule)', position: 'relative', '--delay': `${bi * 120}ms` } as React.CSSProperties}>
-              <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr' }}>
-                <div style={{ aspectRatio: '1', position: 'relative' }}><Image src={ba.img1} alt="Before" fill className="object-cover" /></div>
-                <div style={{ aspectRatio: '1', position: 'relative' }}><Image src={ba.img2} alt="After" fill className="object-cover" /></div>
-              </div>
-              <div style={{ position: 'absolute', top: 0, left: '50%', bottom: 0, width: 2, background: 'var(--lime)' }} />
-              <div style={{ position: 'absolute', top: 10, left: 8, background: 'var(--red)', color: '#fff', fontFamily: 'var(--font-barlow-condensed)', fontWeight: 700, fontSize: 9, letterSpacing: '.2em', textTransform: 'uppercase', padding: '3px 7px', borderRadius: 4 }}>Before</div>
-              <div style={{ position: 'absolute', top: 10, right: 8, background: 'var(--lime)', color: '#0a0a0a', fontFamily: 'var(--font-barlow-condensed)', fontWeight: 700, fontSize: 9, letterSpacing: '.2em', textTransform: 'uppercase', padding: '3px 7px', borderRadius: 4 }}>After</div>
-              <div style={{ padding: 16 }}>
-                <div className="hed" style={{ fontSize: 18, marginBottom: 4 }}>{ba.name}</div>
-                <div style={{ fontSize: 12, color: 'var(--fg-40)' }}>{ba.meta}</div>
-              </div>
-            </div>
-          ))}
+          {/* Bottom row — 2 more reels side by side */}
+          <div style={{ display: 'grid', gridTemplateColumns: 'repeat(2,1fr)', gap: 14, marginTop: 14 }} className="ig-row2-resp">
+            {[
+              'https://www.instagram.com/p/DfB8Cruttbb/',
+              'https://www.instagram.com/p/DfPBhDeNhAS/',
+            ].map((url, i) => (
+              <a
+                key={url}
+                href={url}
+                target="_blank" rel="noopener noreferrer"
+                className="reveal-child ig-card"
+                style={{ borderRadius: 14, overflow: 'hidden', border: '1px solid var(--rule)', background: '#000', position: 'relative', display: 'block', aspectRatio: '9/16', '--delay': `${i*80}ms` } as React.CSSProperties}
+              >
+                <iframe
+                  src={`${url}embed/`}
+                  style={{ width: '100%', height: '100%', border: 'none', position: 'absolute', inset: 0 }}
+                  allowFullScreen
+                  loading="lazy"
+                />
+              </a>
+            ))}
+          </div>
         </div>
       </section>
 
@@ -447,26 +446,41 @@ export default async function HomePage() {
         </div>
       </section>
 
-      {/* ── ARTIST FEATURE ────────────────────────────────────────────────── */}
-      <section className="wrap-wide cap" style={{ paddingBlock: 100, background: 'var(--bg)', overflow: 'hidden' }}>
-        <div style={{ display: 'grid', gridTemplateColumns: '1fr 1.1fr', gap: 72, alignItems: 'center' }} className="artist-grid-resp">
-          <div className="reveal-left" style={{ position: 'relative', borderRadius: 16, overflow: 'hidden', aspectRatio: '4/5' }}>
-            <Image src="/assets/img/real-tattoo-studio-1.jpg" alt="Featured artist" fill className="object-cover" />
-            <div style={{ position: 'absolute', inset: -2, borderRadius: 'inherit', border: '2px solid var(--lime)', pointerEvents: 'none' }} />
-          </div>
-          <div className="reveal-right" style={{ display: 'flex', flexDirection: 'column', gap: 18 }}>
-            <p className="lbl">Artist Feature</p>
-            <div className="hed" style={{ fontSize: 120, color: 'var(--red)', lineHeight: .6, opacity: .5 }}>&ldquo;</div>
-            <blockquote className="hed" style={{ fontSize: 'clamp(22px,2.5vw,34px)' }}>
-              &ldquo;My clients come back with the sharpest healed work I&apos;ve ever seen. KONG isn&apos;t a skincare brand — it&apos;s a tattoo brand. That&apos;s the difference.&rdquo;
+      {/* ── ARTIST FEATURE — Dale Nathan ──────────────────────────────────── */}
+      <section style={{ position: 'relative', overflow: 'hidden', minHeight: '90vh', display: 'flex', alignItems: 'center' }}>
+        {/* Full-bleed background image */}
+        <div style={{ position: 'absolute', inset: 0, zIndex: 0 }}>
+          <Image src="/assets/img/real-barbell-kong.png" alt="Dale Nathan — KONG Tattoo Care Ambassador" fill className="object-cover object-center" style={{ opacity: 0.45 }} />
+          <div style={{ position: 'absolute', inset: 0, background: 'linear-gradient(100deg,rgba(10,10,10,.98) 0%,rgba(10,10,10,.75) 50%,rgba(10,10,10,.2) 100%)' }} />
+          {/* Mobile gradient — dark from bottom */}
+          <div style={{ position: 'absolute', inset: 0, background: 'linear-gradient(0deg,rgba(10,10,10,.98) 0%,transparent 50%)' }} />
+        </div>
+        <div className="wrap-wide cap reveal-section" style={{ position: 'relative', zIndex: 1, paddingBlock: 100 }}>
+          <div style={{ maxWidth: 580 }}>
+            <p className="lbl reveal-child">Artist Feature</p>
+            <div className="hed reveal-child" style={{ fontSize: 'clamp(72px,10vw,140px)', color: 'var(--red)', lineHeight: .75, opacity: .35, marginTop: 8 }}>&ldquo;</div>
+            <blockquote className="hed reveal-child" style={{ fontSize: 'clamp(24px,3vw,40px)', marginTop: -8, marginBottom: 24 }}>
+              &ldquo;KONG keeps my clients&apos; ink looking fresh longer. It&apos;s the only aftercare I trust in my studio.&rdquo;
             </blockquote>
-            <div>
-              <strong style={{ color: 'var(--lime)', fontFamily: 'var(--font-barlow-condensed)', fontSize: 14, letterSpacing: '.1em', textTransform: 'uppercase', display: 'block' }}>Lauren Scobie</strong>
-              <span style={{ fontSize: 12, color: 'var(--fg-40)' }}>Lead Artist · East London Tattoo Co.</span>
+            <div className="reveal-child" style={{ marginBottom: 32 }}>
+              <strong style={{ color: 'var(--lime)', fontFamily: 'var(--font-barlow-condensed)', fontSize: 16, letterSpacing: '.12em', textTransform: 'uppercase', display: 'block', marginBottom: 4 }}>Dale Nathan Tattoo</strong>
+              <span style={{ fontSize: 13, color: 'var(--fg-40)' }}>KONG Ambassador · Award-Winning UK Tattoo Artist</span>
             </div>
-            <div style={{ display: 'flex', gap: 12, flexWrap: 'wrap' }}>
-              <Link href="/shop-all" className="btn btn-lime">Shop Lauren&apos;s Picks</Link>
-              <Link href="/about" className="btn btn-out">Watch Her Process</Link>
+            {/* Discount code card */}
+            <div className="reveal-child" style={{ display: 'inline-flex', alignItems: 'center', gap: 16, background: 'rgba(200,255,0,.08)', border: '1.5px solid var(--lime)', borderRadius: 14, padding: '16px 24px', marginBottom: 32, flexWrap: 'wrap' }}>
+              <div>
+                <div style={{ fontFamily: 'var(--font-barlow-condensed)', fontWeight: 700, fontSize: 10, letterSpacing: '.24em', textTransform: 'uppercase', color: 'var(--fg-40)', marginBottom: 4 }}>Exclusive Discount</div>
+                <div className="hed" style={{ fontSize: 28, color: 'var(--lime)', letterSpacing: '.06em' }}>DNTKONG10</div>
+              </div>
+              <div style={{ width: 1, height: 40, background: 'rgba(200,255,0,.2)', flexShrink: 0 }} />
+              <div style={{ fontSize: 13, color: 'var(--fg-70)', lineHeight: 1.5 }}>
+                <strong style={{ color: '#fff', display: 'block' }}>10% off your order</strong>
+                Use at checkout
+              </div>
+            </div>
+            <div className="reveal-child" style={{ display: 'flex', gap: 12, flexWrap: 'wrap' }}>
+              <Link href="/shop-all" className="btn btn-lime" style={{ fontSize: 13 }}>Shop with Dale&apos;s Code</Link>
+              <a href="https://www.instagram.com/dalenathantattoo" target="_blank" rel="noopener noreferrer" className="btn btn-out" style={{ fontSize: 13 }}>Follow Dale →</a>
             </div>
           </div>
         </div>
@@ -570,23 +584,27 @@ export default async function HomePage() {
         .bar-fill.in { width: var(--target) !important; }
 
         /* Responsive */
+        /* Instagram embed cards */
+        .ig-card { text-decoration: none; }
+        .ig-card iframe { pointer-events: none; }
+        .ig-card:hover { border-color: var(--lime) !important; }
+
         @media (max-width: 1100px) {
           .coll-grid-resp { grid-template-columns: repeat(3,1fr) !important; }
-          .vid-grid-resp { grid-template-columns: 1fr !important; }
-          .ba-grid-resp { grid-template-columns: repeat(2,1fr) !important; }
-          .artist-grid-resp { grid-template-columns: 1fr !important; gap: 40px !important; }
-          .soc-grid-resp { grid-template-columns: repeat(4,1fr) !important; }
           .gal-grid-resp { grid-template-columns: repeat(3,1fr) !important; grid-template-rows: auto !important; }
           .gal-grid-resp > * { grid-column: span 1 !important; grid-row: span 1 !important; height: 200px; }
         }
         @media (max-width: 768px) {
           .coll-grid-resp { grid-template-columns: repeat(2,1fr) !important; }
-          .ba-grid-resp { grid-template-columns: 1fr !important; }
           .rev-grid-resp { grid-template-columns: 1fr !important; }
           .steps-grid-resp { grid-template-columns: repeat(2,1fr) !important; }
           .steps-line-resp { display: none !important; }
           .stats-grid-resp { grid-template-columns: repeat(2,1fr) !important; }
           .newsletter-row { flex-direction: column !important; }
+          /* Instagram grid: single column on mobile */
+          .ig-grid-resp { grid-template-columns: 1fr !important; }
+          .ig-grid-resp > *:first-child { grid-row: span 1 !important; }
+          .ig-row2-resp { grid-template-columns: 1fr !important; }
         }
         @media (prefers-reduced-motion: reduce) {
           .hero-reveal, .reveal-child, .reveal-left, .reveal-right,
