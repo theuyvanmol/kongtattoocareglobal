@@ -75,10 +75,23 @@ export async function GET() {
       )
     }
 
+    // Also decode JWT header/payload for debugging (no private info in header/payload)
+    const jwtParts = jwt.split('.')
+    const jwtHeader = JSON.parse(Buffer.from(jwtParts[0], 'base64url').toString())
+    const jwtPayload = JSON.parse(Buffer.from(jwtParts[1], 'base64url').toString())
+
     return new NextResponse(
       `<html><body style="font-family:monospace;padding:20px;background:#111;color:#ff6">
 <h2 style="color:#fff">❌ No token (status ${resp.status})</h2>
+<p>Shopify response:</p>
 <pre style="background:#000;padding:16px;border-radius:8px;font-size:14px;white-space:pre-wrap">${JSON.stringify(data, null, 2)}</pre>
+<p>JWT Header (debug):</p>
+<pre style="background:#000;padding:16px;border-radius:8px;font-size:14px">${JSON.stringify(jwtHeader, null, 2)}</pre>
+<p>JWT Payload (debug):</p>
+<pre style="background:#000;padding:16px;border-radius:8px;font-size:14px">${JSON.stringify(jwtPayload, null, 2)}</pre>
+<p>Token endpoint: https://admin.shopify.com/store/${storeHandle}/oauth/access_token</p>
+<p>Client ID prefix: ${clientId.slice(0, 8)}...</p>
+<p>Private key prefix: ${privateKeyPem.slice(0, 30)}...</p>
 </body></html>`,
       { status: 200, headers: { 'Content-Type': 'text/html' } }
     )
