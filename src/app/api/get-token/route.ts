@@ -5,17 +5,49 @@ export async function GET() {
   try {
     const clientId = process.env.SHOPIFY_API_KEY || ''
     const clientSecret = process.env.SHOPIFY_API_SECRET || ''
+    const privateKeyPem = process.env.SHOPIFY_PRIVATE_KEY || ''
     const storeHandle = 'kongtattoocareuk'
 
     if (!clientId) return NextResponse.json({ error: 'Missing SHOPIFY_API_KEY' }, { status: 500 })
     if (!clientSecret) return NextResponse.json({ error: 'Missing SHOPIFY_API_SECRET' }, { status: 500 })
+    if (!privateKeyPem) return NextResponse.json({ error: 'Missing SHOPIFY_PRIVATE_KEY' }, { status: 500 })
 
-    // Dev Dashboard apps use admin.shopify.com endpoint
+    // Dev Dashboard apps use JWT bearer grant with public key
+    const { createSign } = await import('crypto')
+
+    const header = Buffer.from(JSON.stringify({ alg: 'ES256', typ: 'JWT', kid: 'kong-admin-key-2' })).toString('base64url')
+    const now = Math.floor(Date.now() / 1000)
+    const payload = Buffer.from(JSON.stringify({
+      iss: clientId, sub: clientId,
+      aud: `https://admin.shopify.com`,
+      iat: now, exp: now + 60,
+      jti: crypto.randomUUID(),
+    })).toString('base64url')
+
+    const signingInput = `${header}.${payload}`
+    const sign = createSign('SHA256')
+    sign.update(signingInput)
+    sign.end()
+    const derSig = sign.sign(privateKeyPem)
+
+    // Convert DER to raw r||s for JWT ES256
+    let off = 0
+    if (derSig[off++] !== 0x30) throw new Error('Bad DER')
+    off++ // seq len
+    if (derSig[off++] !== 0x02) throw new Error('Bad DER r')
+    const rLen = derSig[off++]; const rStart = derSig[off] === 0x00 ? off + 1 : off; const r = derSig.slice(rStart, off + rLen); off += rLen
+    if (derSig[off++] !== 0x02) throw new Error('Bad DER s')
+    const sLen = derSig[off++]; const sStart = derSig[off] === 0x00 ? off + 1 : off; const s = derSig.slice(sStart, off + sLen)
+    const rPad = Buffer.alloc(32); r.copy(rPad, 32 - r.length)
+    const sPad = Buffer.alloc(32); s.copy(sPad, 32 - s.length)
+    const jwt = `${signingInput}.${Buffer.concat([rPad, sPad]).toString('base64url')}`
+
     const resp = await fetch(`https://admin.shopify.com/store/${storeHandle}/oauth/access_token`, {
       method: 'POST',
       headers: { 'Content-Type': 'application/x-www-form-urlencoded' },
       body: new URLSearchParams({
-        grant_type: 'client_credentials',
+        grant_type: 'urn:ietf:params:oauth:grant-type:jwt-bearer',
+        assertion: jwt,
         client_id: clientId,
         client_secret: clientSecret,
       }).toString(),
