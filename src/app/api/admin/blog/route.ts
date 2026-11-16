@@ -1,7 +1,7 @@
 import { NextResponse, NextRequest } from 'next/server'
 
-const SHOP = 'kongtattoocareuk.myshopify.com'
-const API_VERSION = '2024-10'
+const SHOP = 'kongtattoocareglobal.myshopify.com'
+const API_VERSION = '2026-10'
 
 function shopifyFetch(endpoint: string, options?: RequestInit) {
   const token = process.env.SHOPIFY_ADMIN_TOKEN

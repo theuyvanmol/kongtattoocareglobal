@@ -17,7 +17,7 @@ export default function AdminSettings() {
             <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', padding: '12px 0', borderBottom: '1px solid #1e1e1e' }}>
               <div>
                 <div style={{ color: '#ccc', fontSize: 13, fontWeight: 500 }}>Shopify store</div>
-                <div className="adm-muted">kongtattoocareuk.myshopify.com</div>
+                <div className="adm-muted">kongtattoocareglobal.myshopify.com</div>
               </div>
               <a href="https://admin.shopify.com/store/kongtattoocareuk" target="_blank" rel="noopener" className="adm-btn ghost" style={{ padding: '5px 12px', fontSize: 11 }}>Open →</a>
             </div>

@@ -1,6 +1,6 @@
 import type { ShopifyProduct, ShopifyCollection } from './types'
 
-const DOMAIN = process.env.SHOPIFY_STORE_DOMAIN || 'kongtattoocareuk.myshopify.com'
+const DOMAIN = process.env.SHOPIFY_STORE_DOMAIN || 'kongtattoocareglobal.myshopify.com'
 const TOKEN = process.env.SHOPIFY_STOREFRONT_PRIVATE_TOKEN || process.env.SHOPIFY_STOREFRONT_ACCESS_TOKEN || process.env.NEXT_PUBLIC_SHOPIFY_STOREFRONT_TOKEN || process.env.SHOPIFY_STOREFRONT_PUBLIC_TOKEN || ''
 const API_URL = `https://${DOMAIN}/api/2024-01/graphql.json`
 

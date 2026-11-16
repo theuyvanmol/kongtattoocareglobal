@@ -19,7 +19,7 @@ const POSTS = [
     excerpt: 'Everything you need to know about healing your fresh tattoo — from the first 24 hours through to long-term colour protection.',
     category: 'Aftercare',
     readTime: '8 min read',
-    date: '2024-10-15',
+    date: '2026-10-15',
   },
   {
     slug: 'why-numb-cream-works',
