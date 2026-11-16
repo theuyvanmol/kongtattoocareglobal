@@ -78,7 +78,7 @@ export default function LiveNow() {
 
       {(!data || (data.visitors === 0 && !loading)) && (
         <div style={{ fontSize: 12, color: '#555', textAlign: 'center', padding: '8px 0' }}>
-          No active visitors — analytics will appear once KV storage is connected
+          No active visitors right now — visit the site to see tracking in action
         </div>
       )}
     </div>
