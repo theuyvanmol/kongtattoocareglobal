@@ -171,32 +171,35 @@ export default function AdminDashboard() {
   return (
     <>
       <style>{`
-        .g3{display:grid;grid-template-columns:repeat(3,1fr);gap:1px;background:#E8E5DF;border:1px solid #E8E5DF;border-radius:10px;overflow:hidden;margin-bottom:16px}
-        .g3b{display:grid;grid-template-columns:repeat(3,1fr);gap:1px;background:#E8E5DF;border:1px solid #E8E5DF;border-radius:10px;overflow:hidden;margin-bottom:20px}
-        .g2{display:grid;grid-template-columns:1fr 1fr;gap:16px;margin-bottom:16px}
+        .dash-h{margin-bottom:28px;padding-bottom:20px;border-bottom:1px solid #1e1e1e;display:flex;justify-content:space-between;align-items:flex-end}
+        .dash-h h1{font-size:28px;font-weight:700;color:#fff;letter-spacing:-.5px;margin-bottom:4px}
+        .dash-h small{font-size:12px;color:#555}
+        .g3{display:grid;grid-template-columns:repeat(3,1fr);gap:10px;margin-bottom:10px}
+        .g3b{display:grid;grid-template-columns:repeat(3,1fr);gap:10px;margin-bottom:20px}
+        .g2{display:grid;grid-template-columns:1fr 1fr;gap:16px;margin-bottom:20px}
         .g-live{display:grid;grid-template-columns:1fr 1fr;gap:16px;margin-bottom:20px}
-        .stat{background:#fff;padding:18px 20px;text-align:center}
-        .stat b{display:block;font-size:26px;font-weight:700;color:#1a1a1a;line-height:1;margin-bottom:4px}
-        .stat span{font-size:12px;color:#888}
-        .stat.green b{color:#2d7a4f} .stat.amber b{color:#b7701a}
-        .live-panel{background:#fff;border:1px solid #E8E5DF;border-radius:10px;overflow:hidden}
-        .live-head{padding:14px 16px;border-bottom:1px solid #E8E5DF;display:flex;align-items:center;gap:8px}
-        .live-dot{width:7px;height:7px;background:#2d7a4f;border-radius:50%;animation:kpulse 2s infinite}
-        @keyframes kpulse{0%,100%{opacity:1;box-shadow:0 0 0 0 rgba(45,122,79,.4)}50%{opacity:.8;box-shadow:0 0 0 5px rgba(45,122,79,0)}}
-        .live-head-title{font-size:12px;font-weight:600;color:#555;letter-spacing:.5px;text-transform:uppercase}
-        .globe-wrap{background:#1C2320;border-top:1px solid #E8E5DF;position:relative;height:200px;overflow:hidden;display:flex;align-items:center;justify-content:center}
-        .globe-label{position:absolute;top:10px;right:12px;font-size:10px;color:#8a9e98;letter-spacing:.5px}
+        .stat{background:#161616;border:1px solid #222;border-radius:12px;padding:16px 18px;text-align:center}
+        .stat b{display:block;font-size:26px;font-weight:700;color:#fff;line-height:1.1;margin-bottom:4px}
+        .stat span{font-size:11px;color:#555;letter-spacing:.3px}
+        .stat.red{border-color:#E61E3240} .stat.red b{color:#E61E32}
+        .stat.lime{border-color:#C8FF0040} .stat.lime b{color:#C8FF00}
+        .live-panel{background:#161616;border:1px solid #222;border-radius:12px;overflow:hidden}
+        .live-head{padding:14px 16px;border-bottom:1px solid #1e1e1e;display:flex;align-items:center;gap:8px}
+        .live-dot{width:8px;height:8px;background:#C8FF00;border-radius:50%;animation:kpulse 2s infinite}
+        @keyframes kpulse{0%,100%{opacity:1;box-shadow:0 0 0 0 #C8FF0060}50%{opacity:.8;box-shadow:0 0 0 6px #C8FF0000}}
+        .live-head-title{font-size:12px;font-weight:600;color:#ccc;letter-spacing:.5px;text-transform:uppercase}
+        .globe-wrap{background:#0a0a0a;border-top:1px solid #1e1e1e;position:relative;height:200px;overflow:hidden;display:flex;align-items:center;justify-content:center}
+        .globe-label{position:absolute;top:10px;right:12px;font-size:10px;color:#333;letter-spacing:.5px}
         canvas.globe{width:100%;height:100%}
         @media(max-width:720px){.g3,.g3b{grid-template-columns:1fr 1fr}.g2,.g-live{grid-template-columns:1fr}}
       `}</style>
 
-      <div className="adm-content">
-        <div className="adm-page-head" style={{ marginBottom: 24 }}>
+      <div>
+        <div className="dash-h">
           <div>
-            <h1 className="adm-page-title">Dashboard</h1>
-            <div style={{ fontSize: 13, color: '#888', marginTop: 4 }}>{new Date().toLocaleDateString('en-GB', { weekday: 'long', day: 'numeric', month: 'long', year: 'numeric' })}</div>
+            <h1>Dashboard</h1>
+            <small>{new Date().toLocaleDateString('en-GB', { weekday: 'long', day: 'numeric', month: 'long', year: 'numeric' })}</small>
           </div>
-          <a href="/admin/orders" className="adm-btn secondary">View all orders</a>
         </div>
 
         {error && <div className="adm-error">{error}</div>}
@@ -207,11 +210,11 @@ export default function AdminDashboard() {
           <>
             {/* All-time stats */}
             <div className="g3">
-              <div className="stat">
+              <div className="stat red">
                 <b>{fmt(totalRevenue)}</b>
-                <span>Total revenue</span>
+                <span>Total revenue (Stripe)</span>
               </div>
-              <div className="stat green">
+              <div className="stat lime">
                 <b>{succeeded.length}</b>
                 <span>Total orders</span>
               </div>
@@ -231,9 +234,9 @@ export default function AdminDashboard() {
                 <b>{charges30d.length}</b>
                 <span>Orders · 30 days</span>
               </div>
-              <div className="stat amber">
-                <b>{fmt(balance.available)}</b>
-                <span>Stripe available</span>
+              <div className="stat">
+                <b>{fmt(revenue7d)}</b>
+                <span>Revenue · 7 days</span>
               </div>
             </div>
 
@@ -243,21 +246,21 @@ export default function AdminDashboard() {
                 <div className="adm-card-title">Revenue · last 14 days</div>
                 <Sparkline data={dailyRevenue} />
                 <div style={{ display: 'flex', justifyContent: 'space-between', marginTop: 6 }}>
-                  <span style={{ fontSize: 11, color: '#aaa' }}>{dailyRevenue[0]?.date}</span>
-                  <span style={{ fontSize: 11, color: '#aaa' }}>Today</span>
+                  <span className="adm-muted">{dailyRevenue[0]?.date}</span>
+                  <span className="adm-muted">Today</span>
                 </div>
               </div>
 
               <div className="adm-card">
-                <div className="adm-card-title">Stripe balance</div>
-                <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: 10, marginTop: 16 }}>
-                  <div style={{ background: '#F5F3EE', borderRadius: 8, padding: '14px', textAlign: 'center' }}>
-                    <div style={{ fontSize: 22, fontWeight: 700, color: '#2d7a4f' }}>{fmt(balance.available)}</div>
-                    <div style={{ fontSize: 11, color: '#888', marginTop: 4 }}>Available</div>
+                <div className="adm-card-title" style={{ marginBottom: 16 }}>Stripe balance</div>
+                <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: 10 }}>
+                  <div style={{ background: '#1a1a1a', borderRadius: 8, padding: '14px', textAlign: 'center' }}>
+                    <div style={{ fontSize: 22, fontWeight: 700, color: '#C8FF00' }}>{fmt(balance.available)}</div>
+                    <div style={{ fontSize: 11, color: '#666', marginTop: 4 }}>Available</div>
                   </div>
-                  <div style={{ background: '#F5F3EE', borderRadius: 8, padding: '14px', textAlign: 'center' }}>
-                    <div style={{ fontSize: 22, fontWeight: 700, color: '#b7701a' }}>{fmt(balance.pending)}</div>
-                    <div style={{ fontSize: 11, color: '#888', marginTop: 4 }}>Pending</div>
+                  <div style={{ background: '#1a1a1a', borderRadius: 8, padding: '14px', textAlign: 'center' }}>
+                    <div style={{ fontSize: 22, fontWeight: 700, color: '#fff' }}>{fmt(balance.pending)}</div>
+                    <div style={{ fontSize: 11, color: '#666', marginTop: 4 }}>Pending</div>
                   </div>
                 </div>
               </div>
@@ -287,7 +290,9 @@ export default function AdminDashboard() {
             </div>
 
             {/* Recent Stripe orders */}
-            <div style={{ fontSize: 11, fontWeight: 600, color: '#888', letterSpacing: '.8px', textTransform: 'uppercase', marginBottom: 12 }}>Recent payments</div>
+            <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: 10 }}>
+              <div className="adm-card-title">Recent payments</div>
+            </div>
             <div className="adm-table-wrap">
               <table className="adm-table">
                 <thead>
@@ -305,12 +310,12 @@ export default function AdminDashboard() {
                     <tr><td colSpan={6}><div className="adm-empty">No payments found</div></td></tr>
                   ) : charges.slice(0, 10).map(c => (
                     <tr key={c.id}>
-                      <td style={{ fontWeight: 600, fontFamily: 'monospace', fontSize: 12, color: '#555' }}>{c.id.slice(-8)}</td>
-                      <td style={{ color: '#555' }}>{c.name || c.email || '—'}</td>
-                      <td style={{ color: '#888' }}>{fmtDate(c.created)}</td>
-                      <td style={{ fontWeight: 600 }}>{fmt(c.amount)}</td>
+                      <td style={{ color: '#fff', fontWeight: 600, fontFamily: 'monospace', fontSize: 11 }}>{c.id.slice(-8)}</td>
+                      <td className="adm-muted">{c.name || c.email || '—'}</td>
+                      <td className="adm-muted">{fmtDate(c.created)}</td>
+                      <td style={{ color: '#C8FF00', fontWeight: 600 }}>{fmt(c.amount)}</td>
                       <td><span className={`adm-badge ${c.status}`}>{c.refunded ? 'refunded' : c.status}</span></td>
-                      <td>{c.receipt_url ? <a href={c.receipt_url} target="_blank" rel="noreferrer" style={{ color: '#1C2320', fontSize: 12 }}>View ↗</a> : '—'}</td>
+                      <td>{c.receipt_url ? <a href={c.receipt_url} target="_blank" rel="noreferrer" style={{ color: '#E61E32', fontSize: 11 }}>View →</a> : '—'}</td>
                     </tr>
                   ))}
                 </tbody>
