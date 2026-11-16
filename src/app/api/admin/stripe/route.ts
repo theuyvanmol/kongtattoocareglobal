@@ -33,11 +33,11 @@ export async function GET() {
     }))
 
     const available = (balanceData.available || []).reduce(
-      (sum: number, b: Record<string, number>) => sum + (b.currency === 'gbp' ? b.amount : 0), 0
+      (sum: number, b: Record<string, unknown>) => sum + (b.currency === 'gbp' ? (b.amount as number) : 0), 0
     ) / 100
 
     const pending = (balanceData.pending || []).reduce(
-      (sum: number, b: Record<string, number>) => sum + (b.currency === 'gbp' ? b.amount : 0), 0
+      (sum: number, b: Record<string, unknown>) => sum + (b.currency === 'gbp' ? (b.amount as number) : 0), 0
     ) / 100
 
     return NextResponse.json({ charges, balance: { available, pending } })
