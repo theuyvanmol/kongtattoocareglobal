@@ -1,59 +1,21 @@
 import { NextResponse } from 'next/server'
 
-// TEMPORARY route to get Shopify Admin API token - DELETE AFTER USE
+// TEMPORARY route to exchange OAuth code for Shopify Admin API token - DELETE AFTER USE
 export async function GET() {
   try {
     const clientId = process.env.SHOPIFY_API_KEY || ''
     const clientSecret = process.env.SHOPIFY_API_SECRET || ''
-    const privateKeyPem = process.env.SHOPIFY_PRIVATE_KEY || ''
-    const storeHandle = 'kongtattoocareglobal'
 
     if (!clientId) return NextResponse.json({ error: 'Missing SHOPIFY_API_KEY' }, { status: 500 })
     if (!clientSecret) return NextResponse.json({ error: 'Missing SHOPIFY_API_SECRET' }, { status: 500 })
-    if (!privateKeyPem) return NextResponse.json({ error: 'Missing SHOPIFY_PRIVATE_KEY' }, { status: 500 })
 
-    // Dev Dashboard apps use JWT bearer grant with public key
-    const { createSign } = await import('crypto')
+    const shop = 'mkz0sg-i6.myshopify.com'
+    const code = '3bb15395336bfb5755bc08a819597c2d'
 
-    const header = Buffer.from(JSON.stringify({ alg: 'ES256', typ: 'JWT', kid: 'kong-admin-key-2' })).toString('base64url')
-    const now = Math.floor(Date.now() / 1000)
-    const payload = Buffer.from(JSON.stringify({
-      iss: clientId, sub: clientId,
-      aud: `https://admin.shopify.com`,
-      iat: now, exp: now + 60,
-      jti: crypto.randomUUID(),
-    })).toString('base64url')
-
-    const signingInput = `${header}.${payload}`
-    const sign = createSign('SHA256')
-    sign.update(signingInput)
-    sign.end()
-    const derSig = sign.sign(privateKeyPem)
-
-    // Convert DER to raw r||s for JWT ES256
-    let off = 0
-    if (derSig[off++] !== 0x30) throw new Error('Bad DER')
-    off++ // seq len
-    if (derSig[off++] !== 0x02) throw new Error('Bad DER r')
-    const rLen = derSig[off++]; const rStart = derSig[off] === 0x00 ? off + 1 : off; const r = derSig.slice(rStart, off + rLen); off += rLen
-    if (derSig[off++] !== 0x02) throw new Error('Bad DER s')
-    const sLen = derSig[off++]; const sStart = derSig[off] === 0x00 ? off + 1 : off; const s = derSig.slice(sStart, off + sLen)
-    const rPad = Buffer.alloc(32); r.copy(rPad, 32 - r.length)
-    const sPad = Buffer.alloc(32); s.copy(sPad, 32 - s.length)
-    const jwt = `${signingInput}.${Buffer.concat([rPad, sPad]).toString('base64url')}`
-
-    const resp = await fetch(`https://admin.shopify.com/store/${storeHandle}/oauth/access_token`, {
+    const resp = await fetch(`https://${shop}/admin/oauth/access_token`, {
       method: 'POST',
-      headers: {
-        'Content-Type': 'application/x-www-form-urlencoded',
-        'User-Agent': 'Kong-Tattoo-Care/1.0',
-        'Accept': 'application/json',
-      },
-      body: new URLSearchParams({
-        grant_type: 'urn:ietf:params:oauth:grant-type:jwt-bearer',
-        assertion: jwt,
-        client_id: clientId,
-      }).toString(),
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({ client_id: clientId, client_secret: clientSecret, code }),
       cache: 'no-store',
     })
 
@@ -67,31 +29,20 @@ export async function GET() {
       return new NextResponse(
         `<html><body style="font-family:monospace;padding:20px;background:#111;color:#0f0">
 <h2 style="color:#fff">✅ Shopify Admin Token Retrieved</h2>
-<p>Token has been automatically saved to Vercel as <strong>SHOPIFY_ADMIN_TOKEN</strong> — check below.</p>
 <pre style="background:#000;padding:16px;border-radius:8px;font-size:14px;word-break:break-all">${token}</pre>
 <p style="color:#888">Scope: ${scope}</p>
+<p style="color:#ff0">Copy the token above and paste it as SHOPIFY_ADMIN_TOKEN in Vercel</p>
 </body></html>`,
         { status: 200, headers: { 'Content-Type': 'text/html' } }
       )
     }
 
-    // Also decode JWT header/payload for debugging (no private info in header/payload)
-    const jwtParts = jwt.split('.')
-    const jwtHeader = JSON.parse(Buffer.from(jwtParts[0], 'base64url').toString())
-    const jwtPayload = JSON.parse(Buffer.from(jwtParts[1], 'base64url').toString())
-
     return new NextResponse(
       `<html><body style="font-family:monospace;padding:20px;background:#111;color:#ff6">
-<h2 style="color:#fff">❌ No token (status ${resp.status})</h2>
-<p>Shopify response:</p>
-<pre style="background:#000;padding:16px;border-radius:8px;font-size:14px;white-space:pre-wrap">${JSON.stringify(data, null, 2)}</pre>
-<p>JWT Header (debug):</p>
-<pre style="background:#000;padding:16px;border-radius:8px;font-size:14px">${JSON.stringify(jwtHeader, null, 2)}</pre>
-<p>JWT Payload (debug):</p>
-<pre style="background:#000;padding:16px;border-radius:8px;font-size:14px">${JSON.stringify(jwtPayload, null, 2)}</pre>
-<p>Token endpoint: https://admin.shopify.com/store/${storeHandle}/oauth/access_token</p>
+<h2 style="color:#fff">❌ Token exchange failed (status ${resp.status})</h2>
+<pre style="background:#000;padding:16px;border-radius:8px;font-size:14px">${JSON.stringify(data, null, 2)}</pre>
 <p>Client ID prefix: ${clientId.slice(0, 8)}...</p>
-<p>Private key prefix: ${privateKeyPem.slice(0, 30)}...</p>
+<p>Secret prefix: ${clientSecret.slice(0, 4)}...</p>
 </body></html>`,
       { status: 200, headers: { 'Content-Type': 'text/html' } }
     )
