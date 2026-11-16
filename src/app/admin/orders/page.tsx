@@ -4,119 +4,121 @@ import { useEffect, useState } from 'react'
 interface Order {
   id: number
   name: string
-  total: number
-  financial: string
-  fulfillment: string | null
   email: string
-  customer: string
-  created: string
-  items: number
+  phone: string
+  total: string
+  financial_status: string
+  fulfillment_status: string
+  created_at: string
+  line_items: { title: string; quantity: number; price: string }[]
 }
 
 export default function AdminOrders() {
   const [orders, setOrders] = useState<Order[]>([])
+  const [filtered, setFiltered] = useState<Order[]>([])
   const [loading, setLoading] = useState(true)
-  const [error, setError] = useState('')
   const [search, setSearch] = useState('')
+  const [status, setStatus] = useState('all')
+  const [expanded, setExpanded] = useState<number | null>(null)
 
-  async function load() {
-    setLoading(true)
-    setError('')
-    try {
-      const r = await fetch('/api/admin/orders')
-      const d = await r.json()
-      if (d.error) throw new Error(d.error)
+  useEffect(() => {
+    fetch('/api/admin/orders').then(r => r.json()).then(d => {
       setOrders(d.orders || [])
-    } catch (e) { setError(String(e)) }
-    setLoading(false)
-  }
+      setFiltered(d.orders || [])
+      setLoading(false)
+    })
+  }, [])
 
-  useEffect(() => { load() }, [])
+  useEffect(() => {
+    let list = orders
+    if (search) {
+      const q = search.toLowerCase()
+      list = list.filter(o => o.name.toLowerCase().includes(q) || (o.email || '').toLowerCase().includes(q))
+    }
+    if (status !== 'all') list = list.filter(o => o.financial_status === status || o.fulfillment_status === status)
+    setFiltered(list)
+  }, [search, status, orders])
 
-  function fmt(n: number) {
-    return '£' + n.toLocaleString('en-GB', { minimumFractionDigits: 2, maximumFractionDigits: 2 })
-  }
-
-  function fmtDate(s: string) {
-    return new Date(s).toLocaleDateString('en-GB', { day: 'numeric', month: 'short', year: 'numeric' })
-  }
-
-  const filtered = orders.filter(o => {
-    if (!search) return true
-    const q = search.toLowerCase()
-    return o.name?.toLowerCase().includes(q) ||
-      o.customer?.toLowerCase().includes(q) ||
-      o.email?.toLowerCase().includes(q)
-  })
+  const fmtDate = (s: string) => new Date(s).toLocaleDateString('en-GB', { day: '2-digit', month: 'short', year: 'numeric' })
 
   return (
     <>
       <div className="adm-head">
-        <h1>Orders</h1>
-        <button onClick={load} className="adm-btn ghost" style={{ fontSize: 12 }}>↻ Refresh</button>
-      </div>
-
-      {error && (
-        <div style={{ background: '#fde8e8', border: '1px solid #f5c2c2', borderRadius: 12, padding: '14px 18px', color: '#c0392b', fontSize: 13, marginBottom: 20 }}>
-          {error}
+        <div>
+          <h1>Orders</h1>
+          <small>{filtered.length} of {orders.length} orders</small>
         </div>
-      )}
+      </div>
 
       <div className="adm-filters">
         <input
-          placeholder="Search orders, customers…"
+          placeholder="Search by order # or email…"
           value={search}
           onChange={e => setSearch(e.target.value)}
-          style={{ width: 260 }}
+          style={{ flex: 1, minWidth: 200 }}
         />
-        <span style={{ fontSize: 12, color: '#22382c66', marginLeft: 4 }}>
-          {filtered.length} order{filtered.length !== 1 ? 's' : ''}
-        </span>
+        <select value={status} onChange={e => setStatus(e.target.value)}>
+          <option value="all">All statuses</option>
+          <option value="paid">Paid</option>
+          <option value="pending">Pending</option>
+          <option value="refunded">Refunded</option>
+          <option value="fulfilled">Fulfilled</option>
+          <option value="unfulfilled">Unfulfilled</option>
+        </select>
       </div>
 
-      <div className="adm-table-wrap">
-        {loading ? (
-          <div className="adm-loading">Loading orders…</div>
-        ) : filtered.length === 0 ? (
-          <div className="adm-empty">No orders found.</div>
-        ) : (
+      {loading ? (
+        <div className="adm-loading">Loading orders…</div>
+      ) : (
+        <div className="adm-table-wrap">
           <table className="adm-table">
             <thead>
               <tr>
                 <th>Order</th>
                 <th>Customer</th>
+                <th>Date</th>
                 <th>Items</th>
                 <th>Total</th>
                 <th>Payment</th>
                 <th>Fulfillment</th>
-                <th>Date</th>
               </tr>
             </thead>
             <tbody>
-              {filtered.map(o => {
-                const fin = (o.financial || '').toLowerCase()
-                const ful = (o.fulfillment || '').toLowerCase()
-                const finCls = fin === 'paid' ? 'paid' : fin === 'refunded' ? 'refunded' : 'pending'
-                const fulCls = ful === 'fulfilled' ? 'fulfilled' : 'unfulfilled'
-                return (
-                  <tr key={o.id}>
-                    <td style={{ fontWeight: 500 }}>{o.name}</td>
+              {filtered.length === 0 ? (
+                <tr><td colSpan={7}><div className="adm-empty">No orders found</div></td></tr>
+              ) : filtered.map(o => (
+                <>
+                  <tr key={o.id} style={{ cursor: 'pointer' }} onClick={() => setExpanded(expanded === o.id ? null : o.id)}>
+                    <td style={{ color: '#fff', fontWeight: 600 }}>{o.name}</td>
                     <td>
-                      <div style={{ fontWeight: 500 }}>{o.customer || 'Guest'}</div>
-                      {o.email && <div style={{ fontSize: 11, color: '#22382c66' }}>{o.email}</div>}
+                      <div style={{ color: '#ccc' }}>{o.email || '—'}</div>
+                      {o.phone && <div className="adm-muted">{o.phone}</div>}
                     </td>
-                    <td>{o.items}</td>
-                    <td style={{ fontWeight: 500 }}>{fmt(o.total)}</td>
-                    <td><span className={`adm-badge ${finCls}`}>{o.financial || 'pending'}</span></td>
-                    <td><span className={`adm-badge ${fulCls}`}>{o.fulfillment || 'unfulfilled'}</span></td>
-                    <td style={{ color: '#22382c99', fontSize: 12, whiteSpace: 'nowrap' }}>{fmtDate(o.created)}</td>
+                    <td className="adm-muted">{fmtDate(o.created_at)}</td>
+                    <td className="adm-muted">{(o.line_items || []).length} item{(o.line_items || []).length !== 1 ? 's' : ''}</td>
+                    <td style={{ color: '#C8FF00', fontWeight: 600 }}>£{parseFloat(o.total || '0').toFixed(2)}</td>
+                    <td><span className={`adm-badge ${o.financial_status}`}>{o.financial_status}</span></td>
+                    <td><span className={`adm-badge ${o.fulfillment_status || 'unfulfilled'}`}>{o.fulfillment_status || 'unfulfilled'}</span></td>
                   </tr>
-                )
-              })}
+                  {expanded === o.id && (
+                    <tr key={`${o.id}-exp`}>
+                      <td colSpan={7} style={{ background: '#1a1a1a', padding: '12px 14px' }}>
+                        <div style={{ fontSize: 12, color: '#888', marginBottom: 8 }}>Line items</div>
+                        {(o.line_items || []).map((li, i) => (
+                          <div key={i} style={{ display: 'flex', justifyContent: 'space-between', fontSize: 13, color: '#ccc', padding: '4px 0', borderBottom: '1px solid #222' }}>
+                            <span>{li.title}</span>
+                            <span style={{ color: '#666' }}>×{li.quantity} · £{parseFloat(li.price).toFixed(2)}</span>
+                          </div>
+                        ))}
+                      </td>
+                    </tr>
+                  )}
+                </>
+              ))}
             </tbody>
           </table>
-        )}
-      </div>
+        </div>
+      )}
     </>
   )
 }
