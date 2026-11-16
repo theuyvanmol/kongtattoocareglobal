@@ -22,11 +22,13 @@ function send(p: string, beat = false) {
   const v = getVisitorId()
   const r = document.referrer || undefined
   const payload = JSON.stringify({ v, p, r, beat })
-  if (navigator.sendBeacon) {
-    navigator.sendBeacon('/api/t', new Blob([payload], { type: 'application/json' }))
-  } else {
-    fetch('/api/t', { method: 'POST', body: payload, headers: { 'Content-Type': 'application/json' }, keepalive: true }).catch(() => {})
-  }
+  // Use fetch with keepalive — more reliable than sendBeacon for JSON
+  fetch('/api/t', {
+    method: 'POST',
+    body: payload,
+    headers: { 'Content-Type': 'application/json' },
+    keepalive: true,
+  }).catch(() => {})
 }
 
 export default function Tracker() {
