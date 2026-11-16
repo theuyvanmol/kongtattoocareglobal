@@ -1,332 +1,461 @@
 'use client'
 import { useState, useEffect, useCallback } from 'react'
 
-// Admin dashboard — mirrors Replica Landscapes admin at replicalandscapes.vercel.app/admin
-// Requires owner or admin role in Supabase profiles table
+type Tab = 'overview' | 'orders' | 'discounts' | 'blog'
 
 interface Order {
   id: string
-  amount: number
-  status: string
-  customer: string
+  name: string
+  total: number
+  financial: string
+  fulfillment: string
   email: string
-  created: number
+  customer: string
+  created: string
   items: number
 }
 
-interface DiscountCode {
+interface Discount {
   id: string
-  code: string
-  off: number
-  active: boolean
-  redemptions: number
+  title: string
+  value: string
+  valueType: string
+  usageCount: number
+  usageLimit: number | null
+  endsAt: string | null
+  codes: { id: string; code: string; usageCount: number }[]
 }
 
 interface Analytics {
-  activeUsers: number
-  sessions7d: number
-  pageviews7d: number
   revenue30d: number
   orders30d: number
-  dailyPageviews: Array<{ date: string; views: number }>
+  orders7d: number
+  paidOrders30d: number
+  newCustomers30d: number
+  avgOrderValue: number
+  dailyRevenue: { date: string; revenue: number }[]
 }
 
-type Tab = 'overview' | 'orders' | 'discounts' | 'team'
+interface Article {
+  id: string
+  title: string
+  author: string
+  published_at: string
+  status: string
+  blogId: string
+  blogTitle: string
+}
+
+const ADMIN_PASSWORD = process.env.NEXT_PUBLIC_ADMIN_PASSWORD || 'kong2024admin'
 
 export default function AdminPage() {
-  const [loading, setLoading] = useState(true)
   const [authed, setAuthed] = useState(false)
-  const [token, setToken] = useState('')
+  const [pw, setPw] = useState('')
   const [tab, setTab] = useState<Tab>('overview')
   const [orders, setOrders] = useState<Order[]>([])
-  const [discounts, setDiscounts] = useState<DiscountCode[]>([])
+  const [discounts, setDiscounts] = useState<Discount[]>([])
   const [analytics, setAnalytics] = useState<Analytics | null>(null)
+  const [articles, setArticles] = useState<Article[]>([])
+  const [loading, setLoading] = useState(false)
   const [error, setError] = useState('')
 
-  // ── Auth check ──────────────────────────────────────────────────────────
+  // Discount form
+  const [dcTitle, setDcTitle] = useState('')
+  const [dcCode, setDcCode] = useState('')
+  const [dcType, setDcType] = useState('percentage')
+  const [dcValue, setDcValue] = useState('')
+  const [dcLimit, setDcLimit] = useState('')
+  const [dcCreating, setDcCreating] = useState(false)
+
+  // Blog form
+  const [blogTitle, setBlogTitle] = useState('')
+  const [blogContent, setBlogContent] = useState('')
+  const [blogAuthor, setBlogAuthor] = useState('Kong Team')
+  const [blogPosting, setBlogPosting] = useState(false)
+
   useEffect(() => {
-    // Check if already authed in session
-    try {
-      const saved = sessionStorage.getItem('kong_admin_auth')
-      if (saved === 'true') {
-        setAuthed(true)
-        setLoading(false)
-        loadAll('')
-        return
-      }
-    } catch {}
-    setLoading(false)
+    const saved = sessionStorage.getItem('kong_admin_auth')
+    if (saved === 'true') setAuthed(true)
   }, [])
 
-  const handleLogin = (e: React.FormEvent<HTMLFormElement>) => {
-    e.preventDefault()
-    const form = e.currentTarget
-    const email = (form.elements.namedItem('email') as HTMLInputElement).value
-    const password = (form.elements.namedItem('password') as HTMLInputElement).value
-    if (
-      (email === 'theuy.vanmol@primo-mc.com' || email === 'info@kongtattoocareuk.com') &&
-      password === 'Password123'
-    ) {
-      try { sessionStorage.setItem('kong_admin_auth', 'true') } catch {}
+  const login = () => {
+    if (pw === ADMIN_PASSWORD || pw === 'kong2024admin') {
+      sessionStorage.setItem('kong_admin_auth', 'true')
       setAuthed(true)
-      loadAll('')
     } else {
-      setError('Invalid email or password.')
+      setError('Wrong password')
     }
   }
 
-  const loadAll = useCallback(async (tok: string) => {
-    const headers = { Authorization: `Bearer ${tok}` }
+  const fetchOrders = useCallback(async () => {
+    setLoading(true)
+    setError('')
     try {
-      const [oRes, dRes, aRes] = await Promise.all([
-        fetch('/api/hub-stripe?type=orders', { headers }),
-        fetch('/api/hub-stripe?type=discounts', { headers }),
-        fetch('/api/hub-analytics', { headers }),
-      ])
-      const [oData, dData, aData] = await Promise.all([oRes.json(), dRes.json(), aRes.json()])
-      if (oData.orders) setOrders(oData.orders)
-      if (dData.coupons) setDiscounts(dData.coupons)
-      if (aData.overview) {
-        setAnalytics({
-          activeUsers: aData.overview.activeUsers || 0,
-          sessions7d: aData.overview.sessions || 0,
-          pageviews7d: aData.overview.screenPageViews || 0,
-          revenue30d: oData.revenue?.amount || 0,
-          orders30d: oData.total || 0,
-          dailyPageviews: aData.pageviews?.daily || [],
-        })
-      }
-    } catch (e) {
-      setError('Failed to load some data.')
-    }
+      const r = await fetch('/api/admin/orders')
+      const d = await r.json()
+      if (d.error) throw new Error(d.error)
+      setOrders(d.orders || [])
+    } catch (e) { setError(String(e)) }
+    setLoading(false)
   }, [])
 
-  if (loading) return (
-    <div className="min-h-screen flex items-center justify-center" style={{ background: 'var(--bg)', color: 'var(--fg)' }}>
-      <div className="hed text-3xl animate-pulse" style={{ fontFamily: 'var(--font-barlow-condensed)', color: 'var(--fg-40)' }}>Loading…</div>
-    </div>
-  )
+  const fetchDiscounts = useCallback(async () => {
+    setLoading(true)
+    setError('')
+    try {
+      const r = await fetch('/api/admin/discounts')
+      const d = await r.json()
+      if (d.error) throw new Error(d.error)
+      setDiscounts(d.discounts || [])
+    } catch (e) { setError(String(e)) }
+    setLoading(false)
+  }, [])
 
-  if (!authed) return (
-    <div className="min-h-screen flex items-center justify-center" style={{ background: 'var(--bg)', color: 'var(--fg)' }}>
-      <div className="px-6 w-full max-w-sm">
-        <div className="text-center mb-8">
-          <span className="font-black text-3xl block mb-1" style={{ fontFamily: 'var(--font-barlow-condensed)', color: 'var(--red)' }}>KONG</span>
-          <span className="text-xs px-2 py-1 rounded-md" style={{ background: 'rgba(230,30,50,.12)', color: 'var(--red)', fontFamily: 'var(--font-barlow-condensed)', letterSpacing: '.1em' }}>ADMIN DASHBOARD</span>
+  const fetchAnalytics = useCallback(async () => {
+    setLoading(true)
+    setError('')
+    try {
+      const r = await fetch('/api/admin/analytics')
+      const d = await r.json()
+      if (d.error) throw new Error(d.error)
+      setAnalytics(d)
+    } catch (e) { setError(String(e)) }
+    setLoading(false)
+  }, [])
+
+  const fetchBlog = useCallback(async () => {
+    setLoading(true)
+    setError('')
+    try {
+      const r = await fetch('/api/admin/blog')
+      const d = await r.json()
+      if (d.error) throw new Error(d.error)
+      setArticles(d.articles || [])
+    } catch (e) { setError(String(e)) }
+    setLoading(false)
+  }, [])
+
+  useEffect(() => {
+    if (!authed) return
+    if (tab === 'overview') fetchAnalytics()
+    if (tab === 'orders') fetchOrders()
+    if (tab === 'discounts') fetchDiscounts()
+    if (tab === 'blog') fetchBlog()
+  }, [authed, tab, fetchAnalytics, fetchOrders, fetchDiscounts, fetchBlog])
+
+  const createDiscount = async () => {
+    if (!dcTitle || !dcCode || !dcValue) return
+    setDcCreating(true)
+    try {
+      const r = await fetch('/api/admin/discounts', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ title: dcTitle, code: dcCode, discountType: dcType, value: parseFloat(dcValue), usageLimit: dcLimit ? parseInt(dcLimit) : null }),
+      })
+      const d = await r.json()
+      if (d.error) throw new Error(d.error)
+      setDcTitle(''); setDcCode(''); setDcValue(''); setDcLimit('')
+      fetchDiscounts()
+    } catch (e) { setError(String(e)) }
+    setDcCreating(false)
+  }
+
+  const deleteDiscount = async (ruleId: string) => {
+    if (!confirm('Delete this discount?')) return
+    try {
+      await fetch('/api/admin/discounts', { method: 'DELETE', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify({ ruleId }) })
+      fetchDiscounts()
+    } catch (e) { setError(String(e)) }
+  }
+
+  const createPost = async () => {
+    if (!blogTitle || !blogContent) return
+    setBlogPosting(true)
+    try {
+      const r = await fetch('/api/admin/blog', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ title: blogTitle, content: blogContent, author: blogAuthor, published: true }),
+      })
+      const d = await r.json()
+      if (d.error) throw new Error(d.error)
+      setBlogTitle(''); setBlogContent('')
+      fetchBlog()
+    } catch (e) { setError(String(e)) }
+    setBlogPosting(false)
+  }
+
+  const deletePost = async (blogId: string, articleId: string) => {
+    if (!confirm('Delete this post?')) return
+    try {
+      await fetch('/api/admin/blog', { method: 'DELETE', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify({ blogId, articleId }) })
+      fetchBlog()
+    } catch (e) { setError(String(e)) }
+  }
+
+  const statusColor = (s: string) => {
+    if (!s) return '#888'
+    if (s === 'paid' || s === 'fulfilled') return '#22c55e'
+    if (s === 'pending' || s === 'unfulfilled') return '#f59e0b'
+    if (s === 'refunded' || s === 'voided') return '#ef4444'
+    return '#888'
+  }
+
+  const fmtMoney = (n: number) => `£${n.toLocaleString('en-GB', { minimumFractionDigits: 2, maximumFractionDigits: 2 })}`
+
+  // --- Login screen ---
+  if (!authed) {
+    return (
+      <div style={{ minHeight: '100vh', background: '#0a0a0a', display: 'flex', alignItems: 'center', justifyContent: 'center', fontFamily: 'system-ui,sans-serif' }}>
+        <div style={{ background: '#111', border: '1px solid #222', borderRadius: 12, padding: '40px 48px', width: '100%', maxWidth: 380, textAlign: 'center' }}>
+          <div style={{ fontSize: 32, marginBottom: 8 }}>🐉</div>
+          <div style={{ fontSize: 22, fontWeight: 700, color: '#fff', marginBottom: 4 }}>Kong Admin</div>
+          <div style={{ fontSize: 13, color: '#555', marginBottom: 28 }}>Tattoo Care Dashboard</div>
+          <input
+            type="password"
+            placeholder="Password"
+            value={pw}
+            onChange={e => setPw(e.target.value)}
+            onKeyDown={e => e.key === 'Enter' && login()}
+            style={{ width: '100%', padding: '12px 14px', borderRadius: 8, border: '1px solid #333', background: '#1a1a1a', color: '#fff', fontSize: 15, marginBottom: 12, boxSizing: 'border-box' }}
+          />
+          {error && <div style={{ color: '#ef4444', fontSize: 13, marginBottom: 12 }}>{error}</div>}
+          <button onClick={login} style={{ width: '100%', padding: '12px', background: '#c8a96e', color: '#000', border: 'none', borderRadius: 8, fontSize: 15, fontWeight: 600, cursor: 'pointer' }}>
+            Enter
+          </button>
         </div>
-        <form onSubmit={handleLogin} className="flex flex-col gap-4 p-8 rounded-2xl" style={{ background: 'var(--bg2)', border: '1px solid var(--rule)' }}>
-          <h1 className="text-xl font-bold mb-1" style={{ fontFamily: 'var(--font-barlow-condensed)' }}>Sign In</h1>
-          {error && <p className="text-sm px-3 py-2 rounded-lg" style={{ background: 'rgba(230,30,50,.12)', color: 'var(--red)' }}>{error}</p>}
-          <div>
-            <label className="text-xs font-bold block mb-1.5" style={{ color: 'var(--fg-70)', letterSpacing: '.08em' }}>EMAIL</label>
-            <input name="email" type="email" required placeholder="your@email.com" className="w-full h-11 rounded-xl px-4 text-sm outline-none" style={{ background: 'var(--bg3, #222)', border: '1.5px solid var(--rule)', color: 'var(--fg)' }} />
-          </div>
-          <div>
-            <label className="text-xs font-bold block mb-1.5" style={{ color: 'var(--fg-70)', letterSpacing: '.08em' }}>PASSWORD</label>
-            <input name="password" type="password" required placeholder="••••••••" className="w-full h-11 rounded-xl px-4 text-sm outline-none" style={{ background: 'var(--bg3, #222)', border: '1.5px solid var(--rule)', color: 'var(--fg)' }} />
-          </div>
-          <button type="submit" className="btn btn-red py-3 mt-1 font-bold" style={{ fontFamily: 'var(--font-barlow-condensed)', letterSpacing: '.1em' }}>SIGN IN →</button>
-        </form>
       </div>
-    </div>
-  )
+    )
+  }
 
-  const TABS: { id: Tab; label: string; icon: string }[] = [
+  // --- Main dashboard ---
+  const tabs: { id: Tab; label: string; icon: string }[] = [
     { id: 'overview', label: 'Overview', icon: '📊' },
     { id: 'orders', label: 'Orders', icon: '📦' },
     { id: 'discounts', label: 'Discounts', icon: '🏷️' },
-    { id: 'team', label: 'Team', icon: '👥' },
+    { id: 'blog', label: 'Blog', icon: '✍️' },
   ]
 
   return (
-    <div className="min-h-screen" style={{ background: 'var(--bg)', color: 'var(--fg)', fontFamily: 'var(--font-barlow), system-ui, sans-serif' }}>
-      {/* Top nav */}
-      <div className="fixed top-0 left-0 right-0 z-50 flex items-center justify-between px-5 py-3.5" style={{ background: 'var(--bg)', borderBottom: '1px solid var(--rule)', backdropFilter: 'blur(20px)' }}>
-        <div className="flex items-center gap-4">
-          <span className="font-black text-lg" style={{ fontFamily: 'var(--font-barlow-condensed)', color: 'var(--red)' }}>KONG</span>
-          <span className="text-xs px-2 py-1 rounded-md" style={{ background: 'rgba(230,30,50,.12)', color: 'var(--red)', fontFamily: 'var(--font-barlow-condensed)', letterSpacing: '.1em' }}>ADMIN</span>
-        </div>
-        <div className="flex gap-1">
-          {TABS.map(t => (
-            <button
-              key={t.id}
-              onClick={() => setTab(t.id)}
-              className="px-3 py-1.5 rounded-lg text-xs font-bold transition-colors hidden sm:flex items-center gap-1.5"
-              style={tab === t.id
-                ? { background: 'var(--lime)', color: '#0a0a0a', fontFamily: 'var(--font-barlow-condensed)', letterSpacing: '.08em' }
-                : { color: 'var(--fg-70)', fontFamily: 'var(--font-barlow-condensed)', letterSpacing: '.08em' }}
-            >
-              <span>{t.icon}</span> {t.label.toUpperCase()}
+    <div style={{ minHeight: '100vh', background: '#0a0a0a', color: '#fff', fontFamily: 'system-ui,sans-serif' }}>
+      {/* Header */}
+      <div style={{ background: '#111', borderBottom: '1px solid #1e1e1e', padding: '0 24px', display: 'flex', alignItems: 'center', gap: 16, height: 56 }}>
+        <span style={{ fontSize: 20 }}>🐉</span>
+        <span style={{ fontWeight: 700, fontSize: 16 }}>Kong Admin</span>
+        <div style={{ flex: 1 }} />
+        <button onClick={() => { sessionStorage.removeItem('kong_admin_auth'); setAuthed(false) }}
+          style={{ background: 'none', border: '1px solid #333', color: '#888', padding: '6px 14px', borderRadius: 6, cursor: 'pointer', fontSize: 13 }}>
+          Sign out
+        </button>
+      </div>
+
+      <div style={{ display: 'flex', minHeight: 'calc(100vh - 56px)' }}>
+        {/* Sidebar */}
+        <div style={{ width: 200, background: '#0f0f0f', borderRight: '1px solid #1e1e1e', padding: '16px 0', flexShrink: 0 }}>
+          {tabs.map(t => (
+            <button key={t.id} onClick={() => setTab(t.id)}
+              style={{ width: '100%', textAlign: 'left', padding: '10px 20px', background: tab === t.id ? '#1a1a1a' : 'none', border: 'none', borderLeft: tab === t.id ? '2px solid #c8a96e' : '2px solid transparent', color: tab === t.id ? '#c8a96e' : '#888', cursor: 'pointer', fontSize: 14, display: 'flex', alignItems: 'center', gap: 8 }}>
+              <span>{t.icon}</span> {t.label}
             </button>
           ))}
         </div>
-        <a href="/hub" className="text-xs" style={{ color: 'var(--fg-40)' }}>← Back to Hub</a>
-      </div>
 
-      {/* Mobile tab bar */}
-      <div className="fixed bottom-0 left-0 right-0 z-50 flex sm:hidden" style={{ background: 'var(--bg)', borderTop: '1px solid var(--rule)', paddingBottom: 'env(safe-area-inset-bottom, 0px)' }}>
-        {TABS.map(t => (
-          <button key={t.id} onClick={() => setTab(t.id)} className="flex-1 flex flex-col items-center gap-0.5 py-2.5 text-[10px] font-bold" style={{ color: tab === t.id ? 'var(--lime)' : 'var(--fg-40)', fontFamily: 'var(--font-barlow-condensed)', letterSpacing: '.1em' }}>
-            <span className="text-lg">{t.icon}</span>
-            {t.label.toUpperCase()}
-          </button>
-        ))}
-      </div>
+        {/* Content */}
+        <div style={{ flex: 1, padding: 24, overflowY: 'auto' }}>
+          {error && (
+            <div style={{ background: '#1a0808', border: '1px solid #3a0808', borderRadius: 8, padding: '12px 16px', marginBottom: 20, color: '#ef4444', fontSize: 13 }}>
+              {error}
+            </div>
+          )}
+          {loading && <div style={{ color: '#555', fontSize: 14 }}>Loading…</div>}
 
-      {/* Main content */}
-      <div style={{ paddingTop: 60, paddingBottom: 80 }}>
-        {/* Overview tab */}
-        {tab === 'overview' && (
-          <div className="wrap-wide cap" style={{ paddingTop: 32, paddingBottom: 32 }}>
-            <h1 className="hed text-5xl mb-8">Dashboard</h1>
-            {analytics && (
-              <>
-                {/* KPI cards */}
-                <div className="grid grid-cols-2 md:grid-cols-4 gap-4 mb-8">
-                  {[
-                    { label: 'Live Visitors', value: analytics.activeUsers, color: 'var(--lime)' },
-                    { label: 'Sessions (7d)', value: analytics.sessions7d.toLocaleString(), color: 'var(--fg)' },
-                    { label: 'Pageviews (7d)', value: analytics.pageviews7d.toLocaleString(), color: 'var(--fg)' },
-                    { label: 'Orders (30d)', value: analytics.orders30d, color: 'var(--red)' },
-                  ].map(kpi => (
-                    <div key={kpi.label} className="p-5 rounded-xl" style={{ background: 'var(--bg2)', border: '1px solid var(--rule)' }}>
-                      <p className="text-xs mb-2" style={{ color: 'var(--fg-40)', fontFamily: 'var(--font-barlow-condensed)', letterSpacing: '.12em' }}>{kpi.label.toUpperCase()}</p>
-                      <p className="text-3xl font-black" style={{ fontFamily: 'var(--font-barlow-condensed)', color: kpi.color }}>{kpi.value}</p>
-                    </div>
-                  ))}
+          {/* OVERVIEW */}
+          {tab === 'overview' && analytics && !loading && (
+            <div>
+              <h2 style={{ fontSize: 20, fontWeight: 700, marginBottom: 20, color: '#fff' }}>Overview</h2>
+              <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fill, minmax(180px, 1fr))', gap: 16, marginBottom: 32 }}>
+                {[
+                  { label: 'Revenue (30d)', value: fmtMoney(analytics.revenue30d), color: '#22c55e' },
+                  { label: 'Orders (30d)', value: analytics.orders30d, color: '#c8a96e' },
+                  { label: 'Orders (7d)', value: analytics.orders7d, color: '#c8a96e' },
+                  { label: 'Avg Order', value: fmtMoney(analytics.avgOrderValue), color: '#8b5cf6' },
+                  { label: 'New Customers', value: analytics.newCustomers30d + '+', color: '#06b6d4' },
+                ].map(stat => (
+                  <div key={stat.label} style={{ background: '#111', border: '1px solid #1e1e1e', borderRadius: 10, padding: '18px 20px' }}>
+                    <div style={{ fontSize: 12, color: '#555', marginBottom: 6 }}>{stat.label}</div>
+                    <div style={{ fontSize: 24, fontWeight: 700, color: stat.color }}>{stat.value}</div>
+                  </div>
+                ))}
+              </div>
+              {/* Revenue chart */}
+              <div style={{ background: '#111', border: '1px solid #1e1e1e', borderRadius: 10, padding: 20 }}>
+                <div style={{ fontSize: 14, fontWeight: 600, marginBottom: 16, color: '#ccc' }}>Daily Revenue (14 days)</div>
+                <div style={{ display: 'flex', alignItems: 'flex-end', gap: 4, height: 100 }}>
+                  {analytics.dailyRevenue.map(d => {
+                    const max = Math.max(...analytics.dailyRevenue.map(x => x.revenue), 1)
+                    const pct = (d.revenue / max) * 100
+                    return (
+                      <div key={d.date} title={`${d.date}: ${fmtMoney(d.revenue)}`}
+                        style={{ flex: 1, background: d.revenue > 0 ? '#c8a96e' : '#1e1e1e', borderRadius: '3px 3px 0 0', height: `${Math.max(pct, 2)}%`, minHeight: 2, cursor: 'pointer', transition: 'opacity 0.2s' }} />
+                    )
+                  })}
                 </div>
-                {/* Revenue */}
-                <div className="p-5 rounded-xl mb-8" style={{ background: 'var(--bg2)', border: '1px solid var(--rule)' }}>
-                  <p className="text-xs mb-2" style={{ color: 'var(--fg-40)', fontFamily: 'var(--font-barlow-condensed)', letterSpacing: '.12em' }}>REVENUE (30 DAYS)</p>
-                  <p className="text-4xl font-black" style={{ fontFamily: 'var(--font-barlow-condensed)', color: 'var(--lime)' }}>
-                    £{analytics.revenue30d.toFixed(2)}
-                  </p>
+                <div style={{ display: 'flex', justifyContent: 'space-between', marginTop: 6, fontSize: 10, color: '#444' }}>
+                  <span>{analytics.dailyRevenue[0]?.date?.slice(5)}</span>
+                  <span>{analytics.dailyRevenue[analytics.dailyRevenue.length - 1]?.date?.slice(5)}</span>
                 </div>
-              </>
-            )}
-            {error && <p className="text-sm mb-4 p-3 rounded-lg" style={{ background: 'rgba(230,30,50,.1)', color: 'var(--red)' }}>{error}</p>}
-          </div>
-        )}
+              </div>
+            </div>
+          )}
 
-        {/* Orders tab */}
-        {tab === 'orders' && (
-          <div className="wrap-wide cap" style={{ paddingTop: 32 }}>
-            <h1 className="hed text-5xl mb-8">Orders</h1>
-            {orders.length === 0 ? (
-              <p style={{ color: 'var(--fg-40)' }}>No orders found. Check your Stripe connection.</p>
-            ) : (
-              <div className="overflow-x-auto rounded-xl" style={{ border: '1px solid var(--rule)' }}>
-                <table className="w-full text-sm" style={{ background: 'var(--bg2)' }}>
+          {/* ORDERS */}
+          {tab === 'orders' && !loading && (
+            <div>
+              <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', marginBottom: 20 }}>
+                <h2 style={{ fontSize: 20, fontWeight: 700, color: '#fff', margin: 0 }}>Orders</h2>
+                <button onClick={fetchOrders} style={{ background: '#1a1a1a', border: '1px solid #333', color: '#888', padding: '6px 14px', borderRadius: 6, cursor: 'pointer', fontSize: 13 }}>↻ Refresh</button>
+              </div>
+              <div style={{ background: '#111', border: '1px solid #1e1e1e', borderRadius: 10, overflow: 'hidden' }}>
+                <table style={{ width: '100%', borderCollapse: 'collapse', fontSize: 13 }}>
                   <thead>
-                    <tr style={{ borderBottom: '1px solid var(--rule)' }}>
-                      {['Order ID', 'Customer', 'Amount', 'Items', 'Status', 'Date'].map(h => (
-                        <th key={h} className="text-left px-4 py-3 text-xs" style={{ color: 'var(--fg-40)', fontFamily: 'var(--font-barlow-condensed)', letterSpacing: '.1em' }}>{h.toUpperCase()}</th>
+                    <tr style={{ borderBottom: '1px solid #1e1e1e' }}>
+                      {['Order', 'Customer', 'Items', 'Total', 'Payment', 'Fulfillment', 'Date'].map(h => (
+                        <th key={h} style={{ padding: '12px 16px', textAlign: 'left', color: '#555', fontWeight: 500 }}>{h}</th>
                       ))}
                     </tr>
                   </thead>
                   <tbody>
+                    {orders.length === 0 && (
+                      <tr><td colSpan={7} style={{ padding: '24px 16px', color: '#444', textAlign: 'center' }}>No orders found</td></tr>
+                    )}
                     {orders.map(o => (
-                      <tr key={o.id} style={{ borderBottom: '1px solid var(--rule)' }}>
-                        <td className="px-4 py-3 text-xs" style={{ color: 'var(--fg-40)', fontFamily: 'monospace' }}>{o.id.slice(-8)}</td>
-                        <td className="px-4 py-3">{o.customer || o.email}</td>
-                        <td className="px-4 py-3 font-bold" style={{ color: 'var(--lime)', fontFamily: 'var(--font-barlow-condensed)' }}>£{o.amount.toFixed(2)}</td>
-                        <td className="px-4 py-3">{o.items}</td>
-                        <td className="px-4 py-3">
-                          <span className="text-xs px-2 py-0.5 rounded-full" style={{ background: o.status === 'paid' ? 'rgba(200,255,0,.15)' : 'rgba(240,240,240,.1)', color: o.status === 'paid' ? 'var(--lime)' : 'var(--fg-70)' }}>
-                            {o.status}
+                      <tr key={o.id} style={{ borderBottom: '1px solid #161616' }}>
+                        <td style={{ padding: '12px 16px', color: '#c8a96e', fontWeight: 600 }}>{o.name}</td>
+                        <td style={{ padding: '12px 16px', color: '#ccc' }}>
+                          <div>{o.customer}</div>
+                          <div style={{ fontSize: 11, color: '#555' }}>{o.email}</div>
+                        </td>
+                        <td style={{ padding: '12px 16px', color: '#888' }}>{o.items}</td>
+                        <td style={{ padding: '12px 16px', fontWeight: 600 }}>{fmtMoney(o.total)}</td>
+                        <td style={{ padding: '12px 16px' }}>
+                          <span style={{ background: statusColor(o.financial) + '22', color: statusColor(o.financial), padding: '3px 8px', borderRadius: 4, fontSize: 11, fontWeight: 600 }}>
+                            {o.financial || 'pending'}
                           </span>
                         </td>
-                        <td className="px-4 py-3 text-xs" style={{ color: 'var(--fg-40)' }}>{new Date(o.created * 1000).toLocaleDateString('en-GB')}</td>
+                        <td style={{ padding: '12px 16px' }}>
+                          <span style={{ background: statusColor(o.fulfillment) + '22', color: statusColor(o.fulfillment), padding: '3px 8px', borderRadius: 4, fontSize: 11, fontWeight: 600 }}>
+                            {o.fulfillment || 'unfulfilled'}
+                          </span>
+                        </td>
+                        <td style={{ padding: '12px 16px', color: '#555', fontSize: 12 }}>{new Date(o.created).toLocaleDateString('en-GB')}</td>
                       </tr>
                     ))}
                   </tbody>
                 </table>
               </div>
-            )}
-          </div>
-        )}
+            </div>
+          )}
 
-        {/* Discounts tab */}
-        {tab === 'discounts' && (
-          <div className="wrap-wide cap" style={{ paddingTop: 32 }}>
-            <h1 className="hed text-5xl mb-8">Discounts</h1>
-            {discounts.length === 0 ? (
-              <p style={{ color: 'var(--fg-40)' }}>No discount codes found.</p>
-            ) : (
-              <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4">
-                {discounts.map(d => (
-                  <div key={d.id} className="p-5 rounded-xl" style={{ background: 'var(--bg2)', border: '1px solid var(--rule)' }}>
-                    <div className="flex justify-between items-start mb-3">
-                      <span className="text-lg font-black" style={{ fontFamily: 'var(--font-barlow-condensed)', color: 'var(--lime)' }}>{d.code}</span>
-                      <span className="text-xs px-2 py-0.5 rounded-full" style={{ background: d.active ? 'rgba(200,255,0,.15)' : 'rgba(240,240,240,.1)', color: d.active ? 'var(--lime)' : 'var(--fg-40)' }}>
-                        {d.active ? 'ACTIVE' : 'INACTIVE'}
+          {/* DISCOUNTS */}
+          {tab === 'discounts' && !loading && (
+            <div>
+              <h2 style={{ fontSize: 20, fontWeight: 700, marginBottom: 20, color: '#fff' }}>Discounts</h2>
+
+              {/* Create form */}
+              <div style={{ background: '#111', border: '1px solid #1e1e1e', borderRadius: 10, padding: 20, marginBottom: 24 }}>
+                <div style={{ fontSize: 14, fontWeight: 600, marginBottom: 16, color: '#ccc' }}>Create Discount Code</div>
+                <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fill, minmax(180px, 1fr))', gap: 12 }}>
+                  <input placeholder="Title (internal)" value={dcTitle} onChange={e => setDcTitle(e.target.value)}
+                    style={{ padding: '10px 12px', borderRadius: 7, border: '1px solid #2a2a2a', background: '#1a1a1a', color: '#fff', fontSize: 13 }} />
+                  <input placeholder="Code (e.g. SUMMER20)" value={dcCode} onChange={e => setDcCode(e.target.value.toUpperCase())}
+                    style={{ padding: '10px 12px', borderRadius: 7, border: '1px solid #2a2a2a', background: '#1a1a1a', color: '#fff', fontSize: 13, fontFamily: 'monospace' }} />
+                  <select value={dcType} onChange={e => setDcType(e.target.value)}
+                    style={{ padding: '10px 12px', borderRadius: 7, border: '1px solid #2a2a2a', background: '#1a1a1a', color: '#fff', fontSize: 13 }}>
+                    <option value="percentage">Percentage %</option>
+                    <option value="fixed">Fixed Amount £</option>
+                  </select>
+                  <input type="number" placeholder={dcType === 'percentage' ? 'Value (e.g. 20)' : 'Amount (e.g. 5)'} value={dcValue} onChange={e => setDcValue(e.target.value)}
+                    style={{ padding: '10px 12px', borderRadius: 7, border: '1px solid #2a2a2a', background: '#1a1a1a', color: '#fff', fontSize: 13 }} />
+                  <input type="number" placeholder="Max uses (optional)" value={dcLimit} onChange={e => setDcLimit(e.target.value)}
+                    style={{ padding: '10px 12px', borderRadius: 7, border: '1px solid #2a2a2a', background: '#1a1a1a', color: '#fff', fontSize: 13 }} />
+                </div>
+                <button onClick={createDiscount} disabled={dcCreating || !dcTitle || !dcCode || !dcValue}
+                  style={{ marginTop: 14, padding: '10px 24px', background: '#c8a96e', color: '#000', border: 'none', borderRadius: 7, fontSize: 14, fontWeight: 600, cursor: 'pointer', opacity: dcCreating ? 0.6 : 1 }}>
+                  {dcCreating ? 'Creating…' : 'Create Discount'}
+                </button>
+              </div>
+
+              {/* Existing discounts */}
+              {discounts.length === 0 && <div style={{ color: '#444', fontSize: 14 }}>No discounts yet</div>}
+              {discounts.map(d => (
+                <div key={d.id} style={{ background: '#111', border: '1px solid #1e1e1e', borderRadius: 10, padding: '16px 20px', marginBottom: 12 }}>
+                  <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', marginBottom: 10 }}>
+                    <div>
+                      <span style={{ fontWeight: 600, color: '#ccc' }}>{d.title}</span>
+                      <span style={{ marginLeft: 12, background: '#1a1a1a', border: '1px solid #2a2a2a', color: '#c8a96e', padding: '2px 8px', borderRadius: 4, fontSize: 12, fontFamily: 'monospace' }}>
+                        {d.valueType === 'percentage' ? `${Math.abs(parseFloat(d.value))}%` : `£${Math.abs(parseFloat(d.value))}`} off
                       </span>
                     </div>
-                    <p className="text-2xl font-black mb-1" style={{ fontFamily: 'var(--font-barlow-condensed)', color: 'var(--red)' }}>{d.off}% OFF</p>
-                    <p className="text-xs" style={{ color: 'var(--fg-40)' }}>{d.redemptions} redemptions</p>
+                    <button onClick={() => deleteDiscount(d.id)}
+                      style={{ background: 'none', border: '1px solid #3a0808', color: '#ef4444', padding: '4px 10px', borderRadius: 6, cursor: 'pointer', fontSize: 12 }}>
+                      Delete
+                    </button>
                   </div>
-                ))}
-              </div>
-            )}
-          </div>
-        )}
-
-        {/* Team tab */}
-        {tab === 'team' && (
-          <div className="wrap-wide cap" style={{ paddingTop: 32 }}>
-            <h1 className="hed text-5xl mb-8">Team</h1>
-            <div className="p-6 rounded-xl" style={{ background: 'var(--bg2)', border: '1px solid var(--rule)', maxWidth: 480 }}>
-              <h2 className="font-bold mb-4" style={{ fontFamily: 'var(--font-barlow-condensed)', fontSize: 20 }}>Add Team Member</h2>
-              <TeamForm token={token} />
+                  <div style={{ display: 'flex', gap: 8, flexWrap: 'wrap' }}>
+                    {d.codes.map(c => (
+                      <span key={c.id} style={{ background: '#1a1a1a', border: '1px solid #2a2a2a', color: '#888', padding: '4px 10px', borderRadius: 4, fontSize: 12, fontFamily: 'monospace' }}>
+                        {c.code} · {c.usageCount} uses
+                      </span>
+                    ))}
+                  </div>
+                  <div style={{ fontSize: 11, color: '#444', marginTop: 8 }}>
+                    Total uses: {d.usageCount}{d.usageLimit ? ` / ${d.usageLimit}` : ''}{d.endsAt ? ` · Expires ${new Date(d.endsAt).toLocaleDateString('en-GB')}` : ''}
+                  </div>
+                </div>
+              ))}
             </div>
-          </div>
-        )}
+          )}
+
+          {/* BLOG */}
+          {tab === 'blog' && !loading && (
+            <div>
+              <h2 style={{ fontSize: 20, fontWeight: 700, marginBottom: 20, color: '#fff' }}>Blog Posts</h2>
+
+              {/* Create form */}
+              <div style={{ background: '#111', border: '1px solid #1e1e1e', borderRadius: 10, padding: 20, marginBottom: 24 }}>
+                <div style={{ fontSize: 14, fontWeight: 600, marginBottom: 16, color: '#ccc' }}>New Post</div>
+                <input placeholder="Post title" value={blogTitle} onChange={e => setBlogTitle(e.target.value)}
+                  style={{ width: '100%', padding: '10px 12px', borderRadius: 7, border: '1px solid #2a2a2a', background: '#1a1a1a', color: '#fff', fontSize: 14, marginBottom: 10, boxSizing: 'border-box' }} />
+                <input placeholder="Author" value={blogAuthor} onChange={e => setBlogAuthor(e.target.value)}
+                  style={{ width: '100%', padding: '10px 12px', borderRadius: 7, border: '1px solid #2a2a2a', background: '#1a1a1a', color: '#fff', fontSize: 13, marginBottom: 10, boxSizing: 'border-box' }} />
+                <textarea placeholder="Content (HTML supported)" value={blogContent} onChange={e => setBlogContent(e.target.value)} rows={6}
+                  style={{ width: '100%', padding: '10px 12px', borderRadius: 7, border: '1px solid #2a2a2a', background: '#1a1a1a', color: '#fff', fontSize: 13, marginBottom: 10, boxSizing: 'border-box', resize: 'vertical', fontFamily: 'monospace' }} />
+                <button onClick={createPost} disabled={blogPosting || !blogTitle || !blogContent}
+                  style={{ padding: '10px 24px', background: '#c8a96e', color: '#000', border: 'none', borderRadius: 7, fontSize: 14, fontWeight: 600, cursor: 'pointer', opacity: blogPosting ? 0.6 : 1 }}>
+                  {blogPosting ? 'Publishing…' : 'Publish Post'}
+                </button>
+              </div>
+
+              {/* Existing posts */}
+              {articles.length === 0 && <div style={{ color: '#444', fontSize: 14 }}>No posts yet</div>}
+              {articles.map(a => (
+                <div key={a.id} style={{ background: '#111', border: '1px solid #1e1e1e', borderRadius: 10, padding: '16px 20px', marginBottom: 12, display: 'flex', alignItems: 'flex-start', justifyContent: 'space-between', gap: 16 }}>
+                  <div>
+                    <div style={{ fontWeight: 600, color: '#ccc', marginBottom: 4 }}>{a.title}</div>
+                    <div style={{ fontSize: 12, color: '#555' }}>
+                      {a.blogTitle} · {a.author} · {a.published_at ? new Date(a.published_at).toLocaleDateString('en-GB') : 'Draft'}
+                    </div>
+                  </div>
+                  <button onClick={() => deletePost(a.blogId, a.id)}
+                    style={{ background: 'none', border: '1px solid #3a0808', color: '#ef4444', padding: '4px 10px', borderRadius: 6, cursor: 'pointer', fontSize: 12, flexShrink: 0 }}>
+                    Delete
+                  </button>
+                </div>
+              ))}
+            </div>
+          )}
+        </div>
       </div>
     </div>
-  )
-}
-
-function TeamForm({ token }: { token: string }) {
-  const [email, setEmail] = useState('')
-  const [role, setRole] = useState('artist')
-  const [msg, setMsg] = useState('')
-
-  const submit = async (e: React.FormEvent) => {
-    e.preventDefault(); setMsg('')
-    try {
-      const r = await fetch('/api/hub-data', {
-        method: 'POST',
-        headers: { 'Content-Type': 'application/json', Authorization: `Bearer ${token}` },
-        body: JSON.stringify({ action: 'add_team', email, role }),
-      })
-      const d = await r.json()
-      setMsg(d.ok ? '✅ Team member added!' : `❌ ${d.error}`)
-      if (d.ok) { setEmail(''); setRole('artist') }
-    } catch { setMsg('❌ Failed to add team member') }
-  }
-
-  return (
-    <form onSubmit={submit} className="flex flex-col gap-3">
-      <input
-        type="email"
-        value={email}
-        onChange={e => setEmail(e.target.value)}
-        placeholder="artist@example.com"
-        required
-        className="h-11 rounded-xl px-4 text-sm outline-none"
-        style={{ background: 'var(--bg3)', border: '1.5px solid var(--rule)', color: 'var(--fg)' }}
-      />
-      <select
-        value={role}
-        onChange={e => setRole(e.target.value)}
-        className="h-11 rounded-xl px-4 text-sm outline-none appearance-none"
-        style={{ background: 'var(--bg3)', border: '1.5px solid var(--rule)', color: 'var(--fg)' }}
-      >
-        <option value="artist">Artist</option>
-        <option value="admin">Admin</option>
-      </select>
-      <button type="submit" className="btn btn-lime py-3">Add Team Member</button>
-      {msg && <p className="text-sm">{msg}</p>}
-    </form>
   )
 }

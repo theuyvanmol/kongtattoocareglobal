@@ -1,0 +1,69 @@
+import { NextResponse } from 'next/server'
+
+const SHOP = 'kongtattoocareuk.myshopify.com'
+const API_VERSION = '2024-10'
+
+function shopifyFetch(endpoint: string, options?: RequestInit) {
+  const token = process.env.SHOPIFY_ADMIN_TOKEN
+  if (!token) throw new Error('Missing SHOPIFY_ADMIN_TOKEN')
+  return fetch(`https://${SHOP}/admin/api/${API_VERSION}${endpoint}`, {
+    ...options,
+    headers: {
+      'X-Shopify-Access-Token': token,
+      'Content-Type': 'application/json',
+      ...(options?.headers || {}),
+    },
+  })
+}
+
+export async function GET() {
+  try {
+    const now = new Date()
+    const thirtyDaysAgo = new Date(now.getTime() - 30 * 24 * 60 * 60 * 1000).toISOString()
+    const sevenDaysAgo = new Date(now.getTime() - 7 * 24 * 60 * 60 * 1000).toISOString()
+
+    // Fetch orders for revenue stats
+    const [ordersResp, customersResp] = await Promise.all([
+      shopifyFetch(`/orders.json?status=any&created_at_min=${thirtyDaysAgo}&limit=250&fields=id,total_price,created_at,financial_status`),
+      shopifyFetch(`/customers.json?created_at_min=${thirtyDaysAgo}&limit=10&fields=id,created_at`),
+    ])
+
+    const ordersData = ordersResp.ok ? await ordersResp.json() : { orders: [] }
+    const customersData = customersResp.ok ? await customersResp.json() : { customers: [] }
+
+    const orders30d = ordersData.orders || []
+    const paidOrders = orders30d.filter((o: Record<string, string>) => o.financial_status === 'paid')
+    const revenue30d = paidOrders.reduce((sum: number, o: Record<string, string>) => sum + parseFloat(o.total_price || '0'), 0)
+
+    // Orders last 7 days
+    const orders7d = orders30d.filter((o: Record<string, string>) => new Date(o.created_at) >= new Date(sevenDaysAgo))
+
+    // Daily revenue for chart (last 14 days)
+    const dailyMap: Record<string, number> = {}
+    for (let i = 13; i >= 0; i--) {
+      const d = new Date(now.getTime() - i * 24 * 60 * 60 * 1000)
+      const key = d.toISOString().split('T')[0]
+      dailyMap[key] = 0
+    }
+    for (const o of paidOrders) {
+      const key = o.created_at.split('T')[0]
+      if (key in dailyMap) dailyMap[key] += parseFloat(o.total_price || '0')
+    }
+    const dailyRevenue = Object.entries(dailyMap).map(([date, revenue]) => ({ date, revenue }))
+
+    // New customers count
+    const newCustomers30d = (customersData.customers || []).length
+
+    return NextResponse.json({
+      revenue30d: Math.round(revenue30d * 100) / 100,
+      orders30d: orders30d.length,
+      orders7d: orders7d.length,
+      paidOrders30d: paidOrders.length,
+      newCustomers30d,
+      avgOrderValue: paidOrders.length > 0 ? Math.round((revenue30d / paidOrders.length) * 100) / 100 : 0,
+      dailyRevenue,
+    })
+  } catch (e) {
+    return NextResponse.json({ error: String(e) }, { status: 500 })
+  }
+}
