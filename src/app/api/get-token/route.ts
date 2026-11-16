@@ -6,7 +6,7 @@ export async function GET() {
     const clientId = process.env.SHOPIFY_API_KEY || ''
     const clientSecret = process.env.SHOPIFY_API_SECRET || ''
     const privateKeyPem = process.env.SHOPIFY_PRIVATE_KEY || ''
-    const storeHandle = 'kongtattoocareuk'
+    const storeHandle = 'kongtattoocareglobal'
 
     if (!clientId) return NextResponse.json({ error: 'Missing SHOPIFY_API_KEY' }, { status: 500 })
     if (!clientSecret) return NextResponse.json({ error: 'Missing SHOPIFY_API_SECRET' }, { status: 500 })
