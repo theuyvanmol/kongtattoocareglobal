@@ -6,8 +6,8 @@ export async function GET() {
   try {
     const clientId = process.env.SHOPIFY_API_KEY || ''
     const privatePem = process.env.SHOPIFY_PRIVATE_KEY || ''
-    const shop = 'kongtattoocareuk.myshopify.com'
-    const tokenUrl = `https://${shop}/admin/oauth/access_token`
+    const storeHandle = 'kongtattoocareuk'
+    const tokenUrl = `https://admin.shopify.com/store/${storeHandle}/oauth/access_token`
 
     if (!clientId || !privatePem) {
       return NextResponse.json({ error: 'Missing SHOPIFY_API_KEY or SHOPIFY_PRIVATE_KEY env vars' }, { status: 500 })
@@ -68,14 +68,12 @@ export async function GET() {
 
     const jwt = `${signingInput}.${sigBase64url}`
 
-    // Exchange JWT for access token
+    // Exchange JWT for access token using client_credentials grant
     const params = new URLSearchParams({
-      grant_type: 'urn:ietf:params:oauth:grant-type:token-exchange',
+      grant_type: 'client_credentials',
       client_assertion_type: 'urn:ietf:params:oauth:client-assertion-type:jwt-bearer',
       client_assertion: jwt,
       client_id: clientId,
-      subject_token: jwt,
-      subject_token_type: 'urn:ietf:params:oauth:token-type:id_token',
     })
 
     const resp = await fetch(tokenUrl, {
