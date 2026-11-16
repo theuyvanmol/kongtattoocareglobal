@@ -3,7 +3,7 @@ import Image from 'next/image'
 import Link from 'next/link'
 import Nav from '@/components/Nav'
 import Footer from '@/components/Footer'
-import { getProducts } from '@/lib/shopify'
+import { getProducts, getCollection } from '@/lib/shopify'
 import ProductCard from '@/components/ProductCard'
 import { defaultMetadata } from '@/lib/metadata'
 import type { ShopifyProduct } from '@/lib/types'
@@ -12,14 +12,14 @@ import NewsletterForm from '@/components/NewsletterForm'
 export const metadata: Metadata = defaultMetadata
 export const revalidate = 60
 
-// ── Collection data ─────────────────────────────────────────────────────────
-const COLLECTIONS = [
-  { id: 'numb',   label: 'Numb',   desc: 'Pre-session pain relief · 3 products',   img: '/assets/img/img-home-4.webp',  href: '/shop-all?c=numb'   },
-  { id: 'renew',  label: 'Renew',  desc: 'Healing & repair · 5 products',           img: '/assets/img/img-home-7.webp',  href: '/shop-all?c=renew'  },
-  { id: 'glow',   label: 'Glow',   desc: 'Vibrance & brightness · 4 products',      img: '/assets/img/img-home-10.webp', href: '/shop-all?c=glow'   },
-  { id: 'defend', label: 'Defend', desc: 'SPF & protection · 3 products',           img: '/assets/img/img-home-13.webp', href: '/shop-all?c=defend' },
-  { id: 'expert', label: 'Expert', desc: 'Studio-grade pro · 6 products',           img: '/assets/img/img-home-16.webp', href: '/shop-all?c=expert' },
-]
+// ── Collection metadata (fallback images for when Shopify collection has no image) ──
+const COLLECTION_META: Record<string, { label: string; desc: string; fallbackImg: string; href: string }> = {
+  numb:   { label: 'Numb',   desc: 'Pre-session pain relief',    fallbackImg: '/assets/img/img-home-4.webp',  href: '/shop-all?c=numb'   },
+  renew:  { label: 'Renew',  desc: 'Healing & repair',           fallbackImg: '/assets/img/img-home-7.webp',  href: '/shop-all?c=renew'  },
+  glow:   { label: 'Glow',   desc: 'Vibrance & brightness',      fallbackImg: '/assets/img/img-home-10.webp', href: '/shop-all?c=glow'   },
+  defend: { label: 'Defend', desc: 'SPF & protection',           fallbackImg: '/assets/img/img-home-13.webp', href: '/shop-all?c=defend' },
+  expert: { label: 'Expert', desc: 'Studio-grade pro',           fallbackImg: '/assets/img/img-home-16.webp', href: '/shop-all?c=expert' },
+}
 
 const REVIEWS = [
   { name: 'James K.', location: 'Manchester', title: 'Best tattoo aftercare I\'ve tried', body: '"My sleeve healed in record time. No peeling, no itching, the colours came out so clean. The Renew Butter is now a permanent part of my kit."', product: 'Tattoo Butter · Renew Collection' },
@@ -51,8 +51,34 @@ export default async function HomePage() {
 
   // Featured = first 8 real products
   const featured = products.slice(0, 8)
-  // Upsell = next 3 real products (or fallback to first 3 if fewer than 11 total)
-  const upsell = products.length >= 4 ? products.slice(0, 3) : products.slice(0, Math.min(3, products.length))
+  // Upsell = top 3 real products
+  const upsell = products.slice(0, Math.min(3, products.length))
+
+  // Fetch collection images from Shopify (each collection has its own hero image)
+  const collectionHandles = ['numb', 'renew', 'glow', 'defend', 'expert']
+  const collectionData = await Promise.all(
+    collectionHandles.map(async (handle) => {
+      try {
+        const coll = await getCollection(handle)
+        const meta = COLLECTION_META[handle]
+        // Use collection image if available, otherwise fall back to first product image
+        const img = coll?.image?.url
+          || coll?.products?.edges?.[0]?.node?.images?.edges?.[0]?.node?.url
+          || meta.fallbackImg
+        const count = coll?.products?.edges?.length ?? 0
+        return {
+          id: handle,
+          label: meta.label,
+          desc: count > 0 ? `${meta.desc} · ${count} product${count !== 1 ? 's' : ''}` : meta.desc,
+          img,
+          href: meta.href,
+        }
+      } catch {
+        const meta = COLLECTION_META[handle]
+        return { id: handle, label: meta.label, desc: meta.desc, img: meta.fallbackImg, href: meta.href }
+      }
+    })
+  )
 
   return (
     <>
@@ -225,7 +251,7 @@ export default async function HomePage() {
           <h2 className="hed reveal-child" style={{ fontSize: 'clamp(44px,6vw,88px)', marginTop: 10, marginBottom: 48 }}>What&apos;s Your <em style={{ color: 'var(--lime)' }}>Ink?</em></h2>
         </div>
         <div className="wrap-wide cap" style={{ display: 'grid', gridTemplateColumns: 'repeat(5,1fr)', gap: 14 }} id="coll-grid">
-          {COLLECTIONS.map((c, i) => (
+          {collectionData.map((c, i) => (
             <Link
               key={c.id}
               href={c.href}
