@@ -5,12 +5,13 @@ export async function GET() {
   try {
     const clientId = process.env.SHOPIFY_API_KEY || ''
     const clientSecret = process.env.SHOPIFY_API_SECRET || ''
-    const storeDomain = 'kongtattoocareuk.myshopify.com'
+    const storeHandle = 'kongtattoocareuk'
 
     if (!clientId) return NextResponse.json({ error: 'Missing SHOPIFY_API_KEY' }, { status: 500 })
     if (!clientSecret) return NextResponse.json({ error: 'Missing SHOPIFY_API_SECRET' }, { status: 500 })
 
-    const resp = await fetch(`https://${storeDomain}/admin/oauth/access_token`, {
+    // Dev Dashboard apps use admin.shopify.com endpoint
+    const resp = await fetch(`https://admin.shopify.com/store/${storeHandle}/oauth/access_token`, {
       method: 'POST',
       headers: { 'Content-Type': 'application/x-www-form-urlencoded' },
       body: new URLSearchParams({
