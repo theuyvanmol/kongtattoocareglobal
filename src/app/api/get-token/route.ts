@@ -55,7 +55,9 @@ export async function GET() {
       throw new Error('Invalid DER signature format')
     }
 
-    // Pad r and s to 32 bytes each
+    // Strip any leading zero byte added by DER for sign, then pad to 32 bytes
+    while (r.length > 32 && r[0] === 0) r = r.slice(1)
+    while (s.length > 32 && s[0] === 0) s = s.slice(1)
     const rPadded = Buffer.alloc(32)
     r.copy(rPadded, 32 - r.length)
     const sPadded = Buffer.alloc(32)
