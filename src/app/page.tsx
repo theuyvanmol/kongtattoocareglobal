@@ -447,40 +447,37 @@ export default async function HomePage() {
       </section>
 
       {/* ── ARTIST FEATURE — Dale Nathan ──────────────────────────────────── */}
-      <section style={{ position: 'relative', overflow: 'hidden', minHeight: '90vh', display: 'flex', alignItems: 'center' }}>
-        {/* Full-bleed background image */}
-        <div style={{ position: 'absolute', inset: 0, zIndex: 0 }}>
-          <Image src="/assets/img/real-barbell-kong.png" alt="Dale Nathan — KONG Tattoo Care Ambassador" fill className="object-cover object-center" style={{ opacity: 0.45 }} />
-          <div style={{ position: 'absolute', inset: 0, background: 'linear-gradient(100deg,rgba(10,10,10,.98) 0%,rgba(10,10,10,.75) 50%,rgba(10,10,10,.2) 100%)' }} />
-          {/* Mobile gradient — dark from bottom */}
-          <div style={{ position: 'absolute', inset: 0, background: 'linear-gradient(0deg,rgba(10,10,10,.98) 0%,transparent 50%)' }} />
-        </div>
-        <div className="wrap-wide cap reveal-section" style={{ position: 'relative', zIndex: 1, paddingBlock: 100 }}>
-          <div style={{ maxWidth: 580 }}>
-            <p className="lbl reveal-child">Artist Feature</p>
-            <div className="hed reveal-child" style={{ fontSize: 'clamp(72px,10vw,140px)', color: 'var(--red)', lineHeight: .75, opacity: .35, marginTop: 8 }}>&ldquo;</div>
-            <blockquote className="hed reveal-child" style={{ fontSize: 'clamp(24px,3vw,40px)', marginTop: -8, marginBottom: 24 }}>
+      <section className="wrap-wide cap" style={{ paddingBlock: 100, background: 'var(--bg)', overflow: 'hidden' }}>
+        <div style={{ display: 'grid', gridTemplateColumns: '1fr 1.1fr', gap: 72, alignItems: 'center' }} className="artist-grid-resp">
+          <div className="reveal-left" style={{ position: 'relative', borderRadius: 16, overflow: 'hidden', aspectRatio: '4/5' }}>
+            <Image src="/assets/img/real-tattoo-studio-1.jpg" alt="Dale Nathan Tattoo" fill className="object-cover" />
+            <div style={{ position: 'absolute', inset: -2, borderRadius: 'inherit', border: '2px solid var(--lime)', pointerEvents: 'none' }} />
+          </div>
+          <div className="reveal-right" style={{ display: 'flex', flexDirection: 'column', gap: 18 }}>
+            <p className="lbl">Artist Feature</p>
+            <div className="hed" style={{ fontSize: 120, color: 'var(--red)', lineHeight: .6, opacity: .5 }}>&ldquo;</div>
+            <blockquote className="hed" style={{ fontSize: 'clamp(22px,2.5vw,34px)' }}>
               &ldquo;KONG keeps my clients&apos; ink looking fresh longer. It&apos;s the only aftercare I trust in my studio.&rdquo;
             </blockquote>
-            <div className="reveal-child" style={{ marginBottom: 32 }}>
-              <strong style={{ color: 'var(--lime)', fontFamily: 'var(--font-barlow-condensed)', fontSize: 16, letterSpacing: '.12em', textTransform: 'uppercase', display: 'block', marginBottom: 4 }}>Dale Nathan Tattoo</strong>
-              <span style={{ fontSize: 13, color: 'var(--fg-40)' }}>KONG Ambassador · Award-Winning UK Tattoo Artist</span>
+            <div>
+              <strong style={{ color: 'var(--lime)', fontFamily: 'var(--font-barlow-condensed)', fontSize: 14, letterSpacing: '.1em', textTransform: 'uppercase', display: 'block' }}>Dale Nathan Tattoo</strong>
+              <span style={{ fontSize: 12, color: 'var(--fg-40)' }}>KONG Ambassador · Award-Winning UK Tattoo Artist</span>
             </div>
-            {/* Discount code card */}
-            <div className="reveal-child" style={{ display: 'inline-flex', alignItems: 'center', gap: 16, background: 'rgba(200,255,0,.08)', border: '1.5px solid var(--lime)', borderRadius: 14, padding: '16px 24px', marginBottom: 32, flexWrap: 'wrap' }}>
+            {/* Discount code */}
+            <div style={{ display: 'inline-flex', alignItems: 'center', gap: 14, background: 'rgba(200,255,0,.07)', border: '1.5px solid rgba(200,255,0,.35)', borderRadius: 12, padding: '14px 20px', flexWrap: 'wrap' }}>
               <div>
-                <div style={{ fontFamily: 'var(--font-barlow-condensed)', fontWeight: 700, fontSize: 10, letterSpacing: '.24em', textTransform: 'uppercase', color: 'var(--fg-40)', marginBottom: 4 }}>Exclusive Discount</div>
-                <div className="hed" style={{ fontSize: 28, color: 'var(--lime)', letterSpacing: '.06em' }}>DNTKONG10</div>
+                <div style={{ fontFamily: 'var(--font-barlow-condensed)', fontWeight: 700, fontSize: 9, letterSpacing: '.24em', textTransform: 'uppercase', color: 'var(--fg-40)', marginBottom: 3 }}>Exclusive Discount</div>
+                <div className="hed" style={{ fontSize: 26, color: 'var(--lime)', letterSpacing: '.06em' }}>DNTKONG10</div>
               </div>
-              <div style={{ width: 1, height: 40, background: 'rgba(200,255,0,.2)', flexShrink: 0 }} />
+              <div style={{ width: 1, height: 36, background: 'rgba(200,255,0,.2)', flexShrink: 0 }} />
               <div style={{ fontSize: 13, color: 'var(--fg-70)', lineHeight: 1.5 }}>
                 <strong style={{ color: '#fff', display: 'block' }}>10% off your order</strong>
-                Use at checkout
+                Add at checkout
               </div>
             </div>
-            <div className="reveal-child" style={{ display: 'flex', gap: 12, flexWrap: 'wrap' }}>
-              <Link href="/shop-all" className="btn btn-lime" style={{ fontSize: 13 }}>Shop with Dale&apos;s Code</Link>
-              <a href="https://www.instagram.com/dalenathantattoo" target="_blank" rel="noopener noreferrer" className="btn btn-out" style={{ fontSize: 13 }}>Follow Dale →</a>
+            <div style={{ display: 'flex', gap: 12, flexWrap: 'wrap' }}>
+              <Link href="/shop-all" className="btn btn-lime">Shop with Dale&apos;s Code</Link>
+              <a href="https://www.instagram.com/dalenathantattoo" target="_blank" rel="noopener noreferrer" className="btn btn-out">Follow Dale →</a>
             </div>
           </div>
         </div>
