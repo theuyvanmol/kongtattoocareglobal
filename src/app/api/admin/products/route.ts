@@ -19,8 +19,51 @@ function shopifyFetch(endpoint: string, options?: RequestInit) {
   })
 }
 
-export async function GET() {
+export async function GET(req: NextRequest) {
+  const { searchParams } = new URL(req.url)
+  const id = searchParams.get('id')
+
   try {
+    if (id) {
+      // Fetch full single product detail including body_html and metafields
+      const [prodResp, metaResp] = await Promise.all([
+        shopifyFetch(`/products/${id}.json`),
+        shopifyFetch(`/products/${id}/metafields.json`),
+      ])
+      if (!prodResp.ok) return NextResponse.json({ error: `Shopify error ${prodResp.status}` }, { status: prodResp.status })
+      const { product: p } = await prodResp.json()
+      const metaData = metaResp.ok ? await metaResp.json() : { metafields: [] }
+      const metafields: Record<string, unknown>[] = metaData.metafields || []
+
+      const seoTitle = metafields.find((m: Record<string, unknown>) => m.namespace === 'global' && m.key === 'title_tag')?.value || ''
+      const seoDescription = metafields.find((m: Record<string, unknown>) => m.namespace === 'global' && m.key === 'description_tag')?.value || ''
+      const seoTitleId = metafields.find((m: Record<string, unknown>) => m.namespace === 'global' && m.key === 'title_tag')?.id
+      const seoDescId = metafields.find((m: Record<string, unknown>) => m.namespace === 'global' && m.key === 'description_tag')?.id
+
+      const variants = p.variants || []
+      return NextResponse.json({
+        product: {
+          id: p.id,
+          title: p.title,
+          status: p.status,
+          body_html: p.body_html || '',
+          price: parseFloat(variants[0]?.price || '0'),
+          inventory: variants.reduce((s: number, v: Record<string, unknown>) => s + (Number(v.inventory_quantity) || 0), 0),
+          image: p.images?.[0]?.src || null,
+          type: p.product_type || '',
+          tags: typeof p.tags === 'string' ? p.tags : (p.tags || []).join(', '),
+          variantCount: variants.length,
+          variantId: variants[0]?.id,
+          updated: p.updated_at,
+          seo_title: seoTitle,
+          seo_description: seoDescription,
+          seo_title_metafield_id: seoTitleId,
+          seo_desc_metafield_id: seoDescId,
+        }
+      })
+    }
+
+    // List all products
     const resp = await shopifyFetch('/products.json?limit=50&fields=id,title,status,variants,images,product_type,tags,updated_at')
     if (!resp.ok) {
       const text = await resp.text()
@@ -54,13 +97,14 @@ export async function GET() {
 export async function PUT(req: NextRequest) {
   try {
     const body = await req.json()
-    const { id, title, status, price, body_html } = body
+    const { id, title, status, price, body_html, tags, seo_title, seo_description, seo_title_metafield_id, seo_desc_metafield_id } = body
 
-    // Update product
+    // Update product core fields
     const productUpdate: Record<string, unknown> = { id }
-    if (title) productUpdate.title = title
-    if (status) productUpdate.status = status
+    if (title !== undefined) productUpdate.title = title
+    if (status !== undefined) productUpdate.status = status
     if (body_html !== undefined) productUpdate.body_html = body_html
+    if (tags !== undefined) productUpdate.tags = tags
 
     const resp = await shopifyFetch(`/products/${id}.json`, {
       method: 'PUT',
@@ -72,9 +116,10 @@ export async function PUT(req: NextRequest) {
       return NextResponse.json({ error: 'Failed to update product', detail: text }, { status: 400 })
     }
 
-    // Update price if provided (update first variant)
+    const prodData = await resp.json()
+
+    // Update price on first variant
     if (price !== undefined) {
-      const prodData = await resp.json()
       const variantId = prodData.product?.variants?.[0]?.id
       if (variantId) {
         await shopifyFetch(`/variants/${variantId}.json`, {
@@ -83,6 +128,39 @@ export async function PUT(req: NextRequest) {
         })
       }
     }
+
+    // Upsert SEO metafields
+    const seoOps: Promise<unknown>[] = []
+
+    if (seo_title !== undefined) {
+      seoOps.push(
+        seo_title_metafield_id
+          ? shopifyFetch(`/metafields/${seo_title_metafield_id}.json`, {
+              method: 'PUT',
+              body: JSON.stringify({ metafield: { id: seo_title_metafield_id, value: seo_title, type: 'single_line_text_field' } }),
+            })
+          : shopifyFetch(`/products/${id}/metafields.json`, {
+              method: 'POST',
+              body: JSON.stringify({ metafield: { namespace: 'global', key: 'title_tag', value: seo_title, type: 'single_line_text_field' } }),
+            })
+      )
+    }
+
+    if (seo_description !== undefined) {
+      seoOps.push(
+        seo_desc_metafield_id
+          ? shopifyFetch(`/metafields/${seo_desc_metafield_id}.json`, {
+              method: 'PUT',
+              body: JSON.stringify({ metafield: { id: seo_desc_metafield_id, value: seo_description, type: 'single_line_text_field' } }),
+            })
+          : shopifyFetch(`/products/${id}/metafields.json`, {
+              method: 'POST',
+              body: JSON.stringify({ metafield: { namespace: 'global', key: 'description_tag', value: seo_description, type: 'single_line_text_field' } }),
+            })
+      )
+    }
+
+    await Promise.all(seoOps)
 
     return NextResponse.json({ success: true })
   } catch (e) {
