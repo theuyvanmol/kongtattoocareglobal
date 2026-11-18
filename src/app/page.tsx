@@ -110,7 +110,7 @@ export default async function HomePage() {
             <span style={{ display: 'inline-block', width: 28, height: 1.5, background: 'var(--red)', flexShrink: 0 }} />
             <span style={{ color: 'var(--lime)' }}>Premium Tattoo Care · UK Made</span>
           </p>
-          <h1 className="hed hero-reveal hero-reveal-2" style={{ fontSize: 'clamp(68px,11vw,160px)', marginBottom: 20 }}>
+          <h1 className="hed hero-reveal hero-reveal-2" style={{ fontSize: 'clamp(52px,11vw,160px)', marginBottom: 20 }}>
             MADE FOR<br />
             <em style={{ color: 'var(--lime)' }}>YOUR</em><br />
             <strong style={{ color: 'var(--red)' }}>ART</strong>
@@ -130,8 +130,8 @@ export default async function HomePage() {
           </div>
         </div>
 
-        {/* Scroll indicator */}
-        <div className="hero-reveal hero-reveal-5" style={{ position: 'absolute', bottom: 32, right: 40, zIndex: 3, display: 'flex', flexDirection: 'column', alignItems: 'center', gap: 8 }}>
+        {/* Scroll indicator — hidden on mobile via CSS */}
+        <div className="hero-reveal hero-reveal-5 scroll-indicator" style={{ position: 'absolute', bottom: 32, right: 40, zIndex: 3, display: 'flex', flexDirection: 'column', alignItems: 'center', gap: 8 }}>
           <div style={{ fontFamily: 'var(--font-barlow-condensed)', fontWeight: 700, fontSize: 9, letterSpacing: '.28em', textTransform: 'uppercase', color: 'var(--fg-40)', writingMode: 'vertical-rl' }}>Scroll</div>
           <div style={{ width: 1, height: 48, background: 'linear-gradient(to bottom, var(--fg-40), transparent)', animation: 'scrollPulse 2s ease-in-out infinite' }} />
         </div>
@@ -178,7 +178,7 @@ export default async function HomePage() {
               <Link href="/shop-all" className="btn btn-out reveal-child" style={{ fontSize: 11, padding: '9px 18px' }}>Shop All →</Link>
             </div>
           </div>
-          <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fill,minmax(220px,1fr))', gap: 16 }}>
+          <div className="product-grid-mobile" style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fill,minmax(220px,1fr))', gap: 16 }}>
             {featured.map((p, idx) => (
               <div key={p.id} className="product-reveal" style={{ '--delay': `${idx * 60}ms` } as React.CSSProperties}>
                 <ProductCard product={p} priority={idx < 2} />
@@ -195,7 +195,7 @@ export default async function HomePage() {
           <h2 className="hed reveal-child" style={{ fontSize: 'clamp(36px,4vw,52px)' }}>Complete Your <em style={{ color: 'var(--lime)' }}>Routine</em></h2>
         </div>
         <p className="reveal-child" style={{ fontSize: 14, color: 'var(--fg-70)', marginBottom: 40 }}>Customers love pairing these products together for the best results.</p>
-        <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fill,minmax(260px,1fr))', gap: 16, marginBottom: 40 }}>
+        <div className="upsell-grid-resp" style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fill,minmax(260px,1fr))', gap: 16, marginBottom: 40 }}>
           {upsell.map((item, i) => {
             const img = item.images?.edges?.[0]?.node?.url || '/assets/img/real-products-studio.jpg'
             const price = item.priceRange?.minVariantPrice?.amount
@@ -246,7 +246,7 @@ export default async function HomePage() {
           <p className="lbl reveal-child">Shop by Collection</p>
           <h2 className="hed reveal-child" style={{ fontSize: 'clamp(44px,6vw,88px)', marginTop: 10, marginBottom: 48 }}>Shop by <em style={{ color: 'var(--lime)' }}>Collection</em></h2>
         </div>
-        <div className="wrap-wide cap" style={{ display: 'grid', gridTemplateColumns: 'repeat(5,1fr)', gap: 14 }} id="coll-grid">
+        <div className="wrap-wide cap coll-grid-resp" style={{ display: 'grid', gridTemplateColumns: 'repeat(5,1fr)', gap: 14 }} id="coll-grid">
           {collectionData.map((c, i) => (
             <Link
               key={c.id}

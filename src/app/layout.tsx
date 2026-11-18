@@ -73,13 +73,9 @@ export default function RootLayout({ children }: { children: React.ReactNode }) 
         {/* Shopify headless analytics bridge */}
         <Script src="/assets/shopify-analytics.js" strategy="afterInteractive" />
 
-        {/* Theme init — prevents flash */}
+        {/* Theme init — always dark, no light theme */}
         <Script id="theme-init" strategy="beforeInteractive">{`
-          (function(){
-            var t = localStorage.getItem('kong-theme') ||
-              (matchMedia('(prefers-color-scheme:light)').matches ? 'light' : 'dark');
-            document.documentElement.setAttribute('data-theme', t);
-          })();
+          document.documentElement.setAttribute('data-theme', 'dark');
         `}</Script>
       </body>
     </html>

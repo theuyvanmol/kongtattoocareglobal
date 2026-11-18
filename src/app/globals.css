@@ -18,29 +18,7 @@
   color-scheme: dark;
 }
 
-:root[data-theme="light"],
-:root.light {
-  --bg: #f4f4f4;
-  --bg2: #fff;
-  --bg3: #eaeaea;
-  --fg: #111;
-  --fg-70: rgba(17,17,17,.7);
-  --fg-40: rgba(17,17,17,.45);
-  --red: #D61728;
-  --lime: #5a8f00;
-  --lime-g: rgba(90,143,0,.08);
-  --rule: rgba(17,17,17,.1);
-  color-scheme: light;
-}
-
-@media (prefers-color-scheme: light) {
-  :root:not([data-theme="dark"]):not(.dark) {
-    --bg: #f4f4f4; --bg2: #fff; --bg3: #eaeaea;
-    --fg: #111; --fg-70: rgba(17,17,17,.7); --fg-40: rgba(17,17,17,.45);
-    --red: #D61728; --lime: #5a8f00; --lime-g: rgba(90,143,0,.08);
-    --rule: rgba(17,17,17,.1); color-scheme: light;
-  }
-}
+/* Light theme intentionally removed — Kong is always dark */
 
 /* ── Base ────────────────────────────────────────────────────────────────── */
 *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
@@ -139,6 +117,138 @@ button { font-family: inherit; cursor: pointer; background: none; border: none; 
 /* ── Mobile bottom nav safe area ─────────────────────────────────────────── */
 .mobile-safe-bottom {
   padding-bottom: calc(16px + env(safe-area-inset-bottom, 0px));
+}
+
+/* ── Mobile overrides ────────────────────────────────────────────────────── */
+@media (max-width: 768px) {
+  /* Buttons: full touch targets, no overflow */
+  .btn {
+    min-height: 48px;
+    padding: 14px 20px;
+    font-size: 13px;
+    border-radius: 10px;
+  }
+
+  /* Section padding */
+  section, .section-pad {
+    padding-block: 60px !important;
+  }
+
+  /* Hero: fit on small screens, no overflow */
+  #hero {
+    min-height: 100svh;
+    align-items: flex-end;
+  }
+  #hero .wrap-wide {
+    padding-bottom: 72px !important;
+    padding-top: 100px !important;
+  }
+
+  /* Collection tabs: smaller text, still scrollable */
+  .collection-tabs-link {
+    font-size: 10px !important;
+    padding: 12px 14px !important;
+  }
+
+  /* Product cards: single column on very small, 2-col on mobile */
+  .product-grid-mobile {
+    grid-template-columns: repeat(2, 1fr) !important;
+    gap: 10px !important;
+  }
+
+  /* Collection grid: 2 cols */
+  .coll-grid-resp {
+    grid-template-columns: repeat(2, 1fr) !important;
+    gap: 10px !important;
+  }
+
+  /* Artist section: stack vertically */
+  .artist-grid-resp {
+    grid-template-columns: 1fr !important;
+    gap: 32px !important;
+  }
+
+  /* Gallery: 2 cols */
+  .gal-grid-resp {
+    grid-template-columns: repeat(2, 1fr) !important;
+    grid-template-rows: auto !important;
+  }
+  .gal-grid-resp > * {
+    grid-column: span 1 !important;
+    grid-row: span 1 !important;
+    aspect-ratio: 1/1 !important;
+    height: auto !important;
+  }
+
+  /* Steps: 2 cols */
+  .steps-grid-resp {
+    grid-template-columns: repeat(2, 1fr) !important;
+    gap: 24px !important;
+  }
+  .steps-line-resp { display: none !important; }
+
+  /* Stats: 2 cols */
+  .stats-grid-resp {
+    grid-template-columns: repeat(2, 1fr) !important;
+    gap: 16px !important;
+  }
+
+  /* Reviews: 1 col */
+  .rev-grid-resp {
+    grid-template-columns: 1fr !important;
+  }
+
+  /* Instagram: 2 cols */
+  .ig-grid-resp {
+    grid-template-columns: repeat(2, 1fr) !important;
+  }
+  .ig-grid-resp > *:first-child {
+    grid-row: span 1 !important;
+    grid-column: span 2 !important;
+  }
+
+  /* Newsletter row: stack */
+  .newsletter-row {
+    flex-direction: column !important;
+    gap: 20px !important;
+  }
+
+  /* Scroll indicator: hide on mobile */
+  #hero .scroll-indicator { display: none !important; }
+
+  /* Upsell cards: single column */
+  .upsell-grid-resp {
+    grid-template-columns: 1fr !important;
+    gap: 12px !important;
+  }
+
+  /* Ticker: smaller */
+  .ticker-item {
+    padding: 10px 18px !important;
+  }
+  .ticker-item span {
+    font-size: 10px !important;
+  }
+
+  /* Section headings: tighter */
+  .section-hed-mobile {
+    font-size: clamp(32px, 9vw, 52px) !important;
+  }
+}
+
+@media (max-width: 480px) {
+  /* Extra small: single column products */
+  .product-grid-mobile {
+    grid-template-columns: 1fr !important;
+  }
+
+  /* Gallery: single col */
+  .gal-grid-resp {
+    grid-template-columns: 1fr !important;
+  }
+  .gal-grid-resp > * {
+    grid-column: span 1 !important;
+  }
 }
 
 @media (prefers-reduced-motion: reduce) {
