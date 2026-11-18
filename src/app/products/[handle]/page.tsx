@@ -21,10 +21,10 @@ export async function generateStaticParams() {
 export async function generateMetadata({
   params,
 }: {
-  params: Promise<{ handle: string }>
+  params: { handle: string }
 }): Promise<Metadata> {
   try {
-    const { handle } = await params
+    const { handle } = params
     const p = await getProduct(handle)
     if (!p) return {}
     const img = p.images.edges[0]?.node.url
@@ -37,9 +37,9 @@ export async function generateMetadata({
 export default async function ProductPage({
   params,
 }: {
-  params: Promise<{ handle: string }>
+  params: { handle: string }
 }) {
-  const { handle } = await params
+  const { handle } = params
   let product: import('@/lib/types').ShopifyProduct | null = null
   try {
     product = await getProduct(handle)

@@ -28,10 +28,9 @@ const FILTERS = [
 export default async function ShopAllPage({
   searchParams,
 }: {
-  searchParams: Promise<{ c?: string; sort?: string }>
+  searchParams: { c?: string; sort?: string }
 }) {
-  const params = await searchParams
-  const activeFilter = params.c || 'all'
+  const activeFilter = searchParams.c || 'all'
 
   let products: ShopifyProduct[] = []
   try {
